@@ -1,0 +1,233 @@
+---
+title: "Macro SSDI"
+author: "Chauncey Gadek" 
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    toc_depth: 5
+    code_folding: show
+    bibliography: true
+    #df_print: paged
+    #df_print: kable
+    #toc_float: true
+      #collapsed: false
+      #smooth_scroll: TRUE
+    theme: cosmo #spacelab #yeti #united #cosmo
+    highlight: tango
+  pdf_document:
+    df_print: kable
+fontsize: 12pt
+geometry: margin=0.25in
+always_allow_html: yes
+---
+
+```{=html}
+<style>
+/* HTML FORMATTING */
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5 {
+  margin-top: 25px; /* space before each header */
+  font-weight: bold; /* bold headers */
+}
+</style>
+```
+```{R, echo=FALSE}
+# I set some GLOBAL R chunk options here.
+#   (to hide this message add "echo=FALSE" to the code chunk options)
+rm(list =ls (all = TRUE)) #This removes objects from global environ
+knitr::opts_chunk$set(echo=F, comment = NA, message = FALSE, warning = FALSE, width = 100)
+knitr::opts_chunk$set(fig.align = "center", fig.height = 4, fig.width = 6)
+#setwd("C:/Users/Trinity's/Dropbox/Crane_trachea")
+#setwd("~/Dropbox/Crane_trachea") #need to change to local directory
+```
+
+# Load Packages
+
+```{R, echo=F}
+library(reshape)
+library(reshape2)
+library(plyr)
+library(dplyr)
+library(tidyr)
+library(car)
+library(rcompanion)
+library(GGally)
+library(Hmisc)
+library(gridExtra)
+library(stats)
+library(gplots)
+library(ggplot2)
+library(ggExtra)
+library(cowplot)
+library(colorspace)
+library(stats4) # Forces knitr to work when it's being wonky
+library(PMCMR) #Allows Kruskal-Wallis post-hocs
+library(effects)
+library(gridExtra)
+library(lattice)
+library(survival)
+library(fmsb)
+library(faraway)
+library(ape)
+#library(wBoot)
+library(ggridges)
+library(boot)
+library(faux)
+library(effsize)
+library(plotrix)
+library(colorspace)
+library(ggpubr)
+library(patchwork)
+library(ggdist)
+
+# Mapping 
+library(raster)
+library(sp)
+library(rgdal)
+library(RStoolbox)
+library(prettymapr)
+library(viridis)
+library(rasterVis)
+
+
+# Modeling packages 
+library(nlme)
+library(lme4)
+library(AICcmodavg)
+library(MuMIn)
+library(glmulti)
+library(reghelper)
+library(lsmeans)
+library(rsq) # get r-squared values from GLM
+library(r2glmm) # for R^2 values from lmer() and glmer()
+library(multcompView) # related to multiple comparisons?
+library(jtools) # interaction plots 
+library(interactions) # interaction plots 
+library(broom)
+library(stargazer) # model output tables
+library(ggeffects) # for estimating model predictions from mixed effects models
+library(MCMCglmm)
+library(bayesplot)
+library(rstan)
+library(Rcpp) # required for brms
+library(brms)
+library(magrittr)
+library(tidybayes)
+library(modelr)
+library(hexbin)
+library(ggExtra)
+library(rgl)
+library(readr)
+library(tidyverse)
+
+# To run each time you load rstan
+options(mc.cores = parallel::detectCores()) # for core setup 
+rstan_options(auto_write = TRUE) # auto save  bare verion of compiled Stan program to HD
+
+# Phylo packages 
+library(phytools)
+library(ape)
+
+#Load in functions
+source("~/Dropbox/Gadek_custom_colors.R")
+
+
+
+#setup folder paths for less coding
+figures <- paste(getwd(), "/figures/", sep="")
+tables <- paste(getwd(), "/Tables/", sep="")
+models <- paste(getwd(), "/models/", sep="")
+results <- paste(getwd(), "/models/results/", sep="")
+```
+
+Sexual size dimorphism is a long-studied phenomenon in animals. In this exploration, I examine a few historical methods of effectively comparing and scaling SSD between species @lovich1992review, and I extend studies of sexual dimorphism across elevation gradients, mainly in insects,(@laiolo2013local, @bowden2013fecundity), to Andean birds using phylogenetic mixed models.
+
+The debate about the proper metric for comparing sexual size dimorphism among taxa has yielded one heuristic: simpler is better. @lovich1992review reviewed various ratio metrics of sexual size dimorphism looking at scalability and intuitive utility and recommend: 
+
+$$
+SDI = \frac{size of larger sex}{size of smaller sex}
+$$
+
+
+# Data wrangling
+
+I'm mainly using the dataset used in @linck2021blood downloaded from Ethan Linck's [Github repo](https://github.com/elinck/andean_range_limits). I am supplementing this with elevational range data collated from @del1992handbook and avian trait data downloaded from the [Open Traits Network](https://opentraits.org/datasets/avonet), (@tobias2022avonet).
+
+```{r}
+
+EG_Witt <- read_csv("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/EG_Witt.csv")
+
+
+Linck_et_al_data <- read_csv("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/Linck_et-al_data.csv")
+
+elevs <- read_csv("~/Dropbox/Research/Macro_SSDI/data/elevs.csv")
+
+avonet <- read_csv("~/Dropbox/Research/Avian_Evo_Trans_Rev/analysis/data/Birdtree_AVONET.csv")
+
+avonet <- avonet%>%
+  mutate(species = factor(Species3),
+         family = factor(Family3))%>%
+  dplyr::select(species, family, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth, Tarsus.Length, Kipps.Distance, `Hand-Wing.Index`, Tail.Length, Habitat, Habitat.Density, Migration, Trophic.Level, Trophic.Niche, Min.Latitude, Max.Latitude, Centroid.Latitude, Centroid.Longitude, Range.Size)
+
+elevs <- elevs%>%
+  mutate(species = str_replace(species, "_", " "),
+         species = factor(species))
+
+df <-Linck_et_al_data%>%
+  filter(!is.na(mass),
+         sex %in% c("male", "female"))%>%
+  mutate(elev_bin = cut(elevation, breaks=7),
+         sex = factor(sex),
+         species = factor(species)
+         )%>%
+     group_by(species) %>% 
+  filter(all(levels(sex) %in% sex))%>%
+  group_by(species, sex) %>% 
+  summarise(mean_mass = mean(mass),
+            )%>%
+  pivot_wider(id_cols = c(species), names_from = c(sex), values_from = c(mean_mass))%>%
+  mutate(SSDI = (male-female)/female)
+
+L.elevs<- Linck_et_al_data%>%
+  group_by(species)%>%
+  summarise(max_elev = max(elevation),
+            mean_elev = mean(elevation),
+            min_elev = min(elevation))%>%
+  mutate(amplitude = max_elev - min_elev)
+
+df<-df%>%
+  left_join(., L.elevs, by="species")
+
+df<-df%>%
+  inner_join(., elevs, by = "species")
+
+df<- df%>%
+  left_join(., avonet, by = "species")
+
+
+```
+
+# Explore data
+```{r}
+
+ggplot(df, aes(x=min_elev, y=SSDI))+
+  #geom_point()+
+  geom_smooth(method="lm", se=T)+
+  theme_cowplot()+
+  theme(legend.position = "none")
+
+ggplot(df, aes(x=max_elev, y=SSDI))+
+  geom_point()+
+  geom_smooth(method="lm", se=T)+
+  theme_cowplot()+
+  theme(legend.position = "none")
+
+ggplot(df, aes(x=min_elev, y=SSDI))+
+  #geom_point()+
+  geom_smooth(method="lm", se=T)+
+  theme_cowplot()+
+  theme(legend.position = "none")
+
+
+```

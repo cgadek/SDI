@@ -1,0 +1,3126 @@
+﻿species,min_elev,max_elev
+Topaza_pyra,0,400
+Topaza_pella,0,500
+Florisuga_fusca,0,1400
+Florisuga_mellivora,0,900
+Eriocnemis_glaucopoides,1500,3400
+Eriocnemis_derbyi,2500,3600
+Eriocnemis_vestita,2800,3500
+Eriocnemis_nigrivestis,2400,4600
+Eriocnemis_mosquera,1200,3600
+Eriocnemis_godini,2100,2300
+Eriocnemis_luciani,2800,4800
+Eriocnemis_cupreoventris,2000,3000
+Eriocnemis_alinae,2300,2800
+Eriocnemis_isabellae,2600,2900
+Eriocnemis_mirabilis,2200,2440
+Haplophaedia_lugens,1200,2500
+Haplophaedia_aureliae,1500,3100
+Haplophaedia_assimilis,1500,2500
+Pterophanes_cyanopterus,2600,3700
+Ensifera_ensifera,1700,3500
+Boissonneaua_matthewsii,1200,2600
+Boissonneaua_flavescens,2000,3500
+Boissonneaua_jardini,1200,2200
+Ocreatus_underwoodii,1100,3000
+Loddigesia_mirabilis,2100,2900
+Urosticte_ruficrissa,1600,2400
+Urosticte_benjamini,700,1600
+Urochroa_bougueri,1600,2800
+Heliodoxa_schreibersii,400,1000
+Heliodoxa_aurescens,150,1500
+Heliodoxa_rubinoides,1100,2100
+Heliodoxa_leadbeateri,400,2400
+Heliodoxa_jacula,300,2000
+Heliodoxa_imperatrix,400,2000
+Heliodoxa_xanthogonys,700,2000
+Heliodoxa_branickii,750,1300
+Heliodoxa_gularis,250,1050
+Aglaeactis_cupripennis,2500,4300
+Aglaeactis_castelnaudii,3500,4300
+Aglaeactis_pamela,3000,3500
+Aglaeactis_aliciae,3000,3500
+Lafresnaya_lafresnayi,1800,3500
+Clytolaema_rubricauda,0,1500
+Coeligena_iris,1700,3300
+Coeligena_helianthea,1900,3300
+Coeligena_bonapartei,1400,3200
+Coeligena_orina,3100,3500
+Coeligena_lutetiae,2600,4800
+Coeligena_phalerata,1400,3700
+Coeligena_violifer,2800,3300
+Coeligena_torquata,1750,3000
+Coeligena_prunellei,1000,2800
+Coeligena_wilsoni,700,1900
+Coeligena_coeligena,1500,2600
+Sephanoides_sephaniodes,0,2000
+Sephanoides_fernandensis,120,660
+Discosura_langsdorffi,100,300
+Discosura_popelairii,500,1500
+Discosura_conversii,0,1000
+Discosura_letitiae,0,500
+Discosura_longicaudus,0,200
+Lophornis_brachylophus,900,1800
+Lophornis_ornatus,100,1000
+Lophornis_gouldii,0,800
+Lophornis_helenae,100,1200
+Lophornis_delattrei,600,2000
+Lophornis_chalybeus,0,1000
+Lophornis_magnificus,0,1000
+Lophornis_pavoninus,500,2000
+Lophornis_stictolophus,0,1300
+Lophornis_adorabilis,300,1200
+Oreotrochilus_adela,2600,4000
+Oreotrochilus_leucopleurus,1200,4000
+Oreotrochilus_estella,2400,5000
+Oreotrochilus_chimborazo,3500,5200
+Oreotrochilus_melanogaster,3500,4400
+Opisthoprora_euryptera,2600,3600
+Polyonymus_caroli,1500,3600
+Metallura_tyrianthina,1500,4200
+Metallura_phoebe,2700,4500
+Metallura_iracunda,1850,3200
+Metallura_baroni,3000,3900
+Metallura_williami,2700,4000
+Metallura_odomae,2600,3350
+Metallura_eupogon,2900,4000
+Metallura_theresiae,2900,3800
+Metallura_aeneocauda,2500,3600
+Oreonympha_nobilis,2500,3900
+Chalcostigma_olivaceum,3600,4600
+Chalcostigma_heteropogon,3000,3900
+Oxypogon_guerinii,3000,5200
+Chalcostigma_stanleyi,3000,4200
+Chalcostigma_herrani,2700,4000
+Chalcostigma_ruficeps,1400,3500
+Sappho_sparganura,1500,4000
+Ramphomicron_microrhynchum,1700,3600
+Ramphomicron_dorsale,2000,4600
+Lesbia_nuna,1700,3800
+Lesbia_victoriae,2600,4000
+Taphrolesbia_griseiventris,2600,3500
+Aglaiocercus_berlepschi,1450,1800
+Aglaiocercus_coelestis,1000,2000
+Adelomyia_melanogenys,1000,2500
+Heliangelus_mavors,2000,3200
+Heliangelus_strophianus,1200,2800
+Heliangelus_micraster,2300,3400
+Heliangelus_exortis,1500,3400
+Heliangelus_viola,2150,3000
+Heliangelus_amethysticollis,1800,3400
+Heliangelus_regalis,1250,2200
+Phlogophilus_hemileucurus,500,1200
+Phlogophilus_harterti,750,1500
+Patagona_gigas,0,4800
+Hylocharis_xantusii,1800,2200
+Hylocharis_leucotis,1200,3500
+Cynanthus_sordidus,900,2200
+Chlorostilbon_russatus,0,2600
+Chlorostilbon_canivetii,0,1900
+Chlorostilbon_mellisugus,0,2700
+Chlorostilbon_stenurus,1000,3000
+Chlorestes_notata,0,500
+Chlorostilbon_lucidus,0,3500
+Chlorostilbon_olivaresi,800,1600
+Chlorostilbon_poortmani,750,2200
+Chlorostilbon_assimilis,0,1500
+Chlorostilbon_auriceps,0,1800
+Chlorostilbon_gibsoni,0,2300
+Cynanthus_latirostris,0,2500
+Leucippus_baeri,0,1300
+Eupetomena_macroura,0,1500
+Aphantochroa_cirrochloris,0,700
+Leucippus_taczanowskii,350,1000
+Taphrospilus_hypostictus,400,1500
+Leucochloris_albicollis,0,1000
+Goldmania_violiceps,600,1200
+Amazilia_yucatanensis,0,1100
+Amazilia_tzacatl,0,2500
+Amazilia_luciae,75,345
+Amazilia_rutila,0,1700
+Amazilia_viridigaster,200,2100
+Hylonympha_macrocerca,500,1200
+Amazilia_saucerrottei,0,2000
+Amazilia_violiceps,0,2250
+Amazilia_boucardi,0,500
+Amazilia_beryllina,500,1800
+Amazilia_tobaci,0,2000
+Goethalsia_bella,600,1500
+Hylocharis_grayi,500,2000
+Lepidopyga_lilliae,0,100
+Lepidopyga_goudoti,0,1000
+Lepidopyga_coeruleogularis,0,100
+Amazilia_castaneiventris,500,1500
+Amazilia_versicolor,50,1700
+Chrysuronia_oenone,0,1500
+Amazilia_amazilia,0,2700
+Amazilia_candida,0,1500
+Amazilia_edward,0,1600
+Hylocharis_humboldtii,0,500
+Amazilia_franciae,600,2100
+Amazilia_cyanura,0,1800
+Amazilia_viridicauda,1000,2500
+Amazilia_chionogaster,450,2000
+Hylocharis_chrysura,200,1000
+Amazilia_viridifrons,0,1500
+Hylocharis_sapphirina,200,500
+Amazilia_fimbriata,0,1100
+Amazilia_lactea,0,1400
+Abeillia_abeillei,1000,2200
+Hylocharis_eliciae,0,1000
+Hylocharis_cyanus,200,1250
+Damophila_julie,0,1800
+Amazilia_decora,0,1580
+Amazilia_cyanifrons,400,2000
+Amazilia_rosenbergi,0,600
+Amazilia_amabilis,0,1400
+Leucippus_chlorocercus,0,400
+Amazilia_leucogaster,0,250
+Amazilia_cyanocephala,0,2400
+Leucippus_fallax,0,550
+Amazilia_brevirostris,0,500
+Phaeochroa_cuvierii,0,1200
+Sternoclyta_cyanopectus,0,2000
+Elvira_chionura,750,2000
+Elvira_cupreiceps,0,1500
+Microchera_albocoronata,300,1650
+Eupherusa_nigriventris,900,2000
+Eupherusa_poliocerca,900,2400
+Eupherusa_eximia,800,2500
+Eupherusa_cyanophrys,700,2600
+Thalurania_ridgwayi,250,1200
+Thalurania_glaucopis,0,850
+Thalurania_furcata,0,1700
+Thalurania_watertonii,0,550
+Thalurania_colombica,0,2000
+Thalurania_fannyi,0,1900
+Chalybura_buffonii,0,2000
+Chalybura_urochrysia,0,900
+Anthocephala_floriceps,400,2300
+Stephanoxis_lalandi,0,1500
+Klais_guimeti,0,1700
+Campylopterus_phainopeplus,1200,4800
+Campylopterus_largipennis,100,1600
+Campylopterus_rufus,900,2000
+Campylopterus_hemileucurus,100,2400
+Campylopterus_villaviscensio,780,1800
+Campylopterus_excellens,0,1400
+Campylopterus_falcatus,900,3000
+Campylopterus_curvipennis,0,1400
+Campylopterus_hyperythrus,1000,2050
+Campylopterus_duidae,1220,1700
+Campylopterus_ensipennis,400,2000
+Eugenes_fulgens,1500,2500
+Panterpe_insignis,1600,3200
+Heliomaster_squamosus,0,800
+Heliomaster_longirostris,0,1500
+Heliomaster_constantii,0,1500
+Heliomaster_furcifer,0,1000
+Lamprolaima_rhami,1200,3000
+Lampornis_hemileucus,700,1400
+Lampornis_clemenciae,1500,3500
+Lampornis_sybillae,1400,2200
+Lampornis_calolaemus,800,2500
+Lampornis_castaneoventris,1500,3000
+Lampornis_viridipallens,900,2700
+Lampornis_amethystinus,900,3000
+Doricha_eliza,0,300
+Doricha_enicura,1000,3000
+Archilochus_alexandri,0,2000
+Archilochus_colubris,0,1900
+Tilmatura_dupontii,0,2500
+Rhodopis_vesper,0,3000
+Myrtis_fanny,0,3000
+Calliphlox_mitchellii,0,2400
+Eulidia_yarrellii,0,1845
+Calliphlox_bryantae,700,1850
+Microstilbon_burmeisteri,1100,2600
+Chaetocercus_heliodor,1200,3000
+Chaetocercus_bombus,0,3000
+Chaetocercus_jourdanii,900,2500
+Chaetocercus_astreans,825,2000
+Chaetocercus_mulsant,1500,2800
+Chaetocercus_berlepschi,0,500
+Myrmia_micrura,0,200
+Thaumastura_cora,0,2400
+Calliphlox_amethystina,0,1500
+Selasphorus_sasin,0,2500
+Selasphorus_rufus,0,3050
+Stellula_calliope,180,3400
+Selasphorus_scintilla,900,2100
+Selasphorus_ardens,750,1800
+Selasphorus_flammula,1800,3500
+Atthis_ellioti,1500,3500
+Atthis_heloisa,1500,3000
+Selasphorus_platycercus,1500,2500
+Calypte_anna,0,1800
+Calypte_costae,0,1000
+Androdon_aequatorialis,0,1100
+Heliothryx_auritus,0,800
+Heliothryx_barroti,0,1000
+Heliactin_bilophus,0,1000
+Calothorax_pulcher,1000,2200
+Calothorax_lucifer,0,2200
+Polytmus_milleri,1300,2200
+Polytmus_theresiae,100,300
+Polytmus_guainumbi,0,600
+Avocettula_recurvirostris,0,800
+Chrysolampis_mosquitus,0,1700
+Anthracothorax_veraguensis,0,1000
+Anthracothorax_prevostii,900,1200
+Anthracothorax_viridigula,0,500
+Anthracothorax_nigricollis,0,1000
+Augastes_lumachella,900,2000
+Augastes_scutatus,900,2000
+Colibri_serrirostris,0,2340
+Colibri_delphinae,100,2800
+Colibri_thalassinus,500,3000
+Colibri_coruscans,1700,4500
+Schistes_geoffroyi,900,2800
+Doryfera_ludovicae,750,2500
+Doryfera_johannae,400,1600
+Eutoxeres_aquila,300,2100
+Eutoxeres_condamini,180,3300
+Phaethornis_superciliosus,0,1400
+Phaethornis_idaliae,0,500
+Phaethornis_malaris,0,1650
+Phaethornis_yaruqui,0,2000
+Phaethornis_guy,600,2200
+Phaethornis_stuarti,0,1000
+Phaethornis_longirostris,0,2500
+Phaethornis_bourcieri,0,1600
+Phaethornis_hispidus,0,1200
+Phaethornis_philippii,0,325
+Phaethornis_koepckeae,270,1130
+Phaethornis_subochraceus,150,800
+Phaethornis_augusti,500,3500
+Phaethornis_pretrei,400,2100
+Phaethornis_eurynome,100,2250
+Phaethornis_squalidus,0,2250
+Phaethornis_longuemareus,0,700
+Phaethornis_atrimentalis,0,1200
+Phaethornis_nattereri,0,500
+Phaethornis_ruber,0,1500
+Phaethornis_griseogularis,300,1800
+Phaethornis_striigularis,0,1570
+Phaethornis_anthophilus,0,1500
+Phaethornis_rupurumii,0,500
+Phaethornis_syrmatophorus,1000,2300
+Glaucis_aeneus,0,800
+Glaucis_dohrnii,0,500
+Anopetia_gounellei,40,1190
+Glaucis_hirsutus,0,1800
+Ramphodon_naevius,0,500
+Threnetes_ruckeri,0,1200
+Threnetes_leucurus,0,1800
+Threnetes_niger,0,500
+Busarellus nigricollis,0,500
+Leucopternis princeps,0,750
+Buteo albicaudatus,0,2400
+Buteo polyosoma,0,5000
+Geranoaetus melanoleucus,0,4600
+Leucopternis occidentalis,0,1500
+Leucopternis albicollis,0,1600
+Leucopternis polionotus,500,1500
+Leucopternis semiplumbeus,0,1200
+Leucopternis kuhli,0,500
+Leucopternis melanops,0,1000
+Buteo nitidus,0,1800
+Buteo lineatus,0,2500
+Buteo platypterus,0,3000
+Buteo jamaicensis,0,3200
+Buteo albigula,1700,3500
+Buteo brachyurus,0,2500
+Buteo swainsoni,500,2100
+Buteo albonotatus,0,3000
+Buteo regalis,0,2000
+Buteo lagopus,0,1200
+Parabuteo unicinctus,0,1900
+Buteo leucorrhous,1000,3200
+Buteo magnirostris,0,2500
+Leucopternis plumbeus,0,1400
+Buteogallus meridionalis,0,1000
+Buteogallus urubitinga,0,1400
+Harpyhaliaetus solitarius,0,500
+Harpyhaliaetus coronatus,0,1230
+Leucopternis lacernulatus,0,2890
+Buteogallus aequinoctialis,0,500
+Buteogallus anthracinus,0,1800
+Leucopternis schistaceus,0,600
+Rostrhamus sociabilis,0,2800
+Ictinia plumbea,0,2600
+Ictinia mississippiensis,0,1000
+Geranospiza caerulescens,0,750
+Spiza_americana,0,1500
+Cyanocompsa_cyanoides,0,1400
+Cyanoloxia_glaucocaerulea,0,1700
+Cyanocompsa_brissonii,0,2000
+Amaurospiza_concolor,450,2700
+Amaurospiza_moesta,0,2700
+Amaurospiza_carrizalensis,0,2700
+Cyanocompsa_parellina,0,1800
+Passerina_caerulea,0,1100
+Passerina_amoena,0,3000
+Passerina_cyanea,0,1850
+Passerina_ciris,0,1850
+Passerina_versicolor,0,2000
+Passerina_leclancherii,0,1200
+Passerina_rositae,180,800
+Granatellus_venustus,0,1200
+Granatellus_sallaei,0,1200
+Granatellus_pelzelni,0,850
+Chlorothraupis_carmioli,300,1450
+Chlorothraupis_olivacea,0,1500
+Chlorothraupis_stolzmanni,200,2100
+Habia_cristata,700,2000
+Habia_atrimaxillaris,0,200
+Habia_rubica,0,2250
+Habia_fuscicauda,0,1200
+Habia_gutturalis,100,1400
+Piranga_rubra,0,2700
+Piranga_bidentata,800,2850
+Piranga_flava,500,2050
+Piranga_ludoviciana,450,3050
+Piranga_olivacea,0,3000
+Piranga_roseogularis,0,250
+Piranga_erythrocephala,900,2600
+Piranga_rubriceps,1700,3000
+Piranga_leucoptera,100,2000
+Caryothraustes_canadensis,250,1250
+Caryothraustes_poliogaster,0,1200
+Periporphyrus_erythromelas,0,1000
+Rhodothraupis_celaeno,0,1200
+Cardinalis_sinuatus,0,2000
+Cardinalis_cardinalis,0,2597
+Cardinalis_phoeniceus,0,700
+Pheucticus_chrysopeplus,0,2500
+Pheucticus_melanocephalus,0,3000
+Pheucticus_ludovicianus,900,2000
+Pheucticus_aureoventris,600,3200
+Pheucticus_tibialis,700,2600
+Pheucticus_chrysogaster,0,3500
+Ramphastos_toco,0,1750
+Ramphastos_dicolorus,100,1500
+Ramphastos_tucanus,0,1440
+Ramphastos_ambiguus,0,2286
+Ramphastos_vitellinus,0,1700
+Ramphastos_brevis,0,1550
+Ramphastos_sulfuratus,0,1600
+Aulacorhynchus_coeruleicinctis,1600,2500
+Aulacorhynchus_haematopygus,300,2200
+Aulacorhynchus_sulcatus,300,2000
+Aulacorhynchus_derbianus,600,2000
+Aulacorhynchus_huallagae,2000,2600
+Andigena_laminirostris,1300,2500
+Andigena_hypoglauca,2200,3600
+Andigena_cucullata,2400,3300
+Andigena_nigrirostris,1700,2700
+Selenidera_nattereri,0,1000
+Selenidera_reinwardtii,0,1000
+Selenidera_gouldii,0,800
+Selenidera_maculirostris,0,1000
+Selenidera_spectabilis,300,1000
+Selenidera_piperivora,0,900
+Pteroglossus_bailloni,0,1550
+Pteroglossus_viridis,0,800
+Pteroglossus_inscriptus,0,1000
+Pteroglossus_beauharnaesii,0,500
+Pteroglossus_bitorquatus,0,800
+Pteroglossus_aracari,0,600
+Pteroglossus_torquatus,0,1000
+Pteroglossus_frantzii,0,1200
+Pteroglossus_pluricinctus,500,750
+Pteroglossus_castanotis,0,1300
+Pteroglossus_azara,0,1400
+Semnornis_ramphastinus,1000,2000
+Semnornis_frantzii,1200,2200
+Capito_dayi,50,550
+Capito_aurovirens,500,600
+Capito_brunneipectus,0,1000
+Capito_niger,0,800
+Capito_hypoleucus,700,1600
+Capito_squamatus,0,800
+Capito_maculicoronatus,0,900
+Capito_quinticolor,0,350
+Eubucco_tucinkae,150,850
+Eubucco_richardsoni,0,1200
+Eubucco_versicolor,1000,2000
+Eubucco_bourcierii,1000,1800
+Poospiza_melanoleuca,0,1800
+Poospiza_cinerea,600,1400
+Poospiza_torquata,0,1800
+Hemispingus_trifasciatus,2900,3600
+Poospiza_alticola,2900,4300
+Poospiza_erythrophrys,900,3100
+Poospiza_cabanisi,0,500
+Nephelornis_oneilli,3000,3800
+Urothraupis_stolzmanni,3000,4000
+Cypsnagra_hirundinacea,0,1000
+Donacospiza_albifrons,0,900
+Poospiza_caesar,2900,3500
+Poospiza_hypochondria,2500,4200
+Poospiza_thoracica,800,1500
+Thlypopsis_ornata,200,3400
+Thlypopsis_pectoralis,2500,3200
+Hemispingus_superciliaris,1900,3600
+Thlypopsis_ruficeps,1500,3700
+Pyrrhocoma_ruficeps,0,1400
+Thlypopsis_sordida,0,1500
+Thlypopsis_inornata,450,2200
+Thlypopsis_fulviceps,750,2300
+Hemispingus_frontalis,1500,3200
+Hemispingus_melanotis,1100,3050
+Hemispingus_reyi,1900,3200
+Hemispingus_atropileus,1800,3600
+Hemispingus_parodii,2600,3500
+Hemispingus_calophrys,2300,3350
+Hemispingus_goeringi,2300,3200
+Hemispingus_rufosuperciliaris,2800,3500
+Poospiza_garleppi,2700,4200
+Poospiza_baeri,1200,3100
+Poospiza_rubecula,2500,3800
+Poospiza_hispaniolensis,0,1000
+Poospiza_whitii,600,2500
+Poospiza_nigrorufa,0,870
+Poospiza_ornata,0,1000
+Poospiza_boliviana,1600,3100
+Hemispingus_xanthophthalmus,2200,3350
+Hemispingus_verticalis,2700,3600
+Cnemoscopus_rubrirostris,1250,3350
+Xenospingus_concolor,0,2500
+Piezorhina_cinerea,0,300
+Saltator_aurantiirostris,0,4000
+Saltator_maxillosus,900,2200
+Saltator_cinctus,1700,3080
+Saltator_fuliginosus,0,1200
+Saltator_grossus,0,1800
+Saltator_nigriceps,1200,2900
+Saltator_atriceps,0,1800
+Saltator_atripennis,400,2200
+Saltator_maximus,0,1800
+Saltator_striatipectus,0,2500
+Saltator_coerulescens,0,1500
+Saltator_similis,0,1200
+Saltator_orenocensis,0,600
+Saltator_atricollis,500,1800
+Saltatricula_multicolor,0,600
+Emberizoides_duidae,1300,2100
+Emberizoides_herbicola,0,1500
+Emberizoides_ypiranganus,0,900
+Embernagra_platensis,0,2500
+Coryphaspiza_melanotis,0,1200
+Sporophila_albogularis,500,1200
+Sporophila_collaris,0,500
+Sporophila_plumbea,0,1500
+Sporophila_falcirostris,0,1200
+Sporophila_schistacea,0,2000
+Sporophila_caerulescens,0,2100
+Sporophila_nigricollis,0,2500
+Sporophila_luctuosa,0,3200
+Sporophila_frontalis,100,1500
+Dolospingus_fringilloides,0,700
+Oryzoborus_angolensis,0,1600
+Oryzoborus_funereus,0,1600
+Sporophila_torqueola,0,2000
+Sporophila_intermedia,0,2300
+Sporophila_corvina,0,1800
+Sporophila_palustris,0,1100
+Sporophila_ruficollis,0,1200
+Sporophila_hypoxantha,0,1100
+Sporophila_bouvreuil,0,1100
+Sporophila_hypochroma,0,1100
+Sporophila_melanogaster,700,1000
+Sporophila_cinnamomea,0,1100
+Sporophila_minuta,0,2200
+Sporophila_castaneiventris,0,1500
+Sporophila_simplex,500,2500
+Sporophila_telasco,0,1500
+Sporophila_peruviana,0,2000
+Sporophila_leucoptera,0,800
+Oryzoborus_atrirostris,0,1050
+Oryzoborus_crassirostris,0,1400
+Oryzoborus_maximiliani,0,1100
+Oryzoborus_nuttingi,500,900
+Sporophila_lineola,0,500
+Tiaris_fuliginosus,0,2300
+Tiaris_obscurus,0,2100
+Tiaris_bicolor,0,1300
+Tiaris_olivaceus,300,2300
+Coereba_flaveola,0,2600
+Dacnis_viguieri,0,600
+Dacnis_lineata,0,1500
+Dacnis_hartlaubi,300,2200
+Dacnis_flaviventer,0,1000
+Dacnis_cayana,0,2000
+Dacnis_albiventris,0,500
+Dacnis_nigripes,0,850
+Dacnis_venusta,0,1000
+Tersina_viridis,50,2100
+Cyanerpes_caeruleus,0,1800
+Cyanerpes_cyaneus,0,2000
+Cyanerpes_nitidus,0,1000
+Cyanerpes_lucidus,0,1500
+Charitospiza_eucosma,0,1200
+Ramphocelus_dimidiatus,0,2600
+Ramphocelus_nigrogularis,0,1100
+Ramphocelus_carbo,0,2000
+Ramphocelus_melanogaster,500,1800
+Ramphocelus_bresilius,0,800
+Ramphocelus_passerinii,0,1200
+Ramphocelus_costaricensis,0,1200
+Ramphocelus_flammigerus,800,2000
+Ramphocelus_sanguinolentus,0,1200
+Tachyphonus_rufus,0,2700
+Tachyphonus_coronatus,0,1300
+Tachyphonus_phoenicius,0,2000
+Lanio_leucothorax,0,900
+Lanio_aurantius,0,1200
+Lanio_fulvus,0,1350
+Lanio_versicolor,0,1200
+Tachyphonus_delatrii,0,1500
+Rhodospingus_cruentus,0,750
+Tachyphonus_surinamus,0,1400
+Coryphospingus_pileatus,0,1000
+Coryphospingus_cucullatus,0,3100
+Tachyphonus_luctuosus,0,2200
+Tachyphonus_rufiventer,0,1650
+Tachyphonus_cristatus,0,1400
+Trichothraupis_melanops,0,1700
+Eucometis_penicillata,0,1700
+Conothraupis_speculigera,0,1950
+Volatinia_jacarina,0,2600
+Creurgops_dentatus,1200,2500
+Creurgops_verticalis,1100,2800
+Hemithraupis_guira,0,1500
+Hemithraupis_ruficapilla,0,1500
+Hemithraupis_flavicollis,0,1350
+Heterospingus_rubrifrons,0,900
+Heterospingus_xanthopygius,0,1100
+Chrysothlypis_chrysomelas,350,1600
+Chrysothlypis_salmoni,25,1200
+Chlorophanes_spiza,0,2300
+Iridophanes_pulcherrimus,1000,2000
+Diglossa_gloriosa,3000,4150
+Diglossa_humeralis,1850,4000
+Diglossa_brunneiventris,2000,4300
+Diglossa_carbonaria,2100,4300
+Diglossa_albilatera,1200,3400
+Diglossa_venezuelensis,885,2450
+Diglossa_duidae,1400,2500
+Diglossa_major,1400,2850
+Diglossa_lafresnayii,2000,3800
+Diglossa_gloriosissima,3000,3800
+Diglossa_mystacalis,2400,4000
+Diglossa_plumbea,1200,3000
+Diglossa_baritula,1200,3350
+Diglossa_sittoides,800,3500
+Diglossa_indigotica,700,2200
+Diglossa_cyanea,1400,3600
+Diglossa_caerulescens,1300,3200
+Diglossa_glauca,1000,2300
+Catamenia_homochroa,1600,3500
+Catamenia_inornata,2200,4400
+Catamenia_analis,0,4650
+Idiopsar_brachyurus,3900,4600
+Diuca_speculifera,3800,5000
+Phrygilus_erythronotus,3800,4500
+Phrygilus_dorsalis,3300,4500
+Xenodacnis_parina,3200,4600
+Phrygilus_plebejus,0,4700
+Phrygilus_unicolor,800,5000
+Haplospiza_rustica,800,3600
+Acanthidops_bairdii,1500,3100
+Haplospiza_unicolor,0,1400
+Sicalis_raimondii,200,2500
+Sicalis_lutea,3500,4500
+Sicalis_auriventris,800,4500
+Sicalis_olivascens,1000,4500
+Sicalis_luteocephala,2500,3800
+Sicalis_lebruni,0,1200
+Sicalis_uropygialis,2500,4800
+Sicalis_taczanowskii,0,300
+Sicalis_luteola,0,3900
+Sicalis_columbiana,0,300
+Sicalis_flaveola,0,2500
+Melanodera_xanthogramma,1500,3000
+Melanodera_melanodera,0,500
+Phrygilus_atriceps,2400,4500
+Phrygilus_punensis,2500,4800
+Phrygilus_gayi,0,3000
+Phrygilus_patagonicus,0,1500
+Sicalis_citrina,0,2800
+Conirostrum_rufum,2600,3300
+Conirostrum_cinereum,0,4500
+Conirostrum_tamarugense,0,2950
+Conirostrum_ferrugineiventre,2500,4100
+Conirostrum_sitticolor,2300,3700
+Oreomanes_fraseri,2700,4850
+Conirostrum_albifrons,1500,3000
+Conirostrum_leucogenys,0,800
+Conirostrum_speciosum,0,1300
+Conirostrum_bicolor,0,200
+Conirostrum_margaritae,0,300
+Tangara_desmaresti,500,2200
+Tangara_cyanoventris,500,1200
+Tangara_cyanocephala,0,1000
+Tangara_fastuosa,0,1000
+Tangara_seledon,0,900
+Tangara_velia,0,1075
+Tangara_callophrys,0,1000
+Tangara_chilensis,0,1500
+Tangara_mexicana,0,1000
+Tangara_inornata,0,1200
+Tangara_lavinia,0,800
+Tangara_gyrola,0,1800
+Tangara_florida,100,1100
+Tangara_icterocephala,400,2100
+Tangara_arthus,600,2500
+Tangara_schrankii,0,1600
+Tangara_johannae,0,700
+Tangara_parzudakii,1000,2500
+Tangara_xanthocephala,1000,2600
+Tangara_chrysotis,850,2400
+Tangara_fucosa,1400,2000
+Tangara_dowii,800,3000
+Tangara_nigroviridis,900,3000
+Tangara_vassorii,1300,3500
+Tangara_rufigenis,900,2050
+Tangara_labradorides,1100,2400
+Tangara_cyanotis,900,2600
+Tangara_heinei,700,2800
+Tangara_phillipsi,1300,1570
+Tangara_argyrofenges,1100,2200
+Tangara_viridicollis,800,3050
+Tangara_cyanoptera,450,2200
+Tangara_nigrocincta,0,1400
+Tangara_cyanicollis,0,2400
+Tangara_larvata,0,1800
+Tangara_cayana,0,2500
+Tangara_vitriolina,500,3000
+Tangara_meyerdeschauenseei,1450,2200
+Tangara_preciosa,0,1000
+Tangara_palmeri,0,1100
+Thraupis_ornata,0,1750
+Thraupis_palmarum,0,2600
+Thraupis_abbas,0,1800
+Thraupis_cyanoptera,0,1600
+Thraupis_episcopus,0,2700
+Thraupis_sayaca,0,3200
+Tangara_ruficervix,900,2500
+Tangara_guttata,300,2000
+Tangara_xanthogastra,100,1800
+Tangara_rufigula,400,2100
+Tangara_punctata,0,2000
+Tangara_varia,0,300
+Bangsia_edwardsi,500,2000
+Bangsia_aureocincta,1600,2200
+Bangsia_rothschildi,150,1100
+Bangsia_melanochlamys,1400,1750
+Bangsia_arcaei,300,1200
+Wetmorethraupis_sterrhopteron,450,1000
+Paroaria_capitata,0,500
+Paroaria_gularis,0,400
+Paroaria_baeri,0,400
+Paroaria_dominicana,0,1200
+Paroaria_coronata,0,500
+Diuca_diuca,0,2500
+Gubernatrix_cristata,0,700
+Neothraupis_fasciata,500,1100
+Lophospingus_griseocristatus,1000,3100
+Lophospingus_pusillus,0,2000
+Schistochlamys_ruficapillus,0,2050
+Schistochlamys_melanopis,0,1800
+Cissopis_leverianus,0,2000
+Stephanophorus_diadematus,0,2400
+Chlorochrysa_calliparaea,900,2200
+Chlorochrysa_nitidissima,900,2200
+Chlorochrysa_phoenicotis,600,2200
+Buthraupis_eximia,2750,3800
+Buthraupis_aureodorsalis,3000,3700
+Chlorornis_riefferii,1500,3500
+Buthraupis_wetmorei,2950,3650
+Buthraupis_montana,1800,3700
+Anisognathus_lacrymosus,1800,3300
+Anisognathus_igniventris,0,4650
+Anisognathus_melanogenys,1200,3200
+Anisognathus_notabilis,900,2400
+Anisognathus_somptuosus,900,2900
+Thraupis_cyanocephala,800,3300
+Dubusia_taeniata,1900,3600
+Delothraupis_castaneoventris,1650,3500
+Saltator_rufiventris,2500,4000
+Pipraeidea_melanonota,0,3250
+Thraupis_bonariensis,0,4200
+Iridosornis_reinhardti,2000,3700
+Iridosornis_rufivertex,2100,3400
+Iridosornis_jelskii,2000,3700
+Iridosornis_analis,1400,2300
+Iridosornis_porphyrocephalus,0,1200
+Calochaetes_coccineus,320,1800
+Parkerthraustes_humeralis,200,1000
+Orchesticus_abeillei,750,1600
+Phrygilus_carbonarius,0,700
+Phrygilus_alaudinus,0,4100
+Porphyrospiza_caerulescens,600,1100
+Phrygilus_fruticeti,0,4000
+Incaspiza_ortizi,1800,2600
+Incaspiza_personata,2300,4000
+Incaspiza_pulchra,1500,2700
+Catamblyrhynchus_diadema,1800,3500
+Sericossypha_albocristata,1600,3200
+Compsothraupis_loricata,0,1000
+Nemosia_pileata,0,1300
+Cyanicterus_cyanicterus,0,600
+Corapipo leucorrhoa,0,1500
+Corapipo altera,0,1500
+Corapipo gutturalis,0,1100
+Masius chrysopterus,1100,2300
+Ilicura militaris,500,1250
+Chiroxiphia boliviana,900,1650
+Chiroxiphia pareola,0,750
+Chiroxiphia lanceolata,0,1400
+Chiroxiphia linearis,0,1500
+Chiroxiphia caudata,0,1900
+Antilophia galeata,0,1000
+Antilophia bokermanni,0,800
+Xenopipo uniformis,800,2100
+Xenopipo atronitens,0,1200
+Chloropipo unicolor,950,2500
+Chloropipo flavicapilla,1200,2400
+Lepidothrix coronata,0,1400
+Lepidothrix vilasboasi,0,200
+Lepidothrix iris,0,200
+Lepidothrix nattereri,0,500
+Lepidothrix coeruleocapilla,500,2100
+Lepidothrix isidorei,500,1700
+Lepidothrix serena,0,500
+Lepidothrix suavissima,250,1800
+Cryptopipo holochlora,600,1300
+Pipra filicauda,0,800
+Pipra aureola,0,800
+Pipra fasciicauda,0,800
+Machaeropterus deliciosus,400,1900
+Machaeropterus regulus,0,1500
+Machaeropterus pyrocephalus,0,1050
+Ceratopipra cornuta,800,1800
+Ceratopipra mentalis,0,750
+Ceratopipra rubrocapilla,0,700
+Ceratopipra chloromeros,0,1400
+Ceratopipra erythrocephala,0,1100
+Dixiphia pipra,0,1600
+Heterocercus aurantiivertex,0,500
+Heterocercus flavivertex,0,500
+Heterocercus linteatus,0,500
+Manacus vitellinus,0,1200
+Manacus manacus,0,1000
+Manacus candei,0,950
+Manacus aurantiacus,0,1100
+Neopelma chrysocephalum,0,700
+Tyranneutes virescens,0,500
+Tyranneutes stolzmanni,0,800
+Neopelma sulphureiventer,0,900
+Neopelma chrysolophum,1150,1750
+Neopelma pallescens,0,900
+Iodopleura pipra,0,900
+Iodopleura fusca,0,500
+Iodopleura isabellae,0,900
+Tityra semifasciata,0,1200
+Tityra cayana,0,1100
+Tityra inquisitor,0,1200
+Xenornis setifrons,0,600
+Pachyramphus albogriseus,500,3050
+Pachyramphus major,800,2300
+Pachyramphus marginatus,0,1000
+Pachyramphus cinnamomeus,0,1300
+Pachyramphus castaneus,0,1900
+Pachyramphus versicolor,1500,3400
+Pachyramphus spodiurus,0,900
+Pachyramphus rufus,0,1500
+Pachyramphus viridis,0,1700
+Pachyramphus niger,0,1800
+Pachyramphus homochrous,0,900
+Pachyramphus aglaiae,0,1250
+Pachyramphus validus,0,2500
+Pachyramphus minor,0,1050
+Schiffornis major,0,500
+Schiffornis virescens,0,1700
+Schiffornis aenea,900,1700
+Schiffornis stenorhyncha,0,1800
+Schiffornis veraepacis,0,1700
+Schiffornis turdina,0,1500
+Schiffornis olivacea,0,1450
+Laniisoma elegans,700,1800
+Laniocera hypopyrra,0,850
+Laniocera rufescens,0,1350
+Oxyruncus cristatus,0,1800
+Onychorhynchus coronatus,0,1000
+Terenotriccus erythrurus,0,1200
+Myiobius atricaudus,0,1400
+Myiobius sulphureipygius,0,1200
+Myiobius villosus,800,2100
+Myiobius barbatus,0,900
+Piprites pileata,900,2000
+Piprites chloris,0,1500
+Piprites griseiceps,0,800
+Tachuris rubrigastra,0,4200
+Leptopogon rufipectus,1600,2700
+Leptopogon taczanowskii,1700,2650
+Leptopogon amaurocephalus,0,1300
+Leptopogon superciliaris,600,2100
+Mionectes striaticollis,1200,3350
+Mionectes olivaceus,0,1800
+Mionectes oleagineus,0,1200
+Mionectes macconnelli,0,2000
+Mionectes rufiventris,0,1900
+Corythopis torquatus,0,800
+Corythopis delalandi,0,1200
+Pseudotriccus pelzelni,700,2000
+Pseudotriccus simplex,1300,2100
+Pseudotriccus ruficeps,1850,3350
+Phylloscartes eximius,0,1800
+Phylloscartes ophthalmicus,900,1800
+Phylloscartes lanyoni,450,750
+Phylloscartes difficilis,950,2150
+Phylloscartes poecilotis,1500,2400
+Phylloscartes ventralis,1000,1400
+Phylloscartes orbitalis,600,1150
+Phylloscartes chapmani,1000,2000
+Phylloscartes paulista,0,1000
+Phylloscartes oustaleti,500,900
+Phylloscartes virescens,0,500
+Phylloscartes flavovirens,0,500
+Phylloscartes kronei,0,500
+Phylloscartes venezuelanus,1100,2300
+Phylloscartes beckeri,750,1200
+Phylloscartes roquettei,400,500
+Phylloscartes gualaquizae,1050,2000
+Phylloscartes parkeri,700,1200
+Phylloscartes superciliaris,600,1700
+Phylloscartes nigrifrons,900,1800
+Phylloscartes ceciliae,500,800
+Phylloscartes sylviolus,0,600
+Rhynchocyclus fulvipectus,750,2300
+Rhynchocyclus olivaceus,0,950
+Rhynchocyclus brevirostris,0,2100
+Rhynchocyclus pacificus,0,1100
+Tolmomyias poliocephalus,0,800
+Tolmomyias traylori,0,400
+Tolmomyias flaviventris,0,1000
+Tolmomyias sulphurescens,0,2100
+Tolmomyias assimilis,0,1300
+Cnipodectes superrufus,250,550
+Cnipodectes subbrunneus,0,700
+Taeniotriccus andrei,0,350
+Todirostrum cinereum,0,1200
+Todirostrum maculatum,0,500
+Todirostrum nigriceps,0,1100
+Todirostrum chrysocrotaphum,0,900
+Todirostrum pictum,0,500
+Todirostrum poliocephalum,0,1100
+Poecilotriccus calopterus,0,1450
+Poecilotriccus luluae,1850,2900
+Poecilotriccus ruficeps,1600,2700
+Poecilotriccus sylvia,0,1100
+Poecilotriccus russatus,1200,2500
+Poecilotriccus fumifrons,0,400
+Poecilotriccus latirostris,0,1100
+Poecilotriccus plumbeiceps,750,2750
+Hemitriccus furcatus,0,1200
+Poecilotriccus capitalis,0,1100
+Poecilotriccus albifacies,0,1050
+Hemitriccus obsoletus,900,2100
+Hemitriccus diops,0,1300
+Hemitriccus kaempferi,0,500
+Hemitriccus mirandae,600,900
+Hemitriccus orbitatus,0,600
+Hemitriccus rufigularis,800,1350
+Hemitriccus cinnamomeipectus,1700,2200
+Hemitriccus granadensis,2000,3300
+Hemitriccus flammulatus,0,700
+Hemitriccus josephinae,0,500
+Poecilotriccus senex,0,500
+Lophotriccus galeatus,0,1100
+Lophotriccus eulophotes,0,500
+Lophotriccus vitiosus,0,800
+Lophotriccus pileatus,750,2100
+Oncostoma cinereigulare,0,1200
+Oncostoma olivaceum,0,1000
+Hemitriccus minor,0,700
+Hemitriccus cohnhafti,0,300
+Hemitriccus spodiops,800,1600
+Atalotriccus pilaris,0,800
+Hemitriccus zosterops,0,850
+Hemitriccus griseipectus,2000,3300
+Hemitriccus minimus,0,500
+Hemitriccus inornatus,0,500
+Myiornis albiventris,600,1200
+Myiornis auricularis,0,1250
+Myiornis atricapillus,0,700
+Myiornis ecaudatus,0,950
+Hemitriccus nidipendulus,0,900
+Hemitriccus margaritaceiventer,0,1800
+Hemitriccus iohannis,0,600
+Hemitriccus striaticollis,0,700
+Ramphotrigon megacephalum,0,1400
+Deltarhynchus flammulatus,0,1250
+Ramphotrigon fuscicauda,0,900
+Ramphotrigon ruficauda,0,600
+Sirystes sibilator,0,1400
+Rhytipterna immunda,0,500
+Casiornis rufus,0,800
+Casiornis fuscus,0,500
+Rhytipterna simplex,0,1300
+Myiarchus swainsoni,0,1700
+Myiarchus barbirostris,0,2000
+Myiarchus tuberculifer,0,3400
+Myiarchus phaeocephalus,0,1500
+Myiarchus panamensis,0,1400
+Myiarchus ferox,0,950
+Myiarchus validus,0,2000
+Myiarchus yucatanensis,0,500
+Myiarchus nuttingi,0,1800
+Myiarchus crinitus,0,1400
+Myiarchus antillarum,0,800
+Myiarchus oberi,0,900
+Myiarchus stolidus,0,1800
+Myiarchus sagrae,0,1500
+Myiarchus magnirostris,0,1500
+Myiarchus nugator,0,900
+Myiarchus tyrannulus,0,1700
+Myiarchus cinerascens,0,2200
+Myiarchus cephalotes,800,3000
+Myiarchus apicalis,400,2300
+Myiarchus venezuelensis,0,600
+Myiarchus semirufus,0,500
+Attila torridus,0,1200
+Attila rufus,0,1400
+Attila bolivianus,0,450
+Attila citriniventris,0,500
+Attila cinnamomeus,0,500
+Attila phoenicurus,0,1700
+Attila spadiceus,0,1800
+Legatus leucophaius,0,1500
+Machetornis rixosa,0,1000
+Philohydor lictor,0,1300
+Pitangus sulphuratus,0,1600
+Myiozetetes luteiventris,0,500
+Myiozetetes granadensis,0,1200
+Myiozetetes similis,0,1500
+Myiozetetes cayanensis,0,1500
+Myiodynastes bairdii,0,1200
+Myiodynastes chrysocephalus,800,2400
+Myiodynastes hemichrysus,700,1850
+Myiodynastes maculatus,0,1500
+Myiodynastes luteiventris,0,1850
+Megarynchus pitangua,0,1850
+Tyrannopsis sulphurea,0,700
+Conopias trivirgatus,0,950
+Conopias cinchoneti,750,2150
+Conopias parvus,0,1300
+Conopias albovittatus,0,900
+Empidonomus aurantioatrocristatus,0,1800
+Empidonomus varius,0,1900
+Tyrannus albogularis,0,950
+Tyrannus melancholicus,0,1800
+Tyrannus dominicensis,0,900
+Tyrannus cubensis,0,1100
+Tyrannus niveigularis,0,1200
+Tyrannus couchii,0,800
+Tyrannus crassirostris,0,1850
+Tyrannus tyrannus,800,3700
+Tyrannus vociferans,900,2200
+Tyrannus verticalis,0,2300
+Tyrannus forficatus,0,1500
+Tyrannus caudifasciatus,0,2000
+Tyrannus savana,0,1600
+Muscigralla brevicauda,0,1500
+Myiophobus fasciatus,0,2000
+Myiophobus cryptoxanthus,900,1100
+Ochthoeca frontalis,1600,4000
+Ochthoeca diadema,1700,3100
+Ochthoeca jelskii,1300,3400
+Ochthoeca pulchella,1700,2800
+Colorhamphus parvirostris,0,1000
+Tumbezia salvini,0,900
+Ochthoeca fumicolor,1800,4400
+Ochthoeca oenanthoides,2000,4500
+Ochthoeca piurae,1200,3300
+Ochthoeca leucophrys,2000,3500
+Ochthoeca rufipectoralis,2000,3600
+Ochthoeca cinnamomeiventris,1600,3300
+Myiophobus roraimae,900,1900
+Myiophobus phoenicomitra,1100,1400
+Myiophobus flavicans,1500,2700
+Mitrephanes olivaceus,1300,2000
+Mitrephanes phaeocercus,600,3600
+Contopus cooperi,0,3400
+Contopus ochraceus,2100,3000
+Contopus pertinax,900,3400
+Contopus lugubris,1200,2700
+Contopus fumigatus,500,2600
+Contopus albogularis,0,700
+Contopus pallidus,0,1000
+Contopus virens,0,4300
+Contopus caribaeus,0,1000
+Contopus hispaniolensis,0,1000
+Contopus latirostris,0,900
+Contopus cinereus,0,2200
+Contopus sordidulus,900,3000
+Sayornis nigricans,0,2800
+Sayornis phoebe,0,2500
+Sayornis saya,0,2500
+Empidonax oberholseri,0,3000
+Empidonax affinis,1800,4000
+Empidonax hammondii,1000,3000
+Empidonax atriceps,2100,3300
+Empidonax fulvifrons,600,2500
+Empidonax wrightii,0,2500
+Empidonax minimus,0,1500
+Empidonax flaviventris,0,500
+Empidonax flavescens,900,2800
+Empidonax difficilis,1500,3000
+Empidonax occidentalis,1250,3400
+Empidonax albigularis,900,2600
+Empidonax alnorum,0,2500
+Empidonax traillii,0,2500
+Xenotriccus mexicanus,950,1850
+Xenotriccus callizonus,1200,1850
+Empidonax virescens,0,2850
+Lathrotriccus griseipectus,0,1700
+Lathrotriccus euleri,0,1350
+Aphanotriccus audax,0,600
+Aphanotriccus capitalis,0,1000
+Cnemotriccus fuscatus,0,900
+Ochthornis littoralis,0,600
+Satrapa icterophrys,0,2000
+Muscisaxicola fluviatilis,0,800
+Muscisaxicola maculirostris,1000,3800
+Muscisaxicola albifrons,4000,5600
+Muscisaxicola flavinucha,500,4500
+Muscisaxicola rufivertex,300,4500
+Muscisaxicola cinereus,2500,5000
+Muscisaxicola griseus,2700,4800
+Muscisaxicola alpinus,800,4700
+Muscisaxicola maclovianus,0,1200
+Muscisaxicola albilora,1500,4000
+Muscisaxicola juninensis,3200,5000
+Muscisaxicola capistratus,0,4000
+Hymenops perspicillatus,0,1250
+Knipolegus cabanisi,800,2500
+Knipolegus signatus,1900,2900
+Knipolegus aterrimus,0,3200
+Knipolegus cyanirostris,0,2100
+Knipolegus lophotes,0,1250
+Knipolegus nigerrimus,900,2200
+Knipolegus franciscanus,0,500
+Knipolegus poecilurus,900,2600
+Knipolegus orenocensis,0,500
+Knipolegus poecilocercus,0,500
+Knipolegus striaticeps,0,1900
+Knipolegus hudsoni,0,800
+Cnemarchus erythropygius,2900,4100
+Polioxolmis rufipennis,3000,4500
+Xolmis pyrope,0,1800
+Xolmis cinereus,0,1200
+Neoxolmis rufiventris,0,1200
+Xolmis rubetra,0,1000
+Xolmis coronatus,0,1500
+Agriornis albicauda,3000,4500
+Agriornis micropterus,0,4000
+Agriornis lividus,0,1800
+Agriornis murinus,0,2000
+Agriornis montanus,1800,4000
+Myiotheretes striaticollis,1500,3600
+Myiotheretes pernix,2100,2900
+Myiotheretes fumigatus,1800,3600
+Myiotheretes fuscorufus,2200,3500
+Xolmis irupero,0,1200
+Xolmis velatus,0,1000
+Lessonia oreas,2800,4300
+Lessonia rufa,0,2000
+Suiriri affinis (islerorum),250,1200
+Sublegatus arenarum,0,600
+Sublegatus obscurior,0,450
+Sublegatus modestus,0,2750
+Phelpsia inornata,0,500
+Colonia colonus,0,1800
+Muscipipra vetula,0,2200
+Alectrurus tricolor,0,1200
+Alectrurus risora,0,1200
+Heteroxolmis (Xolmis) dominicanus,0,1100
+Gubernetes yetapa,0,1200
+Pyrocephalus rubinus,0,2600
+Fluvicola nengeta,0,800
+Fluvicola pica,0,1000
+Fluvicola albiventer,0,500
+Arundinicola leucocephala,0,600
+Phyllomyias griseocapilla,750,1850
+Zimmerius chrysops,0,2700
+Zimmerius albigularis,0,2500
+Zimmerius viridiflavus,1000,2500
+Zimmerius vilissimus,0,3000
+Zimmerius bolivianus,1200,2850
+Zimmerius gracilipes,0,1300
+Zimmerius acer,0,1400
+Zimmerius cinereicapilla,750,1350
+Zimmerius chicomendezi,0,2500
+Zimmerius villarejoi,0,2600
+Euscarthmus meloryphus,0,2100
+Euscarthmus rufomarginatus,0,1000
+Inezia subflava,0,500
+Inezia caudata,0,400
+Inezia tenuirostris,0,600
+Stigmatura budytoides,0,2300
+Stigmatura napensis,0,300
+Mecocerculus minor,1600,2650
+Mecocerculus calopterus,800,1950
+Mecocerculus poecilocercus,1600,2600
+Mecocerculus hellmayri,1300,2400
+Mecocerculus stictopterus,2600,3600
+Phyllomyias plumbeiceps,1300,2200
+Phyllomyias sclateri,400,2200
+Phyllomyias urichi,800,1100
+Phyllomyias reiseri,0,500
+Phyllomyias virescens,0,1000
+Phyllomyias cinereiceps,1150,2700
+Phyllomyias nigrocapillus,2600,3400
+Phyllomyias uropygialis,1500,3600
+Phyllomyias burmeisteri,0,1800
+Camptostoma imberbe,0,2100
+Camptostoma obsoletum,0,1500
+Ornithion inerme,0,950
+Ornithion semiflavum,0,1250
+Ornithion brunneicapillus,0,1200
+Suiriri suiriri,0,1500
+Pseudelaenia leucospodia,0,800
+Capsiempis flaveola,0,1250
+Phaeomyias murina,0,1750
+Nesotriccus ridgwayi,0,500
+Phyllomyias fasciatus,0,1900
+Phyllomyias weedeni,700,1200
+Phyllomyias griseiceps,0,1300
+Mecocerculus leucophrys,1500,4400
+Culicivora caudacuta,0,1400
+Serpophaga nigricans,0,1000
+Serpophaga cinerea,1100,3200
+Pseudocolopteryx acutipennis,1500,2600
+Pseudocolopteryx dinelliana,0,500
+Pseudocolopteryx flaviventris,0,500
+Pseudocolopteryx citreola,300,1300
+Pseudocolopteryx sclateri,0,500
+Anairetes flavirostris,1400,3700
+Anairetes parulus,0,4000
+Anairetes fernandezianus,0,1000
+Anairetes alpinus,3900,4400
+Anairetes reguloides,0,2900
+Anairetes nigrocristatus,2350,4200
+Uromyias agilis,1800,3400
+Uromyias agraphia,2700,3600
+Polystictus pectoralis,0,1300
+Polystictus superciliaris,900,1400
+Serpophaga griseicapilla,30,2280
+Serpophaga hypoleuca,0,500
+Serpophaga munda,0,2600
+Serpophaga subcristata,0,1500
+Elaenia cristata,0,1350
+Elaenia ruficeps,0,1400
+Elaenia strepera,1500,2400
+Elaenia mesoleuca,0,2100
+Elaenia martinica,0,700
+Elaenia fallax,500,2000
+Elaenia frantzii,900,3600
+Elaenia albiceps,0,3300
+Elaenia pallatangae,2200,3300
+Elaenia parvirostris,0,1000
+Elaenia chiriquensis,0,3000
+Elaenia pelzelni,0,500
+Elaenia spectabilis,0,1000
+Elaenia ridleyana,0,500
+Elaenia obscura,750,2800
+Elaenia dayi,1500,2600
+Elaenia flavogaster,0,1700
+Elaenia gigas,0,1200
+Tyrannulus elatus,0,1000
+Myiopagis subplacens,0,1750
+Myiopagis gaimardii,0,1000
+Myiopagis flavivertex,0,500
+Myiopagis viridicata,0,1700
+Myiopagis caniceps,0,900
+Myiopagis olallai,0,1500
+Myiotriccus ornatus,750,1800
+Nephelomyias pulcher,800,3050
+Nephelomyias lintoni,2250,3200
+Nephelomyias ochraceiventris,2200,3500
+Pyrrhomyias cinnamomeus,600,3550
+Hirundinea ferruginea,0,1800
+Calyptura cristata,0,900
+Neopipo cinnamomea,0,700
+Platyrinchus coronatus,0,900
+Platyrinchus mystaceus,0,1800
+Platyrinchus saturatus,0,900
+Platyrinchus cancrominus,0,1500
+Platyrinchus platyrhynchos,0,900
+Platyrinchus flavigularis,1250,2300
+Platyrinchus leucoryphus,0,900
+Rupicola rupicola,0,1500
+Rupicola peruvianus,500,2400
+Phoenicircus carnifex,0,700
+Phoenicircus nigricollis,0,500
+Carpornis cucullata,400,1600
+Carpornis melanocephala,0,700
+Snowornis cryptolophus,570,2300
+Snowornis subalaris,800,1350
+Haematoderus militaris,0,500
+Querula purpurata,0,1050
+Pyroderus scutatus,650,2700
+Cephalopterus ornatus,0,1300
+Cephalopterus penduliger,700,1800
+Cephalopterus glabricollis,800,2000
+Perissocephalus tricolor,0,1400
+Porphyrolaema porphyrolaema,0,500
+Xipholena punicea,0,500
+Xipholena atropurpurea,0,700
+Xipholena lamellipennis,0,500
+Carpodectes antoniae,0,800
+Carpodectes nitidus,0,750
+Carpodectes hopkei,0,900
+Gymnoderus foetidus,0,700
+Conioptilon mcilhennyi,0,500
+Cotinga cayana,0,800
+Cotinga amabilis,0,1700
+Cotinga nattererii,0,1250
+Cotinga maculata,0,500
+Cotinga cotinga,0,600
+Cotinga maynana,0,500
+Lipaugus unirufus,0,1000
+Lipaugus lanioides,0,900
+Tijuca atra,1100,2100
+Lipaugus weberi,1400,1925
+Lipaugus uropygialis,1800,2600
+Lipaugus fuscocinereus,1700,3000
+Tijuca condita,1400,2000
+Lipaugus vociferans,0,800
+Lipaugus streptophorus,1000,1800
+Procnias tricarunculatus,0,2300
+Procnias albus,0,1250
+Procnias nudicollis,0,1150
+Procnias averano,0,1900
+Zaratornis stresemanni,2700,4400
+Phibalura flavirostris,0,2000
+Phytotoma rara,0,2700
+Phytotoma rutila,0,3100
+Phytotoma raimondii,0,500
+Ampelion rubrocristatus,2800,4050
+Ampelion rufaxilla,2200,2750
+Doliornis sclateri,2500,3350
+Doliornis remseni,3100,3650
+Ampelioides tschudii,900,2300
+Pipreola formosa,800,2200
+Pipreola chlorolepidota,800,1700
+Pipreola frontalis,1100,2000
+Pipreola riefferii,1200,3050
+Pipreola intermedia,2000,3300
+Pipreola arcuata,1800,3350
+Pipreola aureopectus,800,2300
+Pipreola lubomirskii,1600,2300
+Pipreola jucunda,900,2300
+Pipreola pulchra,1500,2250
+Pipreola whitelyi,1300,2250
+Melanopareia maranonica,400,800
+Melanopareia maximiliani,0,2150
+Melanopareia torquata,0,1400
+Pittasoma rufopileatum,0,1100
+Pittasoma michleri,0,1050
+Conopophaga melanogaster,0,500
+Conopophaga roberti,0,500
+Conopophaga lineata,0,2150
+Conopophaga ardesiaca,1000,1650
+Conopophaga castaneiceps,1100,2100
+Conopophaga peruviana,0,850
+Conopophaga aurita,0,500
+Pygiptila stellaris,0,700
+Thamnistes anabatinus,0,1700
+Myrmornis torquata,0,1200
+Euchrepomis sharpei,1100,1650
+Euchrepomis callinotus,750,2000
+Euchrepomis spodioptila,0,1100
+Euchrepomis humeralis,0,650
+Myrmorchilus strigilatus,0,1200
+Microrhopias quixensis,0,1100
+Aprositornis disjuncta,0,500
+Ammonastes pelzelni,0,350
+Myrmophylax atrothorax,0,1600
+Epinecrophylla fulviventris,0,1100
+Epinecrophylla ornata,0,1200
+Epinecrophylla gutturalis,0,1000
+Epinecrophylla spodionota,600,1300
+Epinecrophylla dentei,0,400
+Epinecrophylla amazonica,0,500
+Epinecrophylla fjeldsaai,0,1300
+Epinecrophylla haematonota,0,900
+Epinecrophylla pyrrhonota,0,1300
+Epinecrophylla leucophthalma,0,800
+Clytoctantes alixii,0,1000
+Clytoctantes atrogularis,0,500
+Neoctantes niger,0,800
+Poliocrania exsul,0,1200
+Sipia berlepschi,0,600
+Sipia palliata,0,1100
+Sipia nigricauda,400,1100
+Sipia laemosticta,0,1000
+Ampelornis griseiceps,600,3000
+Hypocnemoides melanopogon,0,500
+Hylophylax punctulatus,0,500
+Hylophylax naevioides,0,900
+Hylophylax naevius,0,1150
+Myrmoderus ferruginea,0,500
+Myrmoderus ruficauda,0,600
+Myrmoderus squamosa,0,1000
+Myrmeciza longipes,0,1700
+Rhopornis ardesiacus,0,900
+Myrmoborus melanurus,0,500
+Myrmoborus lophotes,0,1050
+Myrmoborus lugubris,0,500
+Myrmoborus leucophrys,0,1400
+Myrmoborus myotherinus,0,1200
+Pyriglena atra,0,500
+Pyriglena leucoptera,0,1250
+Hafferia immaculata,0,2000
+Hafferia zeledoni,100,1700
+Hafferia fortis,0,1050
+Percnostola arenarum,0,150
+Percnostola rufifrons,0,500
+Akletos melanoceps,0,600
+Akletos goeldii,0,750
+Gymnocichla nudiceps,0,500
+Sclateria naevia,0,500
+Myrmelastes hyperythra,0,500
+Myrmelastes rufifacies,0,800
+Myrmelastes brunneiceps,0,1400
+Myrmelastes leucostigma,0,1650
+Myrmelastes humaythae,0,500
+Myrmelastes saturata,700,1500
+Myrmelastes caurensis,0,1500
+Myrmelastes schistacea,0,500
+Phaenostictus mcleannani,0,1200
+Pithys albifrons,0,1100
+Pithys castaneus,200,250
+Willisornis vidua,0,800
+Willisornis poecilinotus,0,1350
+Gymnopithys rufigula,0,900
+Gymnopithys bicolor,0,1700
+Gymnopithys leucaspis,0,900
+Rhegmatorhina cristata,0,500
+Rhegmatorhina melanosticta,0,1050
+Rhegmatorhina gymnops,0,500
+Rhegmatorhina berlepschi,0,500
+Rhegmatorhina hoffmannsi,0,500
+Oneillornis lunulatus,0,950
+Oneillornis salvini,0,450
+Phlegopsis erythroptera,0,500
+Phlegopsis nigromaculata,0,700
+Phlegopsis borbae,0,500
+Cercomacra manu,0,1100
+Cercomacra brasiliana,600,1000
+Cercomacra ferdinandi,0,500
+Cercomacra carbonaria,0,500
+Cercomacra nigricans,0,1500
+Cercomacra melanaria,0,500
+Cercomacra cinerascens,0,1100
+Sciaphylax castanea,0,1350
+Sciaphylax hemimelaena,0,1350
+Drymophila squamata,0,600
+Hypocnemis hypoxantha,0,500
+Hypocnemis subflava,0,1100
+Hypocnemis flavescens,0,1100
+Hypocnemis peruviana,0,1100
+Hypocnemis rondoni,0,1100
+Hypocnemis ochrogyna,0,500
+Drymophila ochropyga,650,1300
+Drymophila genei,1150,2200
+Drymophila malura,0,950
+Drymophila ferruginea,0,1250
+Drymophila rubricollis,0,2000
+Drymophila klagesi,500,1800
+Drymophila hellmayri,500,1500
+Drymophila caudata,1200,2500
+Drymophila striaticeps,750,3150
+Drymophila devillei,0,1050
+Cercomacroides nigrescens,0,1800
+Cercomacroides laeta,0,900
+Cercomacra serva,0,1100
+Cercomacroides tyrannina,0,1800
+Cercomacroides parkeri,1130,2000
+Isleria hauxwelli,0,500
+Isleria guttata,0,700
+Xenopsaris albinucha,0,600
+Thamnomanes saturninus,0,500
+Thamnomanes ardesiacus,0,900
+Thamnomanes schistogynus,0,1050
+Thamnomanes caesius,0,850
+Cymbilaimus sanctaemariae,0,1100
+Cymbilaimus lineatus,0,1000
+Batara cinerea,0,2600
+Hypoedaleus guttatus,0,900
+Mackenziaena leachii,0,2150
+Mackenziaena severa,0,1250
+Frederickena viridis,0,700
+Frederickena unduliger,0,1050
+Frederickena fulva,0,1100
+Taraba major,0,1400
+Sakesphorus canadensis,0,900
+Thamnophilus schistaceus,0,1100
+Thamnophilus murinus,0,1000
+Thamnophilus zarumae,800,2650
+Thamnophilus palliatus,0,1700
+Thamnophilus tenuepunctatus,300,1700
+Thamnophilus multistriatus,900,2200
+Thamnophilus ruficapillus,0,2200
+Thamnophilus torquatus,0,1200
+Thamnophilus doliatus,0,2000
+Thamnophilus nigriceps,0,600
+Thamnophilus praecox,0,500
+Thamnophilus melanonotus,0,550
+Thamnophilus cryptoleucus,0,500
+Thamnophilus nigrocinereus,0,500
+Thamnophilus ambiguus,0,700
+Thamnophilus sticturus,0,950
+Thamnophilus pelzelni,0,1100
+Thamnophilus punctatus,0,1500
+Thamnophilus stictocephalus,0,700
+Thamnophilus aroyae,800,1700
+Thamnophilus aethiops,0,950
+Thamnophilus unicolor,1200,2300
+Thamnophilus caerulescens,0,2300
+Thamnophilus bridgesi,0,1150
+Thamnophilus atrinucha,0,1500
+Thamnophilus bernardi,0,1850
+Thamnophilus amazonicus,0,500
+Thamnophilus insignis,900,2000
+Thamnophilus divisorius,0,500
+Thamnophilus melanothorax,0,1300
+Sakesphoroides cristatus,0,1100
+Dysithamnus striaticeps,0,800
+Dysithamnus puncticeps,0,1000
+Herpsilochmus pectoralis,0,500
+Herpsilochmus rufimarginatus,0,1200
+Herpsilochmus roraimae,700,2000
+Herpsilochmus stictocephalus,0,500
+Herpsilochmus dorsimaculatus,0,500
+Herpsilochmus gentryi,0,200
+Herpsilochmus pileatus,0,800
+Herpsilochmus atricapillus,0,1200
+Herpsilochmus parkeri,1350,1350
+Herpsilochmus motacilloides,900,2050
+Herpsilochmus praedictus,0,500
+Herpsilochmus stotzi,0,500
+Herpsilochmus longirostris,0,1200
+Herpsilochmus dugandi,0,500
+Herpsilochmus sticturus,0,500
+Herpsilochmus axillaris,900,1800
+Dysithamnus plumbeus,0,500
+Dysithamnus leucostictus,900,1900
+Dysithamnus mentalis,600,2200
+Dysithamnus xanthopterus,800,1700
+Dysithamnus stictothorax,0,1200
+Dysithamnus occidentalis,900,2100
+Biatas nigropectus,500,1200
+Herpsilochmus sellowi,0,1100
+Rhopias gularis,0,1550
+Dichrozona cincta,0,800
+Megastictus margaritatus,0,500
+Terenura maculata,0,1200
+Myrmochanes hemileucus,0,500
+Myrmotherula cherriei,0,550
+Myrmotherula multostriata,0,550
+Myrmotherula surinamensis,0,700
+Myrmotherula pacifica,0,1300
+Myrmotherula sclateri,0,700
+Myrmotherula ambigua,0,500
+Myrmotherula brachyura,0,900
+Myrmotherula ignota,0,1100
+Myrmotherula longicauda,600,1200
+Myrmotherula klagesi,0,500
+Myrmotherula assimilis,0,500
+Myrmotherula menetriesii,0,900
+Myrmotherula behni,900,1800
+Myrmotherula grisea,500,1650
+Myrmotherula unicolor,0,350
+Myrmotherula snowi,0,550
+Myrmotherula minor,0,900
+Myrmotherula schisticolor,900,2200
+Myrmotherula sunensis,0,900
+Myrmotherula axillaris,0,1100
+Myrmotherula urosticta,0,500
+Myrmotherula longipennis,0,700
+Myrmotherula iheringi,0,650
+Formicivora iheringi,600,900
+Myrmotherula fluminensis,0,500
+Formicivora erythronotos,0,500
+Formicivora littoralis,0,500
+Formicivora serrana,0,1100
+Formicivora melanogaster,0,1000
+Stymphalornis acutirostris,0,500
+Formicivora grantsaui,850,1100
+Formicivora rufa,0,1200
+Formicivora grisea,0,1500
+Scelorchilus rubecula,0,1500
+Scelorchilus albicollis,0,1600
+Pteroptochos megapodius,0,3150
+Pteroptochos tarnii,0,1500
+Pteroptochos castaneus,0,1600
+Psilorhamphus guttatus,0,900
+Liosceles thoracicus,0,1050
+Acropternis orthonyx,2250,3300
+Rhinocrypta lanceolata,0,1800
+Teledromas fuscus,0,2500
+Eleoscytalopus psychopompus,0,500
+Merulaxis stresemanni,0,500
+Merulaxis ater,800,1800
+Eugralla paradoxa,0,1000
+Scytalopus simonsi,3300,4300
+Scytalopus parvirostris,1800,3300
+Scytalopus micropterus,1250,2300
+Scytalopus femoralis,1000,2050
+Scytalopus gettyae,2400,3200
+Scytalopus macropus,2400,3300
+Scytalopus acutirostris,2675,3500
+Scytalopus unicolor,2000,3170
+Scytalopus latrans,1500,4000
+Scytalopus meridanus,1600,4000
+Scytalopus caracae,1200,2400
+Scytalopus latebricola,2000,3660
+Scytalopus parkeri,2250,3350
+Scytalopus spillmanni,1900,3700
+Scytalopus perijanus,1600,3225
+Scytalopus griseicollis,2000,3900
+Scytalopus robbinsi,700,1250
+Scytalopus stilesi,1420,2130
+Scytalopus vicinior,1200,2800
+Scytalopus argentifrons,1000,3100
+Scytalopus panamensis,1050,1500
+Scytalopus chocoensis,250,1465
+Scytalopus bolivianus,1000,2850
+Scytalopus sanctaemartae,900,1700
+Scytalopus atratus,850,1900
+Scytalopus gonzagai,660,1140
+Scytalopus speluncae,750,2500
+Scytalopus diamantinensis,850,1600
+Scytalopus petrophilus,900,2100
+Scytalopus novacapitalis,1000,1200
+Scytalopus fuscus,0,800
+Scytalopus magellanicus,0,3500
+Scytalopus zimmeri,1700,3200
+Scytalopus superciliaris,1500,3350
+Scytalopus urubambae,3500,4170
+Scytalopus schulenbergi,2800,3400
+Scytalopus affinis,2835,4100
+Scytalopus opacus,2600,4000
+Scytalopus canus,3300,3500
+Scytalopus altirostris,2450,3450
+Myornis senilis,2300,3350
+Sclerurus scansor,0,1250
+Sclerurus albigularis,700,2100
+Sclerurus guatemalensis,0,1250
+Sclerurus caudacutus,0,1100
+Sclerurus mexicanus,0,1800
+Sclerurus rufigularis,0,900
+Geositta peruviana,0,700
+Geositta tenuirostris,2500,4600
+Geositta punensis,3200,4600
+Geositta cunicularia,0,4800
+Geositta poeciloptera,700,1250
+Geositta rufipennis,3100,4400
+Geositta crassirostris,600,2500
+Geositta saxicolina,3700,4900
+Geositta antarctica,0,500
+Geositta isabellina,1800,3100
+Geositta maritima,0,2300
+Glyphorynchus spirurus,0,1250
+Dendrocolaptes picumnus,0,2800
+Dendrocolaptes hoffmannsi,0,500
+Dendrocolaptes platyrostris,0,2100
+Dendrocolaptes sanctithomae,0,1800
+Dendrocolaptes certhia,0,1300
+Xiphocolaptes major,0,1800
+Xiphocolaptes promeropirhynchus,0,3500
+Xiphocolaptes falcirostris,0,800
+Xiphocolaptes albicollis,0,1800
+Hylexetastes perrotii,0,500
+Nasica longirostris,0,500
+Dendrexetastes rufigula,0,950
+Drymornis bridgesii,0,1000
+Drymotoxeres pucheranii,2100,2950
+Lepidocolaptes falcinellus,0,1600
+Lepidocolaptes albolineatus,0,1100
+Lepidocolaptes angustirostris,0,1200
+Lepidocolaptes souleyetii,0,1600
+Lepidocolaptes lacrymiger,900,3000
+Lepidocolaptes affinis,1000,3100
+Lepidocolaptes leucogaster,950,4000
+Campylorhamphus falcularius,0,1600
+Campylorhamphus procurvoides,0,500
+Campylorhamphus trochilirostris,0,1200
+Campylorhamphus pusillus,0,2200
+Dendroplex kienerii,0,200
+Dendroplex picus,0,1400
+Xiphorhynchus triangularis,1100,2400
+Xiphorhynchus erythropygius,900,2200
+Xiphorhynchus obsoletus,0,500
+Xiphorhynchus flavigaster,0,1500
+Xiphorhynchus guttatus,0,1250
+Xiphorhynchus susurrans,0,2400
+Xiphorhynchus lachrymosus,0,1200
+Xiphorhynchus pardalotus,0,1800
+Xiphorhynchus ocellatus,0,1600
+Xiphorhynchus fuscus,0,1500
+Xiphorhynchus elegans,0,1500
+Xiphorhynchus spixii,0,500
+Certhiasomus stictolaemus,0,500
+Deconychura longicauda,0,1400
+Sittasomus griseicapillus,0,1550
+Dendrocincla merula,0,600
+Dendrocincla tyrannina,1300,2500
+Dendrocincla homochroa,0,1500
+Dendrocincla fuliginosa,0,1200
+Dendrocincla anabatina,0,1250
+Dendrocincla turdina,0,1250
+Xenops rutilans,0,2400
+Xenops tenuirostris,0,500
+Xenops minutus,0,1500
+Tarphonomus harterti,1430,3000
+Tarphonomus certhioides,0,1800
+Pseudocolaptes lawrencii,1550,3000
+Pseudocolaptes boissonneautii,1400,3400
+Premnornis guttuliger,1300,2750
+Lochmias nematura,0,2450
+Phleocryptes melanops,0,4300
+Limnornis curvirostris,0,500
+Furnarius figulus,0,900
+Furnarius leucopus,0,800
+Furnarius torridus,0,500
+Furnarius cristatus,0,1000
+Furnarius minor,0,500
+Furnarius rufus,0,3500
+Geocerthia serrana,2750,4300
+Cinclodes albiventris,3200,4300
+Cinclodes albidiventris,2500,5000
+Cinclodes olrogi,1600,2800
+Cinclodes oustaleti,0,3700
+Cinclodes atacamensis,2800,4900
+Cinclodes comechingonus,1600,2800
+Cinclodes fuscus,0,4900
+Cinclodes antarcticus,0,500
+Cinclodes excelsior,3200,5200
+Cinclodes aricomae,3500,4600
+Cinclodes palliatus,4400,5000
+Cinclodes patagonicus,0,3400
+Cinclodes taczanowskii,0,500
+Cinclodes nigrofumosus,0,500
+Cinclodes pabsti,750,1100
+Upucerthia validirostris,2700,5000
+Upucerthia dumetaria,0,4000
+Upucerthia albigula,3050,3700
+Upucerthia saturatior,250,1800
+Aphrastura spinicauda,0,1800
+Aphrastura masafuerae,600,1300
+Leptasthenura yanacensis,2900,4600
+Sylviorthorhynchus desmursii,0,1000
+Leptasthenura xenothorax,3600,4550
+Leptasthenura platensis,0,1000
+Leptasthenura striolata,500,1100
+Leptasthenura setaria,750,1900
+Leptasthenura pileata,2000,4300
+Leptasthenura striata,0,4000
+Leptasthenura andicola,3000,4500
+Leptasthenura aegithaloides,0,2500
+Leptasthenura fuliginiceps,1000,4200
+Certhiaxis mustelinus,0,500
+Certhiaxis cinnamomeus,0,1000
+Schoeniophylax phryganophilus,0,500
+Synallaxis propinqua,0,500
+Synallaxis cinerascens,0,2000
+Synallaxis scutata,0,1700
+Synallaxis maranonica,450,1850
+Synallaxis albilora,0,1000
+Synallaxis gujanensis,0,1200
+Synallaxis hellmayri,200,400
+Synallaxis spixi,0,2200
+Synallaxis hypospodia,0,700
+Synallaxis albigularis,0,800
+Synallaxis albescens,0,1500
+Synallaxis courseni,2450,3500
+Synallaxis azarae,600,3500
+Synallaxis frontalis,0,2300
+Synallaxis moesta,0,1200
+Synallaxis cabanisi,200,350
+Synallaxis infuscata,0,500
+Synallaxis ruficapilla,0,1400
+Synallaxis whitneyi,0,1700
+Synallaxis brachyura,0,2000
+Synallaxis subpudica,1200,3200
+Synallaxis tithys,0,750
+Synallaxis kollari,0,100
+Synallaxis erythrothorax,0,1000
+Synallaxis candei,0,1100
+Synallaxis cinnamomea,900,2100
+Synallaxis cherriei,0,1050
+Synallaxis rutilans,0,900
+Synallaxis unirufa,1700,3300
+Synallaxis fuscorufa,900,3000
+Synallaxis zimmeri,1900,3000
+Synallaxis hypochondriaca,1650,3000
+Synallaxis stictothorax,0,400
+Pseudasthenes cactorum,50,2500
+Pseudasthenes steinbachi,500,3000
+Pseudasthenes patagonica,0,500
+Pseudasthenes humicola,0,2200
+Spartonoica maluroides,0,500
+Pseudoseisura cristata,0,500
+Pseudoseisura unirufa,300,500
+Pseudoseisura gutturalis,0,1000
+Pseudoseisura lophotes,0,800
+Acrobatornis fonsecai,0,550
+Metopothrix aurantiaca,0,1100
+Xenerpestes singularis,1050,1700
+Xenerpestes minlosi,0,1000
+Siptornis striaticollis,1300,2400
+Cranioleuca gutturata,0,850
+Thripophaga fusciceps,0,500
+Thripophaga macroura,0,800
+Roraimia adusta,1200,2500
+Cranioleuca sulphurifera,0,500
+Limnoctites rectirostris,0,1000
+Thripophaga berlepschi,3050,3300
+Cranioleuca marcapatae,2400,3300
+Cranioleuca albicapilla,2200,3300
+Cranioleuca vulpina,0,800
+Cranioleuca vulpecula,150,300
+Cranioleuca muelleri,0,500
+Cranioleuca demissa,1100,2450
+Cranioleuca semicinerea,0,900
+Cranioleuca subcristata,300,2300
+Cranioleuca hellmayri,1500,3000
+Cranioleuca curtata,800,2500
+Cranioleuca antisiensis,1200,3100
+Cranioleuca baroni,2600,4400
+Cranioleuca erythrops,700,2300
+Cranioleuca albiceps,2400,3600
+Cranioleuca henricae,1300,3300
+Cranioleuca pyrrhophia,0,2500
+Cranioleuca obsoleta,0,1000
+Cranioleuca pallida,800,2200
+Hellmayrea gularis,2500,3200
+Asthenes hudsoni,0,500
+Asthenes humilis,3500,4800
+Asthenes modesta,0,4600
+Asthenes anthoides,0,1500
+Asthenes wyatti,3000,4300
+Asthenes sclateri,2000,2900
+Asthenes flammulata,3300,4500
+Asthenes virgata,3300,4300
+Asthenes maculicauda,2900,4300
+Asthenes urubambensis,2750,3800
+Asthenes luizae,900,1500
+Asthenes pudibunda,2500,4000
+Asthenes coryi,2800,4100
+Asthenes fuliginosa,3000,4300
+Asthenes perijana,3000,3400
+Asthenes griseomurina,2750,3200
+Asthenes palpebralis,3000,3500
+Asthenes ottonis,2800,3700
+Asthenes helleri,2800,3750
+Asthenes harterti,2900,3500
+Asthenes vilcabambae,2800,3400
+Asthenes moreirae,2000,2800
+Asthenes pyrrholeuca,0,3000
+Asthenes heterura,3000,4150
+Asthenes baeri,0,500
+Asthenes berlepschi,2600,3700
+Asthenes dorbignyi,1800,4300
+Phacellodomus erythrophthalmus,0,1700
+Phacellodomus ferrugineigula,0,1250
+Phacellodomus ruber,0,700
+Phacellodomus dorsalis,2050,2800
+Phacellodomus maculipectus,1000,3100
+Phacellodomus striaticollis,0,700
+Phacellodomus striaticeps,2600,4000
+Phacellodomus sibilatrix,0,500
+Phacellodomus rufifrons,0,2000
+Anumbius annumbi,0,1000
+Coryphistera alaudina,0,700
+Ancistrops strigilatus,0,900
+Philydor rufum,800,2500
+Philydor erythropterum,0,1300
+Clibanornis rufipectus,610,1875
+Clibanornis erythrocephalus,600,1800
+Clibanornis rubiginosus,0,2400
+Clibanornis dendrocolaptoides,0,1000
+Clibanornis rectirostris,600,1200
+Thripadectes holostictus,1600,2700
+Thripadectes rufobrunneus,1200,2500
+Thripadectes virgaticeps,1000,2500
+Thripadectes melanorhynchus,1000,1700
+Thripadectes flammulatus,1400,3250
+Thripadectes scrutator,2100,3500
+Thripadectes ignobilis,800,2500
+Automolus melanopezus,0,500
+Automolus rufipileatus,0,850
+Automolus ochrolaemus,0,1400
+Automolus subulatus,0,1300
+Automolus infuscatus,0,800
+Automolus paraensis,0,800
+Automolus lammi,0,1000
+Automolus leucophthalmus,0,1000
+Megaxenops parnaguae,300,800
+Anabacerthia striaticollis,950,2200
+Anabacerthia variegaticeps,700,2100
+Anabacerthia ruficaudata,0,1300
+Anabacerthia amaurotis,600,1500
+Anabacerthia lichtensteini,0,800
+Syndactyla dimidiata,100,1200
+Syndactyla ruficollis,0,2600
+Syndactyla roraimae,1100,2470
+Syndactyla guttulata,900,2100
+Syndactyla rufosuperciliata,400,2900
+Syndactyla subalaris,1000,2300
+Syndactyla striata,650,1700
+Syndactyla ucayalae,0,1300
+Philydor erythrocercum,0,1300
+Philydor fuscipenne,500,1200
+Anabazenops dorsalis,0,1100
+Anabazenops fuscus,350,1250
+Cichlocolaptes leucophrus,0,1450
+Philydor atricapillus,0,1050
+Heliobletus contaminatus,750,1800
+Philydor pyrrhodes,0,750
+Margarornis squamiger,1400,3600
+Margarornis bellulus,1350,1600
+Margarornis rubiginosus,1200,3000
+Premnoplex tatei,800,2400
+Premnoplex brunnescens,950,2500
+Microxenops milleri,0,500
+Ochetorhynchus melanurus,1400,3000
+Ochetorhynchus phoenicurus,0,1200
+Ochetorhynchus ruficaudus,1300,4300
+Ochetorhynchus andaecola,2600,4500
+Pygarrhichas albogularis,0,2000
+Berlepschia rikeri,0,500
+Formicarius rufifrons,0,500
+Formicarius rufipectus,1100,2200
+Formicarius nigricapillus,0,1800
+Formicarius analis,0,1400
+Formicarius colma,0,750
+Chamaeza campanisona,0,1800
+Chamaeza nobilis,0,500
+Chamaeza ruficauda,700,2100
+Chamaeza meruloides,500,1900
+Chamaeza turdina,1500,2600
+Chamaeza mollissima,1850,3100
+Grallaricula cumanensis,600,1200
+Grallaricula nana,1900,2950
+Grallaricula ferrugineipectus,800,3350
+Grallaricula flavirostris,900,2200
+Grallaricula peruviana,1700,2100
+Grallaricula ochraceifrons,1900,2000
+Grallaricula loricata,1400,2100
+Grallaricula lineifrons,3000,3400
+Hylopezus fulviventris,0,800
+Hylopezus berlepschi,0,500
+Hylopezus dives,0,900
+Myrmothera campanisona,0,850
+Myrmothera simplex,900,2400
+Hylopezus ochroleucus,500,900
+Hylopezus perspicillatus,0,1250
+Hylopezus macularius,0,500
+Grallaria gigantea,1400,3000
+Grallaria excelsa,1700,2300
+Grallaria squamigera,2000,3350
+Grallaria griseonucha,2300,2800
+Grallaria haplonota,900,2000
+Grallaria alleni,2100,2100
+Grallaria guatimalensis,600,3000
+Grallaria chthonia,1800,2100
+Grallaria varia,0,1550
+Grallaria eludens,0,500
+Grallaria dignissima,0,500
+Grallaria ridgelyi,2300,2680
+Grallaria watkinsi,600,1400
+Grallaria ruficapilla,1300,3100
+Grallaria erythroleuca,2500,2950
+Grallaria erythrotis,2000,3000
+Grallaria capitalis,1300,2800
+Grallaria przewalskii,1900,2800
+Grallaria hypoleuca,1500,2200
+Grallaria flavotincta,1300,1800
+Grallaria milleri,2700,3100
+Grallaria kaestneri,2000,2300
+Grallaria bangsi,1600,2400
+Grallaria nuchalis,2200,3300
+Grallaria carrikeri,2400,2800
+Grallaria andicolus,3350,4400
+Grallaria rufula,2400,3600
+Grallaria quitensis,2200,3400
+Grallaria rufocinerea,2400,3100
+Grallaria blakei,2100,2500
+Neodrepanis coruscans,400,1800
+Neodrepanis hypoxantha,1400,2650
+Philepitta castanea,400,1600
+Philepitta schlegeli,0,800
+Pseudocalyptomena graueri,1760,2480
+Psarisomus dalhousiae,200,2500
+Corydon sumatranus,0,2000
+Eurylaimus steerii,0,1220
+Serilophus lunatus,300,1220
+Cymbirhynchus macrorhynchos,0,900
+Eurylaimus ochromalus,0,1200
+Eurylaimus javanicus,500,900
+Smithornis rufolateralis,0,1500
+Smithornis capensis,0,2550
+Smithornis sharpei,850,1950
+Calyptomena hosii,0,1680
+Calyptomena whiteheadi,600,1700
+Calyptomena viridis,0,1700
+Pitta erythrogaster,0,1400
+Pitta kochi,300,2350
+Pitta arquata,600,1200
+Pitta granatina,0,1000
+Pitta ussheri,0,300
+Pitta venusta,400,1600
+Pitta angolensis,0,1000
+Pitta reichenowi,1100,1400
+Pitta brachyura,450,1800
+Pitta anerythra,0,600
+Pitta iris,0,380
+Pitta versicolor,0,1500
+Pitta superba,0,100
+Pitta maxima,200,650
+Pitta steerii,0,1000
+Pitta elegans,0,1400
+Pitta sordida,0,2000
+Pitta moluccensis,0,1800
+Pitta phayrei,0,1830
+Pitta cyanea,60,2000
+Pitta baudi,0,500
+Pitta guajana,0,1500
+Pitta elliotii,0,800
+Pitta gurneyi,0,160
+Pitta caerulea,0,1200
+Pitta nipalensis,0,2150
+Pitta oatesi,380,2600
+Pitta soror,50,1700
+Sapayoa aenigma,0,1350
+Menura novaehollandiae,0,500
+Pomatostomus temporalis,0,500
+Passerella iliaca,0,2000
+Passer domesticus,0,500
+Certhia familiaris,0,3000
+Sitta canadensis,0,1000
+Artamus leucorynchus,200,2000
+Corvus brachyrhynchos,0,2000
+Chlamydera nuchalis,0,600
+Acanthisitta chloris,0,1550
+Aratinga aurea,0,1100
+Nestor notabilis,600,2000
+Atlapetes_forbesi,2700,4600
+Atlapetes_canigenis,2500,3500
+Atlapetes_terborghi,2520,3520
+Atlapetes_melanopsis,2500,3600
+Atlapetes_personatus,1000,2500
+Atlapetes_albiceps,400,1400
+Atlapetes_flaviceps,1900,2440
+Atlapetes_fuscoolivaceus,1600,2400
+Atlapetes_leucopis,2000,3100
+Atlapetes_rufigenis,2750,4100
+Atlapetes_schistaceus,2500,3800
+Atlapetes_leucopterus,600,2900
+Atlapetes_pallidiceps,1650,2500
+Atlapetes_nationi,2000,4000
+Atlapetes_seebohmi,1150,2800
+Atlapetes_pallidinucha,2800,3600
+Atlapetes_latinuchus,1600,3700
+Atlapetes_tricolor,700,3050
+Atlapetes_albofrenatus,1000,2500
+Atlapetes_melanocephalus,1000,3000
+Atlapetes_semirufus,1000,3500
+Atlapetes_rufinucha,1200,3600
+Atlapetes_citrinellus,700,3100
+Atlapetes_fulviceps,1500,3600
+Pselliophorus_luteoviridis,1200,1800
+Pselliophorus_tibialis,1200,1700
+Atlapetes_pileatus,900,3500
+Atlapetes_gutturalis,1200,3150
+Atlapetes_albinucha,1200,3150
+Buarremon_phaeopleurus,70,1800
+Buarremon_phygas,920,1500
+Buarremon_atricapillus,500,1500
+Arremon_assimilis,1500,3600
+Buarremon_basilicus,600,2800
+Buarremon_perijanus,700,900
+Arremon_torquatus,700,3050
+Buarremon_costaricensis,240,1500
+Arremon_taciturnus,0,1000
+Arremon_semitorquatus,300,1000
+Arremon_schlegeli,250,1400
+Arremon_flavirostris,0,1400
+Arremon_aurantiirostris,240,3500
+Arremon_abeillei,0,1800
+Arremon brunneinucha,400,3500
+Accipiter_striatus,900,3700
+Aglaiocercus_kingii,900,2700
+Amblycercus holosericeus,0,3500
+Ammodramus aurifrons,0,1500
+Aulacorhynchus prasinus,0,3700
+Pharomachrus_auriceps,1200,3100
+Pharomachrus_pavoninus,0,700
+Pharomachrus_antisianus,1200,3000
+Pharomachrus_fulgidus,900,2500
+Pharomachrus_mocinno,900,3200
+Euptilotis_neoxenus,2100,2800
+Trogon_rufus,0,1100
+Trogon_mexicanus,800,3500
+Trogon_personatus,700,3600
+Trogon_collaris,700,2400
+Trogon_elegans,0,1900
+Trogon_melanocephalus,0,1000
+Trogon_citreolus,0,1000
+Trogon_bairdii,0,1200
+Trogon_viridis,0,1350
+Trogon_surrucura,0,2000
+Trogon_violaceus,0,1850
+Trogon_curucui,0,1700
+Trogon_comptus,0,1800
+Trogon_melanurus,0,2200
+Trogon_massena,0,1200
+Trogon_clathratus,90,1360
+Andigena_cucullata,2400,3300
+Andigena_hypoglauca,2200,3600
+Andigena_laminirostris,1300,2500
+Andigena_nigrirostris,1700,2700
+Aulacorhynchus_coeruleicinctis,1600,2500
+Aulacorhynchus_derbianus,600,2000
+Aulacorhynchus_haematopygus,300,2200
+Aulacorhynchus_huallagae,2000,2600
+Aulacorhynchus_sulcatus,300,2000
+Capito_aurovirens,500,600
+Capito_brunneipectus,0,1000
+Capito_dayi,50,550
+Capito_hypoleucus,700,1600
+Capito_maculicoronatus,0,900
+Capito_niger,0,800
+Capito_quinticolor,0,350
+Capito_squamatus,0,800
+Eubucco_bourcierii,1000,1800
+Eubucco_richardsoni,0,1200
+Eubucco_tucinkae,150,850
+Eubucco_versicolor,1000,2000
+Pteroglossus_aracari,0,600
+Pteroglossus_azara,0,1400
+Pteroglossus_bailloni,0,1550
+Pteroglossus_beauharnaesii,0,500
+Pteroglossus_bitorquatus,0,800
+Pteroglossus_castanotis,0,1300
+Pteroglossus_frantzii,0,1200
+Pteroglossus_inscriptus,0,1000
+Pteroglossus_pluricinctus,500,750
+Pteroglossus_torquatus,0,1000
+Pteroglossus_viridis,0,800
+Ramphastos_ambiguus,0,2286
+Ramphastos_brevis,0,1550
+Ramphastos_dicolorus,100,1500
+Ramphastos_sulfuratus,0,1600
+Ramphastos_toco,0,1750
+Ramphastos_tucanus,0,1440
+Ramphastos_vitellinus,0,1700
+Selenidera_gouldii,0,800
+Selenidera_maculirostris,0,1000
+Selenidera_nattereri,0,1000
+Selenidera_piperivora,0,900
+Selenidera_reinwardtii,0,1000
+Selenidera_spectabilis,300,1000
+Semnornis_frantzii,1200,2200
+Semnornis_ramphastinus,1000,2000
+Chaetura_viridipennis,0,1500
+Streptoprocne_zonaris,0,4350
+Chaetura_pelagica,0,3200
+Chaetura_chapmani,0,2500
+Chaetura_meridionalis,0,2500
+Chaetura_spinicaudus,0,1000
+Streptoprocne_semicollaris,0,3600
+Cypseloides_niger,1200,3000
+Cypseloides_lemosi,1050,2000
+Chaetura_cinereiventris,0,2000
+Streptoprocne_biscutata,0,2500
+Cypseloides_cryptus,0,2000
+Cypseloides_storeri,1500,2500
+Cypseloides_fumigatus,700,2100
+Chaetura_egregia,0,1200
+Cypseloides_cherriei,500,2500
+Chaetura_brachyura,200,1900
+Chaetura_fumosa,0,700
+Cypseloides_rothschildi,500,2000
+Streptoprocne_phelpsi,400,1400
+Cypseloides_senex,0,1000
+Streptoprocne_rutila,0,3400
+Chaetura_vauxi,0,3000
+Cyanocorax_yncas,800,3000
+Cyanocorax_cayanus,0,1100
+Cyanocorax_melanocyaneus,1000,2450
+Calocitta_formosa,0,1500
+Calocitta_colliei,0,1800
+Cyanocorax_morio,0,2500
+Gymnorhinus_cyanocephalus,1000,2900
+Aphelocoma_coerulescens,0,100
+Aphelocoma_californica,0,3000
+Cyanocitta_cristata,0,1000
+Cyanocitta_stelleri,900,3900
+Cyanolyca_cucullata,800,2100
+Cyanolyca_viridicyanus,1600,4000
+Cyanolyca_mirabilis,1525,3500
+Nystalus_striolatus,0,1850
+Nystalus_chacuru,0,2200
+Nystalus_radiatus,0,1675
+Nystalus_maculatus,0,2000
+Bucco_noanamae,0,100
+Bucco_capensis,0,1700
+Monasa_nigrifrons,0,1000
+Monasa_flavirostris,0,1400
+Monasa_atra,0,1000
+Monasa_morphoeus,0,1350
+Bucco_tamatia,0,1400
+Bucco_macrodactylus,0,600
+Chelidoptera_tenebrosa,0,1000
+Notharchus_ordii,150,300
+Notharchus_swainsoni,0,900
+Notharchus_pectoralis,0,1000
+Notharchus_macrorhynchos,100,250
+Notharchus_tectus,0,1000
+Nonnula_ruficapilla,0,1650
+Nonnula_amaurocephala,0,500
+Nonnula_frontalis,0,1000
+Nonnula_brunnea,0,400
+Nonnula_sclateri,0,500
+Nonnula_rubecula,0,1000
+Hypnelus_ruficollis,0,1300
+Micromonacha_lanceolata,300,1500
+Hapaloptila_castanea,1500,2900
+Malacoptila_fulvogularis,500,2300
+Malacoptila_semicincta,0,1050
+Malacoptila_mystacalis,350,2100
+Malacoptila_panamensis,0,1400
+Malacoptila_striata,0,2100
+Malacoptila_fusca,0,1200
+Malacoptila_rufa,0,500
+Lurocalis_semitorquatus,0,1800
+Lurocalis_rufiventris,1650,3000
+Caprimulgus_nigrescens,100,1100
+Nyctiprogne_vielliardi,0,500
+Nyctiprogne_leucopyga,0,500
+Caprimulgus_longirostris,0,4200
+Caprimulgus_whitelyi,850,1800
+Eleothreptus_candicans,0,210
+Eleothreptus_anomalus,0,1100
+Caprimulgus_parvulus,0,1000
+Caprimulgus_cayennensis,0,3200
+Hydropsalis_climacocerca,0,1000
+Hydropsalis_torquata,0,500
+Caprimulgus_maculicaudus,0,500
+Uropsalis_segmentata,2300,3600
+Uropsalis_lyra,800,3500
+Nyctidromus_albicollis,0,2300
+Caprimulgus_anthonyi,0,800
+Podager_nacunda,0,2500
+Chordeiles_pusillus,0,1050
+Chordeiles_minor,0,2600
+Chordeiles_acutipennis,0,1200
+Chordeiles_rupestris,0,500
+Caprimulgus_hirundinaceus,0,500
+Caprimulgus_maculosus,0,500
+Nyctiphrynus_rosenbergi,0,900
+Nyctiphrynus_ocellatus,0,1350
+Nyctiphrynus_yucatanicus,0,250
+Nyctiphrynus_mcleodii,600,2000
+Caprimulgus_ridgwayi,0,2400
+Caprimulgus_saturatus,1500,3100
+Uropelia_campestris,0,1100
+Metriopelia_aymara,2800,5000
+Metriopelia_ceciliae,2000,2500
+Metriopelia_morenoi,1800,3200
+Metriopelia_melanoptera,900,4900
+Columbina_picui,0,3500
+Columbina_cyanopis,0,800
+Columbina_talpacoti,0,1200
+Columbina_minuta,0,1400
+Columbina_passerina,0,2900
+Columbina_squammata,0,1200
+Columbina_inca,0,4000
+Columbina_cruziana,0,2400
+Columbina_buckleyi,0,1000
+Claravis_godefrida,0,2300
+Claravis_mondetoura,1300,2600
+Claravis_pretiosa,0,2100
+Cacicus_sclateri,0,400
+Cacicus_chrysopterus,0,2800
+Cacicus_uropygialis,1500,2450
+Cacicus_cela,0,1300
+Cacicus_koepckeae,300,700
+Ocyalus_latirostris,0,300
+Psarocolius_oseryi,0,750
+Cacicus_haemorrhous,0,1000
+Cacicus_chrysonotus,1800,3300
+Cacicus_melanicterus,0,1500
+Cacicus_solitarius,0,600
+Psarocolius_angustifrons,0,2500
+Psarocolius_cassini,0,400
+Psarocolius_guatimozinus,0,800
+Psarocolius_atrovirens,800,2800
+Psarocolius_wagleri,0,1700
+Psarocolius_decumanus,0,1700
+Psarocolius_montezuma,0,1600
+Psarocolius_bifasciatus,0,500
+Psarocolius_viridis,0,1100
+Amblycercus_holosericeus,0,3500
+Turdus_fuscater,1500,4250
+Turdus_serranus,900,2900
+Turdus_nigriceps,0,2550
+Turdus_olivater,600,2600
+Turdus_chiguanco,0,4000
+Turdus_fulviventris,1400,2600
+Turdus_ignobilis,0,2800
+Turdus_maranonicus,200,2000
+Turdus_amaurochalinus,0,2600
+Turdus_albicollis,0,1900
+Turdus_assimilis,0,3000
+Turdus_flavipes,0,2500
+Turdus_lawrencii,0,1200
+Turdus_haplochrous,250,350
+Turdus_nudigenis,0,1800
+Turdus_grayi,0,2100
+Turdus_maculirostris,0,2200
+Turdus_rufiventris,0,2600
+Turdus_obsoletus,0,1900
+Turdus_rufopalliatus,0,1500
+Turdus_fumigatus,100,1800
+Turdus_hauxwelli,0,800
+Turdus_leucomelas,0,2000
+Turdus_reevei,600,1600
+Turdus_leucops,900,2000
+Myioborus_melanocephalus,2000,4000
+Basileuterus_leucophrys,0,1000
+Ergaticus_ruber,1800,3500
+Myioborus_albifacies,900,2250
+Wilsonia_pusilla,0,3000
+Basileuterus_roraimae,0,1000
+Basileuterus_rufifrons,0,3000
+Myioborus_castaneocapilla,1200,2200
+Basileuterus_flaveolus,0,1000
+Basileuterus_bivittatus,700,1800
+Basileuterus_leucoblepharus,0,1600
+Basileuterus_trifasciatus,500,2000
+Basileuterus_signatus,1500,3050
+Myioborus_pictus,1000,3000
+Myioborus_pariae,800,1150
+Myioborus_ornatus,400,3400
+Basileuterus_chrysogaster,300,1200
+Basileuterus_luteoviridis,2300,3400
+Myioborus_albifrons,2200,3200
+Basileuterus_melanogenys,2500,3500
+Basileuterus_belli,1200,3500
+Basileuterus_coronatus,1300,2500
+Cardellina_rubrifrons,1300,3000
+Basileuterus_culicivorus,0,2150
+Euthlypis_lachrymosa,50,1800
+Myioborus_torquatus,1400,3500
+Basileuterus_hypoleucus,0,1100
+Basileuterus_cinereicollis,800,2100
+Phaeothlypis_rivularis,0,1400
+Myioborus_cardonai,1200,1600
+Myioborus_flavivertex,2000,3050
+Basileuterus_nigrocristatus,1500,3400
+Wilsonia_canadensis,500,2000
+Phaeothlypis_fulvicauda,0,1000
+Ergaticus_versicolor,2800,3800
+Myioborus_miniatus,500,2500
+Basileuterus_tristriatus,1000,2000
+Basileuterus_conspicillatus,450,2200
+Basileuterus_fraseri,0,1900
+Myioborus_brunniceps,400,3800
+Forpus_xanthopterygius,0,1200
+Forpus_modestus,0,1000
+Forpus_passerinus,0,1800
+Forpus_coelestis,0,1500
+Forpus_conspicillatus,100,1800
+Forpus_xanthops,600,1800
+Pyrrhura_melanura,0,500
+Pyrrhura_hoematotis,1000,2000
+Pyrrhura_albipectus,900,2000
+Pyrrhura_orcesi,300,1300
+Pyrrhura_devillei,0,1000
+Pyrrhura_rhodocephala,800,3050
+Pyrrhura_calliptera,1700,3400
+Pyrrhura_molinae,0,2000
+Pyrrhura_lepida,0,1000
+Pyrrhura_perlata,0,1000
+Pyrrhura_viridicata,1900,2750
+Pyrrhura_frontalis,0,1400
+Pyrrhura_rupicola,0,1100
+Pyrrhura_picta,100,2000
+Pyrrhura_leucotis,0,600
+Pyrrhura_egregia,700,1800
+Pyrrhura_cruentata,0,400
+Cyanoliseus_patagonus,0,2000
+Aratinga_weddellii,0,750
+Aratinga_auricapillus,0,2180
+Aratinga_solstitialis,0,1400
+Aratinga_jandaya,0,1200
+Nandayus_nenday,0,800
+Aratinga_wagleri,350,2000
+Aratinga_rubritorquis,800,2600
+Aratinga_cactorum,0,800
+Aratinga_aurea,0,600
+Aratinga_mitrata,1000,3400
+Aratinga_euops,0,1100
+Aratinga_erythrogenys,0,800
+Aratinga_finschi,0,1600
+Aratinga_pertinax,0,1200
+Aratinga_acuticaudata,0,2650
+Aratinga_leucophthalma,0,1000
+Cyanopsitta_spixii,0,1000
+Ara_ararauna,0,500
+Ara_militaris,600,2600
+Ara_glaucogularis,200,300
+Ara_ambiguus,0,1000
+Ara_severus,0,600
+Ara_rubrogenys,1100,2700
+Ara_chloropterus,0,1500
+Ara_macao,0,1000
+Primolius_auricollis,0,600
+Primolius_maracana,0,1000
+Primolius_couloni,0,800
+Orthopsittaca_manilata,0,1200
+Anodorhynchus_leari,400,800
+Anodorhynchus_hyacinthinus,0,800
+Diopsittaca_nobilis,0,1400
+Guaruba_guarouba,0,1000
+Leptosittaca_branickii,2400,3400
+Enicognathus_ferrugineus,0,2000
+Enicognathus_leptorhynchus,0,2000
+Pionites_melanocephalus,0,1000
+Pionites_leucogaster,0,800
+Deroptyus_accipitrinus,0,1000
+Myiopsitta_monachus,0,1000
+Brotogeris_jugularis,0,1400
+Brotogeris_pyrrhoptera,0,1550
+Brotogeris_cyanoptera,0,1000
+Brotogeris_chrysoptera,0,1200
+Brotogeris_tirica,0,1200
+Brotogeris_versicolurus,0,1000
+Brotogeris_chiriri,0,1560
+Brotogeris_sanctithomae,0,1000
+Pionopsitta_pileata,0,1500
+Triclaria_malachitacea,300,1000
+Pyrilia_vulturina,0,1000
+Pyrilia_caica,0,1100
+Pyrilia_barrabandi,0,500
+Pyrilia_pyrilia,0,1650
+Pyrilia_pulchra,0,2100
+Pyrilia_haematotis,0,1200
+Ognorhynchus_icterotis,1200,3400
+Hapalopsittaca_melanotis,1740,3450
+Hapalopsittaca_fuertesi,2900,3150
+Hapalopsittaca_pyrrhops,2500,3000
+Hapalopsittaca_amazonina,2500,3000
+Pionus_tumultuosus,2000,3300
+Pionus_menstruus,0,1600
+Pionus_chalcopterus,1400,2400
+Pionus_fuscus,0,1800
+Pionus_maximiliani,0,2000
+Pionus_sordidus,500,1500
+Amazona_mercenaria,1500,3000
+Amazona_aestiva,0,1600
+Amazona_ochrocephala,0,300
+Amazona_barbadensis,0,1000
+Amazona_pretrei,300,1000
+Amazona_tucumana,1600,2600
+Amazona_vinacea,0,2000
+Amazona_festiva,0,500
+Amazona_brasiliensis,0,300
+Amazona_rhodocorytha,0,900
+Amazona_dufresniana,0,1700
+Amazona_autumnalis,0,1135
+Amazona_amazonica,0,600
+Amazona_farinosa,0,500
+Amazona_kawalli,0,1000
+Graydidascalus_brachyurus,0,400
+Alipiopsitta_xanthops,600,1200
+Touit_purpuratus,0,1400
+Touit_huetii,0,900
+Touit_melanonotus,500,1000
+Touit_surdus,0,900
+Touit_stictopterus,500,2400
+Touit_batavicus,900,1700
+Touit_dilectissimus,500,1400
+Nannopsittaca_dachilleae,0,1000
+Nannopsittaca_panychlora,0,2200
+Bolborhynchus_orbygnesius,3000,4000
+Bolborhynchus_ferrugineifrons,3200,4000
+Bolborhynchus_lineola,1600,3300
+Hemicircus_canente,0,1300
+Hemicircus_concretus,0,1100
+Nesoctites_micromegas,0,1770
+Sphyrapicus_varius,900,3000
+Sphyrapicus_nuchalis,0,2900
+Sphyrapicus_ruber,0,2900
+Sphyrapicus_thyroideus,850,3200
+Melanerpes_portoricensis,0,500
+Melanerpes_candidus,0,2500
+Melanerpes_cactorum,0,1700
+Melanerpes_chrysauchen,0,1500
+Melanerpes_formicivorus,0,3000
+Melanerpes_pygmaeus,,
+Melanerpes_carolinus,0,900
+Melanerpes_aurifrons,0,2500
+Melanerpes_uropygialis,0,1600
+Melanerpes_flavifrons,0,1800
+Melanerpes_pucherani,0,1300
+Melanerpes_cruentatus,0,1500
+Melanerpes_hypopolius,900,2100
+Melanerpes_rubricapillus,0,1900
+Melanerpes_herminieri,0,500
+Melanerpes_chrysogenys,0,1500
+Melanerpes_superciliaris,0,900
+Melanerpes_erythrocephalus,0,1400
+Melanerpes_pulcher,250,1500
+Melanerpes_hoffmannii,0,2150
+Melanerpes_radiolatus,0,1800
+Melanerpes_lewis,0,2800
+Melanerpes_striatus,0,2400
+Xiphidiopicus_percussus,0,2000
+Picoides_arcticus,0,3100
+Dendrocopos_obsoletus,0,3000
+Picoides_dorsalis,1300,3350
+Picoides_tridactylus,1300,3350
+Dendrocopos_leucopterus,0,2500
+Dendrocopos_ramsayi,0,550
+Dendrocopos_dorae,1200,2400
+Dendrocopos_moluccensis,0,2200
+Dendrocopos_canicapillus,0,2800
+Dendrocopos_maculatus,0,2500
+Dendrocopos_kizuki,0,2100
+Mesopicos_griseocephalus,75,3750
+Mesopicos_goertae,500,2000
+Thripias_namaquus,0,3000
+Thripias_xantholophus,0,2150
+Thripias_pyrrhogaster,0,700
+Mesopicos_elliotii,0,2300
+Dendropicos_poecilolaemus,0,2100
+Dendropicos_lugubris,0,1400
+Dendropicos_fuscescens,0,3500
+Dendropicos_elachus,0,1600
+Dendropicos_gabonensis,0,1400
+Dendropicos_abyssinicus,1600,3000
+Dendropicos_spodocephalus,0,3300
+Dendropicos_stierlingi,0,1500
+Dendrocopos_medius,0,2300
+Dendrocopos_himalayensis,1500,3200
+Dendrocopos_mahrattensis,0,200
+Dendrocopos_nanus,0,1200
+Dendrocopos_atratus,800,2200
+Dendrocopos_hyperythrus,500,4300
+Dendrocopos_temminckii,0,2300
+Dendrocopos_major,0,2500
+Dendrocopos_syriacus,0,2700
+Dendrocopos_leucotos,0,1850
+Dendrocopos_noguchii,,
+Dendrocopos_macei,0,2800
+Dendrocopos_cathpharius,700,3900
+Picoides_fumigatus,800,2900
+Picoides_villosus,0,3852
+Picoides_stricklandi,1200,4100
+Picoides_arizonae,1200,2400
+Picoides_albolarvatus,800,2750
+Veniliornis_chocoensis,0,1000
+Veniliornis_callonotus,0,1800
+Veniliornis_dignus,0,1800
+Veniliornis_affinis,0,1300
+Veniliornis_nigriceps,2000,4000
+Veniliornis_frontalis,0,2000
+Veniliornis_maculifrons,0,500
+Veniliornis_passerinus,0,1300
+Veniliornis_cassini,0,1500
+Veniliornis_kirkii,0,1750
+Veniliornis_spilogaster,0,2000
+Veniliornis_sanguineus,0,500
+Veniliornis_lignarius,0,4000
+Veniliornis_mixtus,0,610
+Picoides_borealis,0,500
+Picoides_nuttallii,0,1700
+Picoides_scalaris,0,3000
+Picoides_pubescens,0,2750
+Dendrocopos_minor,0,2000
+Dendrocopos_assimilis,0,1660
+Dendrocopos_auriceps,900,3000
+Dendrocopos_darjellensis,2500,3500
+Campephilus_robustus,0,2200
+Campephilus_haematogaster,900,2200
+Campephilus_rubricollis,0,2400
+Campephilus_leucopogon,0,2500
+Campephilus_gayaquilensis,0,1500
+Campephilus_melanoleucos,0,3100
+Campephilus_guatemalensis,0,2000
+Campephilus_pollens,1700,2600
+Campephilus_magellanicus,0,2000
+Campephilus_imperialis,1670,305
+Campephilus_principalis,0,2000
+Chrysocolaptes_lucidus,0,2500
+Chrysocolaptes_festivus,0,1200
+Reinwardtipicus_validus,0,2000
+Blythipicus_rubiginosus,0,2200
+Blythipicus_pyrrhotis,600,2500
+Campethera_tullbergi,900,3000
+Campethera_caroli,0,1800
+Campethera_nubica,0,2300
+Campethera_punctuligera,0,500
+Campethera_scriptoricauda,0,500
+Campethera_nivosa,0,1800
+Campethera_bennettii,0,1600
+Campethera_notata,,
+Campethera_abingoni,0,2200
+Campethera_maculosa,0,2100
+Campethera_cailliautii,0,1800
+Campethera_mombassica,,
+Geocolaptes_olivaceus,0,2100
+Picus_awokera,300,2000
+Picus_vaillantii,950,2100
+Picus_viridis,0,3000
+Picus_canus,0,2000
+Picus_vittatus,0,1500
+Picus_viridanus,,
+Picus_rabieri,0,700
+Picus_xanthopygaeus,0,900
+Picus_erythropygius,0,600
+Picus_puniceus,0,1300
+Picus_chlorolophus,0,2100
+Picus_squamatus,600,3700
+Picus_mineaceus,,
+Picus_flavinucha,0,2750
+Picus_mentalis,0,1600
+Colaptes_auratus,0,3300
+Colaptes_campestris,0,1000
+Colaptes_punctigula,0,1600
+Colaptes_chrysoides,0,900
+Colaptes_melanochloros,0,1000
+Colaptes_rivolii,700,3300
+Colaptes_rupicola,2000,5000
+Colaptes_pitius,0,1000
+Colaptes_auricularis,900,2400
+Colaptes_atricollis,500,4300
+Colaptes_rubiginosus,0,3100
+Colaptes_fernandinae,,
+Piculus_flavigula,0,500
+Piculus_simplex,0,900
+Piculus_litae,0,800
+Piculus_leucolaemus,0,1400
+Piculus_callopterus,300,900
+Piculus_chrysochloros,0,650
+Piculus_aurulentus,0,2000
+Mulleripicus_pulverulentus,0,1100
+Mulleripicus_funebris,300,1000
+Mulleripicus_fulvus,0,2200
+Dryocopus_pileatus,0,2300
+Dryocopus_lineatus,0,2100
+Dryocopus_martius,0,2400
+Dryocopus_galeatus,0,800
+Dryocopus_hodgei,0,500
+Dryocopus_schulzi,0,1500
+Dryocopus_javensis,0,3600
+Celeus_loricatus,0,1500
+Celeus_flavus,0,700
+Celeus_undatus,0,500
+Celeus_castaneus,0,750
+Celeus_spectabilis,0,300
+Celeus_grammicus,100,1140
+Celeus_elegans,0,1000
+Celeus_lugubris,0,500
+Celeus_obrieni,0,500
+Celeus_flavescens,0,500
+Dinopium_javanense,0,1700
+Dinopium_rafflesii,0,1600
+Dinopium_shorii,0,1220
+Dinopium_benghalense,0,1700
+Gecinulus_grantia,0,1000
+Gecinulus_viridis,600,1400
+Celeus_brachyurus,0,1740
+Celeus_torquatus,100,500
+Meiglyptes_jugularis,0,900
+Meiglyptes_tukki,0,1000
+Meiglyptes_tristis,0,1100
+Picumnus_innominatus,0,3000
+Picumnus_olivaceus,0,2300
+Picumnus_nigropunctatus,0,100
+Picumnus_fuscus,0,500
+Picumnus_albosquamatus,0,2100
+Picumnus_castelnau,0,900
+Picumnus_sclateri,0,1900
+Picumnus_lafresnayi,0,1800
+Picumnus_squamulatus,0,1900
+Picumnus_steindachneri,1150,2300
+Picumnus_rufiventris,0,1500
+Picumnus_cirratus,0,2100
+Picumnus_pygmaeus,0,750
+Picumnus_spilogaster,0,100
+Picumnus_temminckii,0,800
+Picumnus_granadensis,800,2100
+Picumnus_exilis,0,1900
+Picumnus_cinnamomeus,0,300
+Picumnus_aurifrons,0,1100
+Picumnus_fulvescens,0,950
+Picumnus_limae,0,1000
+Picumnus_minutissimus,0,500
+Picumnus_dorbignyanus,900,2500
+Picumnus_subtilis,0,1000
+Picumnus_pumilus,0,500
+Picumnus_nebulosus,0,1400
+Picumnus_varzeae,0,500
+Sasia_africana,0,1100
+Sasia_abnormis,0,1370
+Sasia_ochracea,0,2130
+Jynx_torquilla,0,3300
+Jynx_ruficollis,600,3300
+Manacus_vitellinus,0,1200
+Manacus_manacus,0,1000
+Manacus_candei,0,700
+Manacus_aurantiacus,0,1100
+Lepidothrix_iris,0,200
+Lepidothrix_suavissima,250,1800
+Lepidothrix_vilasboasi,0,200
+Lepidothrix_coeruleocapilla,500,2100
+Lepidothrix_isidorei,500,1700
+Lepidothrix_serena,0,500
+Lepidothrix_coronata,0,1400
+Lepidothrix_nattereri,0,500
+Pipra_pipra,0,1600
+Machaeropterus_deliciosus,600,1900
+Pipra_erythrocephala,0,2000
+Pipra_mentalis,0,750
+Pipra_cornuta,500,1800
+Pipra_rubrocapilla,0,500
+Machaeropterus_regulus,0,500
+Pipra_chloromeros,0,1400
+Machaeropterus_pyrocephalus,0,1200
+Pipra_filicauda,0,1000
+Pipra_aureola,0,1200
+Pipra_fasciicauda,0,600
+Heterocercus_linteatus,0,500
+Heterocercus_flavivertex,0,300
+Heterocercus_aurantiivertex,0,300
+Xenopipo_holochlora,0,1500
+Xenopipo_atronitens,0,1200
+Xenopipo_uniformis,800,2100
+Xenopipo_flavicapilla,1200,2400
+Xenopipo_unicolor,930,1900
+Masius_chrysopterus,400,2300
+Corapipo_altera,0,1500
+Corapipo_gutturalis,200,1100
+Corapipo_leucorrhoa,0,1500
+Ilicura_militaris,0,1200
+Chiroxiphia_boliviana,650,2200
+Chiroxiphia_linearis,0,1500
+Chiroxiphia_caudata,0,1900
+Chiroxiphia_pareola,0,750
+Chiroxiphia_lanceolata,0,1700
+Antilophia_galeata,500,1000
+Antilophia_bokermanni,0,800
+Tyranneutes_virescens,0,500
+Tyranneutes_stolzmanni,0,1000
+Neopelma_sulphureiventer,0,450
+Neopelma_chrysolophum,1150,1750
+Neopelma_pallescens,0,700
+Neopelma_chrysocephalum,0,700
+Thamnistes_anabatinus,0,1700
+Pygiptila_stellaris,0,700
+Myrmornis_torquata,0,1200
+Myrmotherula_gularis,0,1550
+Myrmotherula_snowi,0,550
+Myrmotherula_minor,0,900
+Myrmeciza_pelzelni,0,350
+Stymphalornis_acutirostris,0,500
+Myrmeciza_atrothorax,0,1600
+Myrmotherula_guttata,0,700
+Myrmeciza_ruficauda,0,600
+Myrmotherula_sunensis,0,900
+Epinecrophylla_fjeldsaai,0,1300
+Myrmotherula_urosticta,0,500
+Epinecrophylla_spodionota,600,1300
+Epinecrophylla_haematonota,0,900
+Myrmotherula_gutturalis,0,1000
+Epinecrophylla_ornata,0,1200
+Epinecrophylla_leucophthalma,0,800
+Myrmotherula_unicolor,0,350
+Myrmotherula_fluminensis,0,500
+Epinecrophylla_fulviventris,0,1100
+Neoctantes_niger,0,800
+Microrhopias_quixensis,0,1100
+Myrmorchilus_strigilatus,0,1200
+Clytoctantes_alixii,0,1000
+Clytoctantes_atrogularis,0,500
+Myrmeciza_disjuncta,0,500
+Myrmotherula_iheringi,0,650
+Formicivora_serrana,0,1100
+Formicivora_grisea,0,1500
+Formicivora_littoralis,0,500
+Formicivora_erythronotos,0,500
+Formicivora_rufa,0,1200
+Formicivora_iheringi,600,900
+Formicivora_melanogaster,0,1000
+Myrmotherula_axillaris,0,1100
+Myrmotherula_longipennis,0,700
+Myrmotherula_schisticolor,900,2200
+Myrmotherula_behni,900,1800
+Myrmotherula_grisea,500,1650
+Myrmotherula_menetriesii,0,900
+Myrmotherula_assimilis,0,500
+Myrmotherula_sclateri,0,700
+Myrmotherula_ambigua,0,500
+Myrmotherula_brachyura,0,900
+Myrmotherula_ignota,0,1100
+Myrmotherula_klagesi,0,500
+Myrmotherula_longicauda,600,1200
+Myrmotherula_cherriei,0,550
+Myrmochanes_hemileucus,0,500
+Myrmotherula_pacifica,0,1300
+Myrmotherula_surinamensis,0,700
+Myrmotherula_multostriata,0,550
+Thamnophilus_nigriceps,0,600
+Thamnophilus_praecox,0,500
+Thamnophilus_nigrocinereus,0,500
+Thamnophilus_cryptoleucus,0,500
+Thamnophilus_caerulescens,0,2300
+Thamnophilus_aroyae,800,1700
+Thamnophilus_aethiops,0,950
+Thamnophilus_unicolor,1200,2300
+Thamnophilus_stictocephalus,0,700
+Thamnophilus_punctatus,0,1500
+Thamnophilus_ambiguus,0,700
+Thamnophilus_sticturus,0,950
+Thamnophilus_pelzelni,0,1100
+Sakesphorus_melanonotus,0,550
+Sakesphorus_melanothorax,0,1300
+Thamnophilus_insignis,900,2000
+Thamnophilus_amazonicus,0,500
+Thamnophilus_murinus,0,1000
+Thamnophilus_schistaceus,0,1100
+Sakesphorus_bernardi,0,1850
+Thamnophilus_bridgesi,0,1150
+Thamnophilus_atrinucha,0,1500
+Biatas_nigropectus,500,1200
+Thamnophilus_divisorius,0,500
+Thamnophilus_ruficapillus,0,2200
+Thamnophilus_torquatus,0,1200
+Thamnophilus_zarumae,800,2650
+Thamnophilus_multistriatus,900,2200
+Thamnophilus_palliatus,0,1700
+Thamnophilus_tenuepunctatus,300,1700
+Thamnophilus_doliatus,0,2000
+Sakesphorus_cristatus,0,1100
+Sakesphorus_canadensis,0,900
+Xenornis_setifrons,0,600
+Dysithamnus_xanthopterus,800,1700
+Herpsilochmus_sellowi,0,1100
+Herpsilochmus_dugandi,0,500
+Herpsilochmus_longirostris,0,1200
+Herpsilochmus_gentryi,0,200
+Herpsilochmus_axillaris,900,1800
+Herpsilochmus_rufimarginatus,0,1200
+Herpsilochmus_sticturus,0,500
+Herpsilochmus_roraimae,700,2000
+Herpsilochmus_pectoralis,0,500
+Herpsilochmus_atricapillus,0,1200
+Herpsilochmus_motacilloides,900,2050
+Herpsilochmus_parkeri,1350,1350
+Herpsilochmus_pileatus,0,800
+Herpsilochmus_dorsimaculatus,0,500
+Herpsilochmus_stictocephalus,0,500
+Dysithamnus_leucostictus,900,1900
+Dysithamnus_plumbeus,0,500
+Dysithamnus_occidentalis,900,2100
+Dysithamnus_mentalis,600,2200
+Dysithamnus_striaticeps,0,800
+Dysithamnus_puncticeps,0,1000
+Dysithamnus_stictothorax,0,1200
+Dichrozona_cincta,0,800
+Mackenziaena_leachii,0,2150
+Mackenziaena_severa,0,1250
+Frederickena_viridis,0,700
+Frederickena_unduligera,0,1050
+Hypoedaleus_guttatus,0,900
+Batara_cinerea,0,2600
+Taraba_major,0,1400
+Cymbilaimus_lineatus,0,1000
+Cymbilaimus_sanctaemariae,0,1100
+Megastictus_margaritatus,0,500
+Myrmotherula_hauxwelli,0,500
+Thamnomanes_schistogynus,0,1050
+Thamnomanes_caesius,0,850
+Thamnomanes_saturninus,0,500
+Thamnomanes_ardesiacus,0,900
+Hypocnemis_hypoxantha,0,500
+Hypocnemis_subflava,0,1100
+Hypocnemis_flavescens,0,1100
+Hypocnemis_peruviana,0,1100
+Hypocnemis_ochrogyna,0,500
+Drymophila_malura,0,950
+Drymophila_ferruginea,0,1250
+Drymophila_devillei,0,1050
+Drymophila_caudata,1200,2500
+Drymophila_rubricollis,0,2000
+Drymophila_ochropyga,650,1300
+Drymophila_genei,1150,2200
+Drymophila_squamata,0,600
+Cercomacra_nigrescens,0,1800
+Cercomacra_serva,0,1100
+Cercomacra_tyrannina,0,1800
+Cercomacra_parkeri,1130,2000
+Cercomacra_laeta,0,900
+Cercomacra_brasiliana,600,1000
+Cercomacra_ferdinandi,0,500
+Cercomacra_nigricans,0,1500
+Cercomacra_cinerascens,0,1100
+Cercomacra_carbonaria,0,500
+Cercomacra_melanaria,0,500
+Cercomacra_manu,0,1100
+Myrmeciza_castanea,0,1350
+Myrmeciza_hemimelaena,0,1350
+Rhegmatorhina_cristata,0,500
+Rhegmatorhina_gymnops,0,500
+Rhegmatorhina_hoffmannsi,0,500
+Rhegmatorhina_melanosticta,0,1050
+Rhegmatorhina_berlepschi,0,500
+Gymnopithys_leucaspis,0,900
+Gymnopithys_rufigula,0,900
+Gymnopithys_salvini,0,450
+Gymnopithys_lunulatus,0,950
+Phlegopsis_erythroptera,0,500
+Phlegopsis_nigromaculata,0,700
+Phaenostictus_mcleannani,0,1200
+Pithys_castaneus,200,250
+Pithys_albifrons,0,1100
+Willisornis_poecilinotus,0,1350
+Myrmeciza_hyperythra,0,500
+Schistocichla_leucostigma,0,1650
+Schistocichla_humaythae,0,500
+Schistocichla_caurensis,0,1500
+Schistocichla_rufifacies,0,800
+Schistocichla_schistacea,0,500
+Schistocichla_brunneiceps,0,1400
+Schistocichla_saturata,700,1500
+Sclateria_naevia,0,500
+Myrmeciza_ferruginea,0,500
+Myrmeciza_squamosa,0,1000
+Hylophylax_punctulatus,0,500
+Hylophylax_naevioides,0,900
+Hylophylax_naevius,0,1150
+Hypocnemoides_melanopogon,0,500
+Myrmeciza_berlepschi,0,600
+Myrmeciza_nigricauda,400,1100
+Myrmeciza_laemosticta,0,1000
+Myrmeciza_griseiceps,600,3000
+Myrmeciza_exsul,0,1200
+Myrmeciza_longipes,0,1700
+Percnostola_rufifrons,0,500
+Percnostola_arenarum,0,150
+Percnostola_lophotes,0,1050
+Pyriglena_leucoptera,0,1250
+Pyriglena_atra,0,500
+Myrmeciza_immaculata,0,2000
+Myrmeciza_fortis,0,1050
+Myrmeciza_goeldii,0,750
+Myrmeciza_melanoceps,0,600
+Rhopornis_ardesiacus,0,900
+Gymnocichla_nudiceps,0,500
+Myrmoborus_leucophrys,0,1400
+Myrmoborus_lugubris,0,500
+Myrmoborus_melanurus,0,500
+Myrmoborus_myotherinus,0,1200
+Terenura_maculata,0,1200
+Terenura_humeralis,0,650
+Terenura_callinota,750,2000
+Terenura_sharpei,1100,1650
+Terenura_spodioptila,0,1100
+Eudromia_formosa,1300,2900
+Eudromia_elegans,0,1200
+Tinamotis_pentlandii,0,2000
+Tinamotis_ingoufi,1350,1800
+Nothoprocta_taczanowskii,0,700
+Nothoprocta_curvirostris,0,1700
+Nothoprocta_cinerascens,0,1500
+Nothoprocta_pentlandii,0,1850
+Nothoprocta_ornata,0,500
+Nothoprocta_perdicaria,100,200
+Taoniscus_nanus,0,500
+Rhynchotus_rufescens,0,700
+Nothura_maculosa,0,500
+Nothura_darwinii,0,900
+Nothura_chacoensis,0,500
+Nothura_boraquira,0,500
+Nothura_minor,0,1800
+Nothocercus_bonapartei,0,900
+Nothocercus_julius,0,1400
+Nothocercus_nigrocapillus,0,1500
+Tinamus_tao,0,1500
+Tinamus_major,900,1400
+Tinamus_solitarius,0,1200
+Tinamus_osgoodi,0,1900
+Tinamus_guttatus,0,500
+Crypturellus_variegatus,2000,3000
+Crypturellus_berlepschi,500,2500
+Crypturellus_noctivagus,1500,4000
+Crypturellus_boucardi,1000,4300
+Crypturellus_strigulosus,0,500
+Crypturellus_cinnamomeus,2700,4000
+Crypturellus_ptaritepui,1700,3250
+Crypturellus_undulatus,0,500
+Crypturellus_soui,200,1000
+Crypturellus_atrocapillus,400,2000
+Crypturellus_kerriae,100,1300
+Crypturellus_brevirostris,0,2500
+Crypturellus_bartletti,200,800
+Crypturellus_obsoletus,0,2500
+Crypturellus_tataupa,0,500
+Crypturellus_parvirostris,0,2000
+Crypturellus_duidae,2500,4800
+Crypturellus_cinereus,0,1000
+Crypturellus_casiquiare,2800,3700
+Crypturellus_erythropus,0,2300
+Crypturellus_transfasciatus,4000,5300
+Cistothorus_palustris,0,2500
+Cistothorus_meridae,3000,4100
+Cistothorus_apolinari,2500,3900
+Cistothorus_platensis,0,4000
+Thryorchilus_browni,2200,3600
+Troglodytes_monticola,3200,4800
+Troglodytes_solstitialis,700,3500
+Troglodytes_ochraceus,900,2450
+Troglodytes_rufulus,1000,2800
+Troglodytes_rufociliatus,1700,3500
+Troglodytes_aedon,0,3700
+Cyphorhinus_phaeocephalus,0,700
+Cyphorhinus_thoracicus,800,2700
+Cyphorhinus_arada,0,1000
+Uropsila_leucogastra,0,500
+Cinnycerthia_peruana,1500,3300
+Cinnycerthia_olivascens,900,3100
+Cinnycerthia_unirufa,2200,3800
+Cinnycerthia_fulva,1500,3300
+Thryothorus_atrogularis,0,1100
+Thryothorus_sclateri,0,600
+Thryothorus_felix,0,2000
+Thryothorus_rutilus,0,1900
+Thryothorus_maculipectus,0,1300
+Thryothorus_eisenmanni,1830,3350
+Thryothorus_fasciatoventris,0,1000
+Thryothorus_euophrys,2000,3500
+Thryothorus_mystacalis,1200,2800
+Thryothorus_coraya,0,1850
+Henicorhina_leucoptera,0,900
+Thryothorus_genibarbis,0,1500
+Henicorhina_leucophrys,400,3000
+Thryothorus_leucopogon,0,900
+Thryothorus_thoracicus,0,1100
+Thryothorus_griseus,0,200
+Thryothorus_spadix,400,1800
+Thryothorus_semibadius,0,1200
+Thryothorus_nigricapillus,0,1100
+Thryothorus_longirostris,0,900
+Thryothorus_leucotis,0,950
+Thryothorus_guarayanus,0,400
+Thryothorus_superciliaris,0,1850
+Thryothorus_modestus,0,2000
+Thryothorus_pleurostictus,0,1600
+Thryothorus_sinaloa,0,2000
+Thryothorus_rufalbus,0,1500
+Thryothorus_nicefori,800,2100
+Henicorhina_leucosticta,1350,2450
+Thryothorus_ludovicianus,0,2000
+Thryomanes_bewickii,0,2900
+Campylorhynchus_albobrunneus,0,1500
+Campylorhynchus_zonatus,0,3000
+Campylorhynchus_fasciatus,0,1500
+Campylorhynchus_megalopterus,2100,3150
+Campylorhynchus_nuchalis,0,800
+Campylorhynchus_turdinus,0,1300
+Campylorhynchus_yucatanicus,0,500
+Campylorhynchus_gularis,800,3000
+Campylorhynchus_rufinucha,0,300
+Campylorhynchus_jocosus,800,2500
+Campylorhynchus_chiapensis,0,300
+Campylorhynchus_brunneicapillus,0,2000
+Odontorchilus_branickii,800,2200
+Odontorchilus_cinereus,0,500
+Galbula_leucogastra,0,900
+Galbula_dea,0,1100
+Galbula_ruficauda,0,900
+Galbula_cyanicollis,0,900
+Galbula_tombacea,0,1200
+Galbula_albirostris,0,900
+Galbula_chalcothorax,0,1000
+Galbula_galbula,0,700
+Galbula_pastazae,600,1700
+Galbula_cyanescens,0,1000
+Galbalcyrhynchus_leucotis,0,500
+Galbalcyrhynchus_purusianus,0,1000
+Jacamerops_aureus,0,1200
+Brachygalba_salmoni,0,700
+Brachygalba_albogularis,0,600
+Brachygalba_goeringi,0,1100
+Brachygalba_lugubris,0,900
+Jacamaralcyon_tridactyla,240,1100
+Stelgidopteryx_serripennis,0,3000
+Stelgidopteryx_ruficollis,0,2000
+Progne_subis,0,2600
+Progne_elegans,0,2600
+Progne_sinaloae,0,2000
+Progne_chalybea,0,2000
+Progne_murphyi,0,1800
+Progne_tapera,0,4000
+Notiochelidon_pileata,1600,3100
+Neochelidon_tibialis,0,1600
+Atticora_fasciata,0,1000
+Atticora_melanoleuca,0,300
+Pygochelidon_cyanoleuca,0,3500
+Alopochelidon_fucata,0,1600
+Notiochelidon_flavipes,2100,3400
+Haplochelidon_andecola,2500,4400
+Notiochelidon_murina,2500,4000
+Tachycineta_leucorrhoa,0,1000
+Tachycineta_meyeni,0,1500
+Tachycineta_stolzmanni,0,500
+Tachycineta_albilinea,0,500
+Tachycineta_albiventer,0,500
+Riparia_riparia,0,1000
+Guira_guira,0,1200
+Crotophaga_major,0,2600
+Crotophaga_sulcirostris,0,2300
+Crotophaga_ani,0,2300
+Geococcyx_californianus,0,2500
+Geococcyx_velox,0,2800
+Neomorphus_rufipennis,0,1100
+Neomorphus_pucheranii,0,700
+Neomorphus_geoffroyi,0,1650
+Neomorphus_squamiger,0,1200
+Neomorphus_radiolosus,500,1200
+Morococcyx_erythropygus,0,1850
+Dromococcyx_pavoninus,0,1600
+Dromococcyx_phasianellus,0,1600
+Tapera_naevia,0,1500
+Piaya_cayana,0,2700
+Coccyzus_minor,0,1300
+Coccyzus_lansbergi,0,800
+Coccyzus_melacoryphus,0,2800
+Coccyzus_euleri,0,900
+Coccyzus_americanus,0,2800
+Coccyzus_erythropthalmus,0,2000
+Piaya_melanogaster,0,800
+Coccycua_cinerea,0,900
+Coccycua_pumila,0,1000
+Coccycua_minuta,0,2000
