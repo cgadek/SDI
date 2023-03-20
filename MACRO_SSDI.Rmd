@@ -21,6 +21,8 @@ output:
 fontsize: 12pt
 geometry: margin=0.25in
 always_allow_html: yes
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{=html}
@@ -45,94 +47,102 @@ knitr::opts_chunk$set(fig.align = "center", fig.height = 4, fig.width = 6)
 # Load Packages
 
 ```{R, echo=F}
-library(reshape)
-library(reshape2)
-library(plyr)
-library(dplyr)
-library(tidyr)
-library(car)
-library(rcompanion)
-library(GGally)
-library(Hmisc)
-library(gridExtra)
-library(stats)
-library(gplots)
-library(ggplot2)
-library(ggExtra)
-library(cowplot)
-library(colorspace)
-library(stats4) # Forces knitr to work when it's being wonky
-library(PMCMR) #Allows Kruskal-Wallis post-hocs
-library(effects)
-library(gridExtra)
-library(lattice)
-library(survival)
-library(fmsb)
-library(faraway)
-library(ape)
-#library(wBoot)
-library(ggridges)
-library(boot)
-library(faux)
-library(effsize)
-library(plotrix)
-library(colorspace)
-library(ggpubr)
-library(patchwork)
-library(ggdist)
+pacman::p_load(
+reshape,
+reshape2,
+plyr,
+dplyr,
+tidyr,
+car,
+picante,
+rcompanion,
+GGally,
+Hmisc,
+gridExtra,
+stats,
+gplots,
+ggplot2,
+ggExtra,
+cowplot,
+colorspace,
+stats4, # Forces knitr to work when it's being wonky
+PMCMR, #Allows Kruskal-Wallis post-hocs
+effects,
+gridExtra,
+lattice,
+survival,
+fmsb,
+faraway,
+ape,
+data.table,
+#wBoot,
+ggridges,
+boot,
+faux,
+effsize,
+plotrix,
+colorspace,
+ggpubr,
+patchwork,
+ggdist,
+factoextra,
 
 # Mapping 
-library(raster)
-library(sp)
-library(rgdal)
-library(RStoolbox)
-library(prettymapr)
-library(viridis)
-library(rasterVis)
+raster,
+sp,
+rgdal,
+RStoolbox,
+prettymapr,
+viridis,
+rasterVis,
 
 
 # Modeling packages 
-library(nlme)
-library(lme4)
-library(AICcmodavg)
-library(MuMIn)
-library(glmulti)
-library(reghelper)
-library(lsmeans)
-library(rsq) # get r-squared values from GLM
-library(r2glmm) # for R^2 values from lmer() and glmer()
-library(multcompView) # related to multiple comparisons?
-library(jtools) # interaction plots 
-library(interactions) # interaction plots 
-library(broom)
-library(stargazer) # model output tables
-library(ggeffects) # for estimating model predictions from mixed effects models
-library(MCMCglmm)
-library(bayesplot)
-library(rstan)
-library(Rcpp) # required for brms
-library(brms)
-library(magrittr)
-library(tidybayes)
-library(modelr)
-library(hexbin)
-library(ggExtra)
-library(rgl)
-library(readr)
-library(tidyverse)
+nlme,
+lme4,
+AICcmodavg,
+MuMIn,
+glmulti,
+reghelper,
+lsmeans,
+rsq, # get r-squared values from GLM
+r2glmm, # for R^2 values from lmer(, and glmer(,
+multcompView, # related to multiple comparisons?
+jtools, # interaction plots 
+interactions, # interaction plots 
+broom,
+stargazer, # model output tables
+ggeffects, # for estimating model predictions from mixed effects models
+MCMCglmm,
+bayesplot,
+rstan,
+Rcpp, # required for brms
+brms,
+magrittr,
+tidybayes,
+modelr,
+hexbin,
+ggExtra,
+rgl,
+readr,
+tidyverse,
+# Phylo packages 
+phytools,
+ape
+)
 
 # To run each time you load rstan
 options(mc.cores = parallel::detectCores()) # for core setup 
-rstan_options(auto_write = TRUE) # auto save  bare verion of compiled Stan program to HD
+rstan_options(auto_write = TRUE) # auto save  bare version of compiled Stan program to HD
 
-# Phylo packages 
-library(phytools)
-library(ape)
+
 
 #Load in functions
-source("~/Dropbox/Gadek_custom_colors.R")
+source("~/Desktop/R_color_palettes/Gadek_custom_colors.R")
+source("~/Desktop/ggplot_themes/ggplot_themes.R")
 
-
+#set theme
+theme_set(theme_arial_clean())
 
 #setup folder paths for less coding
 figures <- paste(getwd(), "/figures/", sep="")
@@ -150,167 +160,147 @@ SDI = \frac{size of larger sex}{size of smaller sex}
 $$
 
 
-# Data wrangling
 
-I'm mainly using the dataset used in @linck2021blood downloaded from Ethan Linck's [Github repo](https://github.com/elinck/andean_range_limits). I am supplementing this with elevational range data collated from @del1992handbook and avian trait data downloaded from the [Open Traits Network](https://opentraits.org/datasets/avonet), (@tobias2022avonet).
+
+I'm mainly using the dataset used in @linck2021blood downloaded from Ethan Linck's [Github repo](https://github.com/elinck/andean_range_limits). I am supplementing this with elevational range data collated from @del1992handbook and avian trait data downloaded from the [Open Traits Network](https://opentraits.org/datasets/avonet), (@tobias2022avonet). These have been processed in the MACRO_morpho_data_wrangling.R file. No need to rerun unless adding/adjusting data/data structure. 
+
+Read in the processed dataframe here.
 
 ```{r}
+df<-read_csv("data/All_elev_macro_morpho.csv")
 
-EG_Witt <- read_csv("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/EG_Witt.csv")
-
-Linck_et_al_data <- read_csv("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/Linck_et-al_data.csv")
-
-elevs <- read_csv("~/Dropbox/Research/Macro_SSDI/data/elevs.csv")
-
-avonet <- read_csv("~/Dropbox/Research/Avian_Evo_Trans_Rev/analysis/data/Birdtree_AVONET.csv")
-
-#read in tree file
-#tree <- read.tree("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/BirdzillaHackett10.tre")
-
-avonet <- avonet%>%
-  mutate(species = factor(Species3),
-         family = factor(Family3))%>%
-  dplyr::select(species, family, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth, Tarsus.Length, Kipps.Distance, `Hand-Wing.Index`, Tail.Length, Habitat, Habitat.Density, Migration, Trophic.Level, Trophic.Niche, Min.Latitude, Max.Latitude, Centroid.Latitude, Centroid.Longitude, Range.Size)
-
-elevs <- elevs%>%
-  mutate(species = str_replace(species, "_", " "),
-         species = factor(species))|>
-  distinct()
-
-df <-Linck_et_al_data%>%
-  filter(!is.na(mass),
-         sex %in% c("male", "female"))%>%
-  mutate(elev_bin = cut(elevation, breaks=7),
-         sex = factor(sex),
-         species = factor(species)
-         )%>%
-     group_by(species) %>% 
-  filter(all(levels(sex) %in% sex))%>%
-  group_by(species, sex) %>% 
-  summarise(mean_mass = mean(mass),
-            )%>%
-  pivot_wider(id_cols = c(species), names_from = c(sex), values_from = c(mean_mass))%>%
-  mutate(SSDI = (male-female)/female)
-
-L.elevs<- Linck_et_al_data%>%
-  group_by(species)%>%
-  summarise(max_sample_elev = max(elevation, na.rm=T),
-            mean_sample_elev = mean(elevation, na.rm=T),
-            min_sample_elev = min(elevation, na.rm=T))
- 
-
-df<-df%>%
-  left_join(., L.elevs, by="species")
-
-df<-df%>%
-  left_join(., elevs, by = "species")
-
-df<- df%>%
-  left_join(., avonet, by = "species")%>%
-   mutate(amplitude = max_elev - min_elev)
-
-#generate Lovich's simple SSDI Metric
-
-df <- df%>%
-  mutate(lov.SSDI = if_else(male > female, (male/female), (female/male)),
-         sex_diff = male-female,
-         species = factor(species))%>%
-  na.omit()
-
-#get vector of species for tree
-species <- df|>
-  dplyr::select(species)|>
-  mutate(species = as.character(str_replace(species, " ", "_")))|>
-  pull()
-
-tree.t <- as.phylo(tree[[sample(1:1000, size=1)]])
-
-tree <- keep.tip(tree.t, tip = species)
-
-write.tree(tree, file="~/Dropbox/Research/Marsh Birds/Marsh_birds/data/tree.tre")
-
-#get variance covariance matrix for models
-A <-ape::vcv(tree)
-
+df.all.birds <-read_csv("data/All_bird_SSDI_macro_morpho.csv")
+tree <- read.tree("data/tree_4398spp.tre")
 ```
 
 # Explore data
+
+```{r, `birdsexdiff`, warning=F}
+df.all.birds%>%
+  mutate(sex_diff = male-female,
+    sex.diff.corr = log10(sex_diff + min(sex_diff)))%>%
+  # filter(sex_diff< 30,
+  #        Kipps.Distance< 60)%>%
+ggplot(., aes(log10(mdpt.elev), log10(sex_diff)))+
+  geom_point(size=2, alpha=0.5, color="grey88", fill="grey88", shape=19)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  #  geom_point(aes(mean_sample_elev, female),alpha=0.6, color="darkgreen")+
+  # geom_smooth(aes(mean_sample_elev, female), method="lm")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+```
+
+When we plot log10sex difference (male mass - female mass) by log10midpoint elevation we get a pretty strong negative trend which is in line with the hypothesis that in harsher environments i.e. higher elevations constraints on sexual dimoprhism are greater.
+  
+```{r}
+df%>%
+  filter(sex_diff< 30,
+         SSDI > -0.2)%>%
+  na.omit()%>%
+  mutate(hct.SDI = (mean_hct_male - mean_hct_female)/mean_hct_female,
+         hb.SDI = (mean_hb_male - mean_hb_female)/mean_hb_female)%>%
+ggplot(., aes(max_elev, hb.SDI, fill=log10(Range.Size)))+
+  geom_point(alpha=0.6, size=2, shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+```
+Very slight decreasing trend in hemoglobin SDI with maximum elevation.
+
 ## Relationship between sex differences and sexual dimorphism indices
 ```{r}
 p1<-ggplot(df, aes(x=sex_diff, y=SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
 p2<-ggplot(df, aes(x=sex_diff, y=lov.SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
 grid.arrange(p1, p2, nrow=1)
 ```
 
-This seems to run counter to @lovich1992review, suggesting that (male -female/male) is most comparable?
+This seems to run counter to @lovich1992review, suggesting that (male - female/male) is most comparable?
+
 
 ## SSDI x elevation
-
 Here I plot SSDI as calculated by (male-female/female)
 ```{r}
-
-p1<-ggplot(df, aes(x=min_elev, y=SSDI))+
+p1 <- df.all.birds%>%
+  ggplot(., aes(x=log10(min_elev), y=SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
-  theme_cowplot()+
+  geom_smooth( se=T,color="black", linetype="dashed")+
   theme(legend.position = "none")
 
-p2 <-ggplot(df, aes(x=max_elev, y=SSDI))+
+p2 <- df.all.birds%>%
+  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
+  ggplot(., aes(x=log10(max_elev), y=SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
-  theme_cowplot()+
+  geom_smooth( se=T, color="black", linetype="dashed")+
   theme(legend.position = "none")
 
-p3 <-ggplot(df, aes(x=mean_sample_elev, y=SSDI))+
+p3 <- df.all.birds%>%
+  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
+  ggplot(., aes(x=log10(mdpt.elev), y=SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
-  theme_cowplot()+
+  geom_smooth( se=T, color="black", linetype="dashed")+
   theme(legend.position = "none")
 
-p4 <-ggplot(df, aes(x=amplitude, y=SSDI))+
+p4 <-ggplot(df.all.birds, aes(x=log10(amplitude), y=SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
-  theme_cowplot()+
+  geom_smooth( se=T, color="black", linetype="dashed")+
   theme(legend.position = "none")
 
 grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
 
 ```
+These look flat when you plot points. There are very slight relationships but, likely nothing to go on.
 
 Here I plot SSDI as calculated in @llovich1992review (mass larger sex/mass smaller sex)
 ```{r}
 
 p1<-ggplot(df, aes(x=min_elev, y=lov.SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+  geom_smooth( se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
 p2 <-ggplot(df, aes(x=max_elev, y=lov.SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
 p3 <-ggplot(df, aes(x=mean_sample_elev, y=lov.SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
 p4 <-ggplot(df, aes(x=amplitude, y=lov.SSDI))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
@@ -322,37 +312,352 @@ Here we see the sexual dimporphism index clearly goes down... More in line with 
 
 ## Latitude of range
 ```{r}
-p1<-ggplot(df, aes(x=Max.Latitude, y=lov.SSDI))+
-  #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+p<-ggplot(df.all.birds, aes(x=Max.Latitude, y=SSDI))+
+  #geom_point(alpha=0.3, color="dodgerblue")+
+  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
-p2 <-ggplot(df, aes(x=max_elev, y=Max.Latitude))+
-  #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+p1<-ggplot(df.all.birds, aes(x=Min.Latitude, y=SSDI))+
+  #geom_point(alpha=0.3, color="dodgerblue")+
+  geom_smooth(method="lm", se=T, color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
-p3 <-ggplot(df, aes(x=mean_sample_elev, y=Max.Latitude))+
-  geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T)+
+p2 <-ggplot(df.all.birds, aes(x=max_elev, y=Max.Latitude))+
+  #geom_point(alpha=0.3, color="dodgerblue")+
+  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
+
+p3 <-ggplot(df.all.birds, aes(x=mdpt.elev, y=Max.Latitude))+
+  #geom_point(alpha=0.3, color="dodgerblue")+
+  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
+  theme_cowplot()+
+  theme(legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, nrow=2)
+```
+
+
+
+## HWI
+```{r}
+p<-ggplot(df.all.birds, aes(x=`Hand-Wing.Index`, y=SSDI))+
+  #geom_point(alpha=0.3)+
+  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
+  theme_cowplot()+
+  theme(legend.position = "none")
+
+p1<-ggplot(df.all.birds, aes(x=max_elev, y=`Hand-Wing.Index`))+
+  #geom_point(alpha=0.3)+
+  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
+  theme_cowplot()+
+  theme(legend.position = "none")
+
+p2 <-ggplot(df.all.birds, aes(x=Max.Latitude, y=`Hand-Wing.Index`))+
+  #geom_point(alpha=0.3)+
+  geom_smooth(method="lm", se=T, color="black", linetype="dashed")+
+  theme_cowplot()+
+  theme(legend.position = "none")
+
+grid.arrange(p, p1, p2, nrow=2)
+```
+
+```{r}
+ggplot(df, aes(`Hand-Wing.Index`, mean_hb))+
+  geom_smooth(method="lm",color="black", linetype="dashed")+
+  geom_point()
+
+ggplot(df, aes(min_elev, `Hand-Wing.Index`))+
+  geom_smooth(method="lm",color="black", linetype="dashed")
+
+```
+## SSDI Phylo PCA
+```{r}
+
+#make matrix
+Livesand_birds2<-Livesand_birds%>%
+  mutate(species = taxon,
+         taxon = gsub(" ", "_", taxon))%>%
+  left_join(., df.all.birds, by="species")%>%
+  filter(family %in% c("Tyrannidae", "Furnariidae", "Picidae", "Emberizidae", "Fringillidae", "Trochilidae", "Turdidae"))
+
+tree <- read.tree("data/birds_mcc.tre")
+
+tips <- Livesand_birds2%>%
+  mutate(taxon = gsub(" ", "_", taxon))%>%
+  dplyr::select(taxon)%>%
+  pull()
+
+pruned.tree<-drop.tip(tree, tree$tip.label[-na.omit(match(tips, tree$tip.label))])
+
+Livesand_birds2 <- Livesand_birds2%>%filter(taxon %in% pruned.tree$tip.label)
+
+phy.pca.mat <-scale(as.matrix(Livesand_birds2[ ,c(6:11, 19:22, 24:25)]))
+
+rownames(phy.pca.mat) <-Livesand_birds2$taxon
+phy.pca.mat<-evobiR::ReorderData(pruned.tree, phy.pca.mat, taxa.names="row names")
+
+bird.sex.pca <-phyl.pca(pruned.tree, phy.pca.mat)
+plot(bird.sex.pca)
+biplot(bird.sex.pca)
+
+s <-as.data.frame(bird.sex.pca$S)
+s$taxon <-names(bird.sex.pca$S)
+s <- tibble::rownames_to_column(s, "taxon")
+s <-s%>%
+  left_join(., Livesand_birds2 , "taxon")%>%
+  mutate(species= gsub("_", " ", taxon))%>%
+  filter(SSDI > -0.6)%>%
+  mutate(min.e.x = scale(min_elev),
+         max.e.z = scale(max_elev),
+         amp.z = scale(amplitude),
+         range.z = scale(Range.Size),
+         corrected.PC1 = PC1+4.28)
+ 
+
+ggplot(s, aes(PC1, SSDI, fill=family))+
+  geom_point(shape=21)+
+  #geom_smooth(method="lm", color="black", linetype="dashed")
+  #scale_fill_gradient2(low="blue", mid="yellow", high="red")
+```
+
+## Phylo_pca model
+```{r}
+A <- vcv(pruned.tree)
+
+
+m1 <- brm(
+  formula = bf(corrected.PC1 ~ 1 + amp.z*family),
+  data = s,
+  family = lognormal(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  #data2 = list(A = A), # Phylogeny
+  cores = 10,
+  chains = 4,
+  thin = 10,
+  warmup = 10000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 20000,
+  control = list(adapt_delta = 0.98, max_treedepth = 17),
+  sample_prior = TRUE # default priors
+)
+
+
+```
+
+## Model SSDI
+### A few large select families
+```{r}
+tree <- read.tree("data/birds_mcc.tre")
+t.brms<-df%>%
+  filter(family %in% c("Furnariidae", "Tyrannidae", "Trochilidae", "Thraupidae"))%>%
+  mutate(amp.z = scale(amplitude),
+         min.z = scale(min_elev),
+         max.z =scale(max_elev),
+         species = gsub(" ", "_", species),
+         mdpt.z = scale((max_elev + min_elev)/2),
+         range.size.z =scale(Range.Size),
+         corrected_SSDI = SSDI + 1)
+
+tips <- as.character(t.brms$species)
+tree <- keep.tip(tree, tips)
+A <- vcv(tree)
+
+
+m1 <- brm(
+  formula = bf(corrected_SSDI ~ 1 +max.z*range.size.z + max.z*family, sigma ~ max.z),
+  data = t.brms,
+  family = lognormal(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  #data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  thin = 10,
+  warmup = 10000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 20000,
+  control = list(adapt_delta = 0.98, max_treedepth = 17),
+  sample_prior = TRUE # default priors
+)
+ccsave(m1, file="models/m1_SSDI.RData") # save model
+load("models/m2_SSDI.RData") # If loading from pre-saved file and not re-running
 
 
 ```
 
 
+# Flight Index
+## Amplitude
+```{r}
 
-All of this is before correcting for phylogeny which we should be next...
+#simple tarsus/hand-wing index
+df%>%
+  mutate(flight_Index = `Hand-Wing.Index`/Tarsus.Length)%>%
+  filter(family %in%c("Tyrannidae", "Trochilidae", "Emberizidae", "Furnariidae", "Thraupidae"))%>%
+ggplot(., aes(flight_Index, amplitude, fill=Range.Size))+
+  geom_point(shape=21, size=3)+
+  geom_smooth(method="lm",color="black", linetype="dashed")+
+  scale_fill_gradient(low="dodgerblue", high="red3")+
+  facet_wrap(.~family, scales = "free")
+
+```
+### max_elev
+```{r}
+
+#simple tarsus/hand-wing index
+df%>%
+  mutate(flight_Index = `Hand-Wing.Index`/Tarsus.Length)%>%
+  filter(family %in%c("Tyrannidae", "Trochilidae", "Emberizidae", "Furnariidae", "Thraupidae"))%>%
+ggplot(., aes(flight_Index, max_elev, fill=amplitude))+
+  geom_point(shape=21, size=3)+
+  geom_smooth(method="lm",color="black", linetype="dashed")+
+  scale_fill_gradient(low="dodgerblue", high="red3")+
+  facet_wrap(.~family, scales = "free")
+
+```
+
+# PCA
+
+```{r}
+f.pca <- df.all.birds%>%
+  mutate(mass= (male+female)/2)%>%
+  dplyr::select(species, family, min_elev, max_elev, mass, Kipps.Distance,  Tarsus.Length, `Hand-Wing.Index`, Tail.Length) #pull columns for PCA dataset
+f.pca <-na.omit(f.pca) #remove NA's (REALLY SHRINKS DATASET...)
+pca.only <-log10(f.pca[,c(5:9)]) #extract morpho characters for PCA
+pca.obj <- prcomp(pca.only)#Do PCA on blood characters
+f.pca[,c(10:14)]<-pca.obj$x #add PCA's back in to data set for modeling.
+setnames(f.pca, old = c('V1', 'V2', 'V3', 'V4', "V5"), new = c('PC1','PC2', 'PC3', 'PC4', "PC5")) #rename PCA value columns
+
+f.pca <- f.pca%>%
+  mutate(amplitude= max_elev-min_elev,
+         mdpt = (max_elev + min_elev)/2,
+         species2 = str_replace(species, " ", "_"),
+         amplitude.z = standardize(amplitude),
+         max_elev.z = standardize(max_elev))
+
+#scree plot
+fviz_eig(pca.obj)
+
+#plot loadings
+fviz_pca_var(pca.obj, col.var = "contrib", axes=c(2,3))
+
+f.pca%>%
+  filter(PC2 >-2)%>%
+  filter(family %in%c("Tyrannidae",  "Emberizidae", "Furnariidae", "Thraupidae")|
+         family == "Trochilidae" & PC2>0.6)%>%
+ggplot(., aes(PC2,  mdpt, fill=amplitude))+
+  geom_point(size=2, shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  theme_cowplot()+
+  scale_fill_gradient(low="dodgerblue", high="red3")+
+  facet_wrap(.~family, scales = "free")
+
+```
+
+## phylogeny for PCA data
+```{r}
+tyannidae.pca<-f.pca%>%
+  filter(family=="Tyrannidae")
+
+tips <- as.character(tyannidae.pca$species2)
+tree <- keep.tip(tree, tips)
+
+
+#what are 7 species not in tree?
+
+f.pca <- f.pca%>%
+  filter(!duplicated(species2))
+
+A <- vcv(tree)
+
+#Bayesian models take forever so lets help it by getting pgls for the variables of interest
+
+pic.pca <- pic(f.pca$PC2, tree)
+pic.amp <- pic(f.pca$amplitude.z, tree)
+pic.max.elev <- pic(f.pca$max_elev.z, tree)
+
+pic.df <- as.data.frame(cbind(pic.pca, pic.amp, pic.max.elev))
+```
+
+
+```{r}
+f.m2 <- brm(
+  formula = bf(pic.amp ~ 1 + pic.pca * pic.max.elev),
+  data = pic.df,
+  family = gaussian(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  cores = 4,
+  chains = 4,
+  thin = 10,
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.99, max_treedepth = 15),
+  sample_prior = TRUE # default priors
+)
+save(hb.m8, file="hb.m8_ReducedModel_PhyloREOnly.RData") # save model
+load("hb.m8_ReducedModel_PhyloREOnly.RData") # If loading from pre-saved file and not re-running
+conditional_effects(f.m2)
+```
+
+All of this is before correcting for phyologeny which we should be next...
 
 ## Modeling
-### Checking
+```{r}
+#read in big tree 
+#tree <- read.tree("data/tree_3432spp.tre")
+A <- vcv(tree)
 
+df.all.birds <-df.all.birds%>%
+  mutate(max_elev.z = standardize(max_elev),
+         species2 = as.character(str_replace(species, " ", "_")))
+
+tyannidae.pca <-tyannidae.pca%>%
+  mutate(mdp.z =scale(mdpt),
+         amp)
+
+get_prior(PC2 ~ 1 + mdp.z + (1|gr(species2, cov=A)), data=tyannidae.pca, data2=list(A=A))
+#MODEL 2: PC2 ~ mdpt PHYLO RANDOM EFFECT
+m1 <- brm(
+  formula = bf(PC2 ~ 1 + mdp.z*amplitude.z + (1|gr(species2, cov=A))),
+  data = tyannidae.pca,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 6,
+  chains = 4,
+  thin = 10,
+  warmup = 10000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 20000,
+  control = list(adapt_delta = 0.99, max_treedepth = 17),
+  sample_prior = TRUE # default priors
+)
+save(ssdi.m2, file="models/m2_SSDI.RData") # save model
+load("models/m2_SSDI.RData") # If loading from pre-saved file and not re-running
+
+
+
+```
+
+### Checking
 
 ```{r}
 hist(df$SSDI)
 #not bad, some long tails...
+plot(tree, type="fan", cex=0.1)
+
+```
+
+
+```{r}
+df.cont <- df|>
+  mutate(species_ = as.character(str_replace(species, " ", "_")))|>
+  filter(species_ %in% species.tree)|>
+  ungroup()|>
+  dplyr::select(SSDI)|>
+  pull()
+
+names(df.cont) <- species.tree
+
+fitEB<-anc.ML(tree,df.cont,model="EB")
+
+obj<-contMap(tree, df.cont)
+obj<-setMap(obj,colors=c("#d1492d","#FFE6BE","#00798c"))
+plot(obj, fsize=c(0.1,1), outline=F, lwd=1.3, type="fan")
 
 ```
