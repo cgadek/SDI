@@ -167,10 +167,9 @@ I'm mainly using the dataset used in @linck2021blood downloaded from Ethan Linck
 Read in the processed dataframe here.
 
 ```{r}
-df<-read_csv("data/All_elev_macro_morpho.csv")
+df<-read_csv("data/All_birds_elev_macro_morpho.csv")
 
-df.all.birds <-read_csv("data/All_bird_SSDI_macro_morpho.csv")
-tree <- read.tree("data/tree_4398spp.tre")
+tree <- read.tree("data/birds_mcc.tre") #need to trim to model. will take a million years to run with 9000+ tips anyway
 ```
 
 # Explore data
@@ -276,6 +275,38 @@ grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
 
 ```
 These look flat when you plot points. There are very slight relationships but, likely nothing to go on.
+
+### Again with Dunning
+Here I plot SSDI as calculated by (male-female/female)
+```{r}
+p1 <- Dunning2%>%
+  ggplot(., aes(x=log10(min_elev), y=SSDI_con))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T,color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p2 <- Dunning2%>%
+  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
+  ggplot(., aes(x=log10(max_elev), y=SSDI_con))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p3 <- Dunning2%>%
+  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
+  ggplot(., aes(x=log10(mdpt), y=SSDI_con))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p4 <-ggplot(Dunning2, aes(x=log10(amp), y=SSDI_con))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+
+```
 
 Here I plot SSDI as calculated in @llovich1992review (mass larger sex/mass smaller sex)
 ```{r}
