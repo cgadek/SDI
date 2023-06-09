@@ -167,65 +167,42 @@ I'm mainly using the dataset used in @linck2021blood downloaded from Ethan Linck
 Read in the processed dataframe here.
 
 ```{r}
+
 df<-read_csv("data/All_birds_elev_macro_morpho.csv")
 
-tree <- read.tree("data/birds_mcc.tre") #need to trim to model. will take a million years to run with 9000+ tips anyway
+df<- df%>%
+  mutate(sex_diff = mean_mass_male-mean_mass_female,
+    sex.diff.corr = log10(sex_diff - min(sex_diff, na.rm=T)+1),
+    mdpt.elev = (max_elev+min_elev)/2,
+    amplitude = max_elev -min_elev,
+    larger_sex = if_else(mean_mass_male > mean_mass_female, "male larger", "female larger"))
+
+#tree <- read.tree(paste0("data/tree_2801spp.tre")) #need to trim to model. will take a million years to run with 9000+ tips anyway
 ```
 
 # Explore data
 
 ```{r, `birdsexdiff`, warning=F}
-df.all.birds%>%
-  mutate(sex_diff = male-female,
-    sex.diff.corr = log10(sex_diff + min(sex_diff)))%>%
-  # filter(sex_diff< 30,
-  #        Kipps.Distance< 60)%>%
-ggplot(., aes(log10(mdpt.elev), log10(sex_diff)))+
-  geom_point(size=2, alpha=0.5, color="grey88", fill="grey88", shape=19)+
-  geom_smooth(method="lm", color="black", linetype="dashed")+
+df%>%
+   filter(sex_diff> -2000,
+          family %in% c("Tyrannidae", "Furnariidae", "Emberizidae", "Fringillidae", "Psittacidae", "Trochilidae"))%>%
+ggplot(., aes(log10(mdpt.elev), sex.diff.corr))+
+  #geom_point(aes(size=Range.Size), shape=21, alpha=0.4, fill="grey")+
+  geom_smooth(method="lm", color="black", linetype="dashed", alpha=0.3, fill="gray55")+
   #  geom_point(aes(mean_sample_elev, female),alpha=0.6, color="darkgreen")+
   # geom_smooth(aes(mean_sample_elev, female), method="lm")+
-  # scale_colour_gradient2(
-  #   low = "#d1492d",
-  #   mid = "#FFE6BE",
-  #   high = "#00798c",
-  #   midpoint = 0,
-  #   breaks = c(-0.2, 0, 0.2)
-  # ) +
+  #scale_fill_continuous_diverging()+
   theme_cowplot()+
   theme(legend.title = element_blank(),
-        legend.position = "none")
+        legend.position = "none")+
+  facet_wrap(.~family, scales="free_y")
 ```
 
-When we plot log10sex difference (male mass - female mass) by log10midpoint elevation we get a pretty strong negative trend which is in line with the hypothesis that in harsher environments i.e. higher elevations constraints on sexual dimoprhism are greater.
-  
-```{r}
-df%>%
-  filter(sex_diff< 30,
-         SSDI > -0.2)%>%
-  na.omit()%>%
-  mutate(hct.SDI = (mean_hct_male - mean_hct_female)/mean_hct_female,
-         hb.SDI = (mean_hb_male - mean_hb_female)/mean_hb_female)%>%
-ggplot(., aes(max_elev, hb.SDI, fill=log10(Range.Size)))+
-  geom_point(alpha=0.6, size=2, shape=21)+
-  geom_smooth(method="lm", color="black", linetype="dashed")+
-  # scale_colour_gradient2(
-  #   low = "#d1492d",
-  #   mid = "#FFE6BE",
-  #   high = "#00798c",
-  #   midpoint = 0,
-  #   breaks = c(-0.2, 0, 0.2)
-  # ) +
-  theme_cowplot()+
-  theme(legend.title = element_blank(),
-        legend.position = "none")
-
-```
-Very slight decreasing trend in hemoglobin SDI with maximum elevation.
+When we plot log10sex difference (male mass - female mass) by log10midpoint elevation we get a pretty strong negative trend which is in line with the hypothesis that in harsher environments i.e. higher elevations constraints on sexual dimorphism are greater.
 
 ## Relationship between sex differences and sexual dimorphism indices
 ```{r}
-p1<-ggplot(df, aes(x=sex_diff, y=SSDI))+
+p1<-ggplot(df, aes(x=sex_diff, y=SSDI_mass))+
   #geom_point(alpha=0.3)+
   geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
@@ -242,31 +219,44 @@ grid.arrange(p1, p2, nrow=1)
 
 This seems to run counter to @lovich1992review, suggesting that (male - female/male) is most comparable?
 
+# Detour to look at only hummingbirds
+```{r}
+df%>%
+  filter(family %in% c("Trochilidae"))%>%
+  mutate(mean_mass = (male_mass + female_mass)/2,
+         Bee = ifelse(taxon == "Mellisuga helenae", "Bee", NA))%>%
+  ggplot(., aes(log10(mean_mass), SSDI_mass, fill=Bee, group=larger_sex))+
+  geom_point(shape=21)+
+  geom_smooth(method="lm", fill="grey", color="black")+
+  geom_abline(intercept = -0.45, slope=1)+
+  coord_cartesian(xlim=c(0,1.4), ylim=c(-0.23, 0.6))
+```
 
-## SSDI x elevation
+# SDI Mass
+## Elevation
 Here I plot SSDI as calculated by (male-female/female)
 ```{r}
-p1 <- df.all.birds%>%
-  ggplot(., aes(x=log10(min_elev), y=SSDI))+
+p1 <- df%>%
+  ggplot(., aes(x=log10(min_elev), y=SSDI_mass))+
   #geom_point(alpha=0.3)+
   geom_smooth( se=T,color="black", linetype="dashed")+
   theme(legend.position = "none")
 
-p2 <- df.all.birds%>%
+p2 <- df%>%
   #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
-  ggplot(., aes(x=log10(max_elev), y=SSDI))+
+  ggplot(., aes(x=log10(max_elev), y=SSDI_mass))+
   #geom_point(alpha=0.3)+
   geom_smooth( se=T, color="black", linetype="dashed")+
   theme(legend.position = "none")
 
-p3 <- df.all.birds%>%
+p3 <- df%>%
   #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
-  ggplot(., aes(x=log10(mdpt.elev), y=SSDI))+
+  ggplot(., aes(x=log10(mdpt.elev), y=SSDI_mass))+
   #geom_point(alpha=0.3)+
   geom_smooth( se=T, color="black", linetype="dashed")+
   theme(legend.position = "none")
 
-p4 <-ggplot(df.all.birds, aes(x=log10(amplitude), y=SSDI))+
+p4 <-ggplot(df, aes(x=log10(amplitude), y=SSDI_mass))+
   #geom_point(alpha=0.3)+
   geom_smooth( se=T, color="black", linetype="dashed")+
   theme(legend.position = "none")
@@ -276,158 +266,473 @@ grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
 ```
 These look flat when you plot points. There are very slight relationships but, likely nothing to go on.
 
-### Again with Dunning
-Here I plot SSDI as calculated by (male-female/female)
-```{r}
-p1 <- Dunning2%>%
-  ggplot(., aes(x=log10(min_elev), y=SSDI_con))+
-  #geom_point(alpha=0.3)+
-  geom_smooth( se=T,color="black", linetype="dashed")+
-  theme(legend.position = "none")
-
-p2 <- Dunning2%>%
-  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
-  ggplot(., aes(x=log10(max_elev), y=SSDI_con))+
-  #geom_point(alpha=0.3)+
-  geom_smooth( se=T, color="black", linetype="dashed")+
-  theme(legend.position = "none")
-
-p3 <- Dunning2%>%
-  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
-  ggplot(., aes(x=log10(mdpt), y=SSDI_con))+
-  #geom_point(alpha=0.3)+
-  geom_smooth( se=T, color="black", linetype="dashed")+
-  theme(legend.position = "none")
-
-p4 <-ggplot(Dunning2, aes(x=log10(amp), y=SSDI_con))+
-  #geom_point(alpha=0.3)+
-  geom_smooth( se=T, color="black", linetype="dashed")+
-  theme(legend.position = "none")
-
-grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
-
-```
-
-Here I plot SSDI as calculated in @llovich1992review (mass larger sex/mass smaller sex)
-```{r}
-
-p1<-ggplot(df, aes(x=min_elev, y=lov.SSDI))+
-  #geom_point(alpha=0.3)+
-  geom_smooth( se=T,color="black", linetype="dashed")+
-  theme_cowplot()+
-  theme(legend.position = "none")
-
-p2 <-ggplot(df, aes(x=max_elev, y=lov.SSDI))+
-  #geom_point(alpha=0.3)+
-  geom_smooth( se=T, color="black", linetype="dashed")+
-  theme_cowplot()+
-  theme(legend.position = "none")
-
-p3 <-ggplot(df, aes(x=mean_sample_elev, y=lov.SSDI))+
-  #geom_point(alpha=0.3)+
-  geom_smooth( se=T, color="black", linetype="dashed")+
-  theme_cowplot()+
-  theme(legend.position = "none")
-
-p4 <-ggplot(df, aes(x=amplitude, y=lov.SSDI))+
-  #geom_point(alpha=0.3)+
-  geom_smooth( se=T, color="black", linetype="dashed")+
-  theme_cowplot()+
-  theme(legend.position = "none")
-
-grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
-
-```
-
-Here we see the sexual dimporphism index clearly goes down... More in line with my predictions that sexual dimorphism will decrease as abiotic selection increases with elevation...
 
 ## Latitude of range
 ```{r}
-p<-ggplot(df.all.birds, aes(x=Max.Latitude, y=SSDI))+
+p<-ggplot(df, aes(x=Max.Latitude, y=SSDI_mass))+
   #geom_point(alpha=0.3, color="dodgerblue")+
-  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
+  geom_smooth(method="loess", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
-p1<-ggplot(df.all.birds, aes(x=Min.Latitude, y=SSDI))+
+p1<-ggplot(df, aes(x=Min.Latitude, y=SSDI_mass))+
   #geom_point(alpha=0.3, color="dodgerblue")+
-  geom_smooth(method="lm", se=T, color="black", linetype="dashed")+
+  geom_smooth(method="loess", se=T, color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
-p2 <-ggplot(df.all.birds, aes(x=max_elev, y=Max.Latitude))+
-  #geom_point(alpha=0.3, color="dodgerblue")+
-  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
-  theme_cowplot()+
-  theme(legend.position = "none")
 
-p3 <-ggplot(df.all.birds, aes(x=mdpt.elev, y=Max.Latitude))+
-  #geom_point(alpha=0.3, color="dodgerblue")+
-  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
-  theme_cowplot()+
-  theme(legend.position = "none")
-
-grid.arrange(p, p1, p2, p3, nrow=2)
+grid.arrange(p, p1, nrow=1)
 ```
 
 
+# SDI Wing
+## Elevation
 
-## HWI
 ```{r}
-p<-ggplot(df.all.birds, aes(x=`Hand-Wing.Index`, y=SSDI))+
+p1 <- df%>%
+  ggplot(., aes(x=log10(min_elev), y=SSDI_wing))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
+  geom_smooth( se=T,color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p2 <- df%>%
+  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
+  ggplot(., aes(x=log10(max_elev), y=SSDI_wing))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p3 <- df%>%
+  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
+  ggplot(., aes(x=log10(mdpt.elev), y=SSDI_wing))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p4 <-ggplot(df, aes(x=log10(amplitude), y=SSDI_wing))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+
+```
+
+## Latitude
+```{r}
+p2 <-ggplot(df, aes(x=Max.Latitude, y=SSDI_wing))+
+  #geom_point(alpha=0.3, color="dodgerblue")+
+  geom_smooth(method="loess", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
-p1<-ggplot(df.all.birds, aes(x=max_elev, y=`Hand-Wing.Index`))+
-  #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T,color="black", linetype="dashed")+
+p3 <-ggplot(df, aes(x=Min.Latitude, y=SSDI_wing))+
+  #geom_point(alpha=0.3, color="dodgerblue")+
+  geom_smooth(method="loess", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
-p2 <-ggplot(df.all.birds, aes(x=Max.Latitude, y=`Hand-Wing.Index`))+
+grid.arrange(p2, p3, ncol=2, nrow=1)
+
+```
+
+
+# HWI
+## Elevation
+
+```{r}
+
+p1 <- df%>%
+  ggplot(., aes(x=log10(min_elev), y=`Hand-Wing.Index`))+
   #geom_point(alpha=0.3)+
-  geom_smooth(method="lm", se=T, color="black", linetype="dashed")+
+  geom_smooth( se=T,color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p2 <- df%>%
+  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
+  ggplot(., aes(x=log10(max_elev), y=`Hand-Wing.Index`))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p3 <- df%>%
+  #filter(family %in% c("Trochilidae", "Furnariidae", "Tyrannidae", "Thraupidae"))%>%
+  ggplot(., aes(x=log10(mdpt.elev), y=`Hand-Wing.Index`))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+p4 <-ggplot(df, aes(x=log10(amplitude), y=`Hand-Wing.Index`))+
+  #geom_point(alpha=0.3)+
+  geom_smooth( se=T, color="black", linetype="dashed")+
+  theme(legend.position = "none")
+
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+
+```
+
+## Latitude
+```{r}
+p2 <-ggplot(df, aes(x=Max.Latitude, y=`Hand-Wing.Index`))+
+  #geom_point(alpha=0.3, color="dodgerblue")+
+  geom_smooth(method="loess", se=T,color="black", linetype="dashed")+
   theme_cowplot()+
   theme(legend.position = "none")
 
-grid.arrange(p, p1, p2, nrow=2)
+p3 <-ggplot(df, aes(x=Min.Latitude, y=`Hand-Wing.Index`))+
+  #geom_point(alpha=0.3, color="dodgerblue")+
+  geom_smooth(method="loess", se=T,color="black", linetype="dashed")+
+  theme_cowplot()+
+  theme(legend.position = "none")
+
+grid.arrange(p2, p3, ncol=2, nrow=1)
+
+```
+
+# SDI Blood
+## Hemoglobin
+```{r}
+p<-df%>%
+  filter()%>%
+ggplot(., aes(max_elev, SSDI_hb, size=Range.Size))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p1<-df%>%
+  filter()%>%
+ggplot(., aes(min_elev, SSDI_hb, size=Range.Size))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p2<-df%>%
+  filter()%>%
+ggplot(., aes(mdpt.elev, SSDI_hb, size=Range.Size))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p3<-df%>%
+  filter()%>%
+ggplot(., aes(amplitude, SSDI_hb, size=Range.Size))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+```
+Very slight decreasing trend in hemoglobin SDI with maximum elevation.
+
+## Hct
+```{r}
+p<-df%>%
+  filter()%>%
+ggplot(., aes(max_elev, SSDI_hct, size=Range.Size))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p1<-df%>%
+  filter()%>%
+ggplot(., aes(min_elev, SSDI_hct, size=Range.Size))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p2<-df%>%
+  filter()%>%
+ggplot(., aes(mdpt.elev, SSDI_hct, size=Range.Size))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p3<-df%>%
+  filter()%>%
+ggplot(., aes(amplitude, SSDI_hct, size=Range.Size))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+
+```
+
+## Hb variability
+```{r}
+p<-df%>%
+  filter()%>%
+  mutate(max_elev = ntile(max_elev, 8))%>%
+  group_by(max_elev)%>%
+  dplyr::summarize(Hb_sd = sd(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(max_elev, Hb_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p1<-df%>%
+  filter()%>%
+  mutate(min_elev = ntile(min_elev, 8))%>%
+  group_by(min_elev)%>%
+  dplyr::summarize(Hb_sd = sd(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(min_elev, Hb_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p2<-df%>%
+  filter()%>%
+  mutate(mdpt.elev = ntile(mdpt.elev, 8))%>%
+  group_by(mdpt.elev)%>%
+  dplyr::summarize(Hb_sd = sd(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(mdpt.elev, Hb_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p3<-df%>%
+  filter()%>%
+  mutate(amplitude = ntile(amplitude, 8))%>%
+  group_by(amplitude)%>%
+  dplyr::summarize(Hb_sd = sd(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(amplitude, Hb_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+
+```
+
+## Hct variability
+```{r}
+p<-df%>%
+  filter()%>%
+  mutate(max_elev = ntile(max_elev, 8))%>%
+  group_by(max_elev)%>%
+  dplyr::summarize(Hct_sd = sd(SSDI_hct, na.rm=T))%>%
+ggplot(., aes(max_elev, Hct_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p1<-df%>%
+  filter()%>%
+  mutate(min_elev = ntile(min_elev, 8))%>%
+  group_by(min_elev)%>%
+  dplyr::summarize(Hct_sd = sd(SSDI_hct, na.rm=T))%>%
+ggplot(., aes(min_elev, Hct_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p2<-df%>%
+  filter()%>%
+  mutate(mdpt.elev = ntile(mdpt.elev, 8))%>%
+  group_by(mdpt.elev)%>%
+  dplyr::summarize(Hct_sd = sd(SSDI_hct, na.rm=T))%>%
+ggplot(., aes(mdpt.elev, Hct_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p3<-df%>%
+  filter()%>%
+  mutate(amplitude = ntile(amplitude, 8))%>%
+  group_by(amplitude)%>%
+  dplyr::summarize(Hct_sd = sd(SSDI_hct, na.rm=T))%>%
+ggplot(., aes(amplitude, Hct_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+
 ```
 
 ```{r}
-ggplot(df, aes(`Hand-Wing.Index`, mean_hb))+
-  geom_smooth(method="lm",color="black", linetype="dashed")+
-  geom_point()
-
-ggplot(df, aes(min_elev, `Hand-Wing.Index`))+
+p1<-ggplot(df, aes(`Hand-Wing.Index`, SSDI_hb))+
   geom_smooth(method="lm",color="black", linetype="dashed")
 
+p2<-ggplot(df, aes(`Hand-Wing.Index`, SSDI_hct))+
+  geom_smooth(method="lm",color="black", linetype="dashed")
+
+grid.arrange(p1, p2, nrow=1)
 ```
 ## SSDI Phylo PCA
 ```{r}
 
 #make matrix
-Livesand_birds2<-Livesand_birds%>%
-  mutate(species = taxon,
-         taxon = gsub(" ", "_", taxon))%>%
-  left_join(., df.all.birds, by="species")%>%
-  filter(family %in% c("Tyrannidae", "Furnariidae", "Picidae", "Emberizidae", "Fringillidae", "Trochilidae", "Turdidae"))
 
 tree <- read.tree("data/birds_mcc.tre")
 
-tips <- Livesand_birds2%>%
+
+df2 <- df%>%mutate(taxon = gsub(" ", "_", taxon))%>%filter(taxon %in% pruned.tree$tip.label)%>%dplyr::select(taxon, c(33:34, 49:57))%>%distinct()
+
+tips <- df2%>%
   mutate(taxon = gsub(" ", "_", taxon))%>%
   dplyr::select(taxon)%>%
   pull()
 
 pruned.tree<-drop.tip(tree, tree$tip.label[-na.omit(match(tips, tree$tip.label))])
 
-Livesand_birds2 <- Livesand_birds2%>%filter(taxon %in% pruned.tree$tip.label)
 
-phy.pca.mat <-scale(as.matrix(Livesand_birds2[ ,c(6:11, 19:22, 24:25)]))
+phy.pca.mat <-scale(as.matrix(df2[ ,c(4:8)]))
 
-rownames(phy.pca.mat) <-Livesand_birds2$taxon
+rownames(phy.pca.mat) <-df2$taxon
 phy.pca.mat<-evobiR::ReorderData(pruned.tree, phy.pca.mat, taxa.names="row names")
 
 bird.sex.pca <-phyl.pca(pruned.tree, phy.pca.mat)
@@ -438,9 +743,8 @@ s <-as.data.frame(bird.sex.pca$S)
 s$taxon <-names(bird.sex.pca$S)
 s <- tibble::rownames_to_column(s, "taxon")
 s <-s%>%
-  left_join(., Livesand_birds2 , "taxon")%>%
-  mutate(species= gsub("_", " ", taxon))%>%
-  filter(SSDI > -0.6)%>%
+   mutate(taxon= gsub("_", " ", taxon))%>%
+  left_join(., df, "taxon")%>%
   mutate(min.e.x = scale(min_elev),
          max.e.z = scale(max_elev),
          amp.z = scale(amplitude),
@@ -448,8 +752,17 @@ s <-s%>%
          corrected.PC1 = PC1+4.28)
  
 
-ggplot(s, aes(PC1, SSDI, fill=family))+
-  geom_point(shape=21)+
+ggplot(s, aes(PC1, SSDI_mass))+
+  geom_point(shape=21)
+
+ggplot(s, aes(PC1, SSDI_tarsus))+
+  geom_point(shape=21)
+
+ggplot(s, aes(PC1, SSDI_wing))+
+  geom_point(shape=21)
+
+ggplot(s, aes(PC1, amplitude))+
+  geom_point(shape=21)
   #geom_smooth(method="lm", color="black", linetype="dashed")
   #scale_fill_gradient2(low="blue", mid="yellow", high="red")
 ```
@@ -460,9 +773,9 @@ A <- vcv(pruned.tree)
 
 
 m1 <- brm(
-  formula = bf(corrected.PC1 ~ 1 + amp.z*family),
+  formula = bf(PC1 ~ 1 + amp.z*family),
   data = s,
-  family = lognormal(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  family = gaussian(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
   #data2 = list(A = A), # Phylogeny
   cores = 10,
   chains = 4,
@@ -485,10 +798,10 @@ t.brms<-df%>%
   mutate(amp.z = scale(amplitude),
          min.z = scale(min_elev),
          max.z =scale(max_elev),
-         species = gsub(" ", "_", species),
-         mdpt.z = scale((max_elev + min_elev)/2),
-         range.size.z =scale(Range.Size),
-         corrected_SSDI = SSDI + 1)
+         species = gsub(" ", "_", taxon),
+         mdpt.z = scale(mdpt.elev),
+         range.size.z =scale(Range.Size))%>%
+  filter(species %in% tree$tip.label)
 
 tips <- as.character(t.brms$species)
 tree <- keep.tip(tree, tips)
@@ -496,19 +809,19 @@ A <- vcv(tree)
 
 
 m1 <- brm(
-  formula = bf(corrected_SSDI ~ 1 +max.z*range.size.z + max.z*family, sigma ~ max.z),
+  formula = bf(SSDI_mass ~ 1 + s(mdpt.z) +(1|gr(species, cov = A))),
   data = t.brms,
-  family = lognormal(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
-  #data2 = list(A = A), # Phylogeny
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
   cores = 8,
   chains = 4,
   thin = 10,
   warmup = 10000, # default is iter/2; shouldn't ever be larger than iter
   iter = 20000,
-  control = list(adapt_delta = 0.98, max_treedepth = 17),
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
   sample_prior = TRUE # default priors
 )
-ccsave(m1, file="models/m1_SSDI.RData") # save model
+save(m1, file="models/m1_SSDI.RData") # save model
 load("models/m2_SSDI.RData") # If loading from pre-saved file and not re-running
 
 
@@ -677,13 +990,24 @@ plot(tree, type="fan", cex=0.1)
 
 ```{r}
 df.cont <- df|>
-  mutate(species_ = as.character(str_replace(species, " ", "_")))|>
-  filter(species_ %in% species.tree)|>
+  mutate(species = as.character(str_replace(Species, " ", "_")))|>
+  filter(species %in% tree$tip.label)|>
   ungroup()|>
-  dplyr::select(SSDI)|>
+  dplyr::select(SSDI_mass)|>
+  na.omit()%>%
   pull()
 
-names(df.cont) <- species.tree
+tips <- df|>
+  mutate(species = as.character(str_replace(Species, " ", "_")))|>
+  filter(species %in% tree$tip.label)|>
+  ungroup()|>
+  dplyr::select(species, SSDI_mass)|>
+    na.omit()%>%
+  pull(species)
+
+tree <- keep.tip(tree, tips)
+
+names(df.cont) <- tree$tip.label
 
 fitEB<-anc.ML(tree,df.cont,model="EB")
 

@@ -1,8 +1,10 @@
 ### MACRO Morphological Data Wrangling
-library(readr)
-library(tidyverse)
-library(ape)
-library(readxl)
+pacman::p_load(
+readr,
+tidyverse,
+ape,
+readxl
+)
 # Data wrangling
 EG_Witt <- read_csv("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/EG_Witt.csv")
 
@@ -44,18 +46,18 @@ Dunning2 <- Dunning%>%
   mutate(species = sub("^\\s*(\\S+\\s+\\S+).*", "\\1", Species))%>%
   dplyr::select(1,16:17, 3:11)%>%
   filter(Sex %in% c("M", "F"))%>%
-  group_by(Species)%>%
+  group_by(Species, family)%>%
   mutate(count = n())%>%
-  pivot_wider(.,id_cols =c(Species, species), values_from = c(Mean, Min, Max, S.D.), names_from = Sex, values_fn = ~mean(.x, na.rm = TRUE))%>% #taking mean when multiple values per species
-  mutate(male_mass = Mean_M, 
-         female_mass = Mean_F,
+  pivot_wider(.,id_cols =c(Species, species, family), values_from = c(Mean, Min, Max, S.D.), names_from = Sex, values_fn = ~mean(.x, na.rm = TRUE))%>% #taking mean when multiple values per species
+  mutate(mass_male = Mean_M, 
+         mass_female = Mean_F,
          taxon = as.factor(species))%>%
-  dplyr::select(taxon, male_mass, female_mass)
+  dplyr::select(taxon, family, mass_male, mass_female)
 
 
 avonet <- avonet%>%
   mutate(taxon = factor(Species3),
-         family = factor(Family3))%>%
+         family = Family3)%>%
   dplyr::select(taxon, family, Beak.Length_Culmen, Beak.Length_Nares, Beak.Width, Beak.Depth, Tarsus.Length, Kipps.Distance, `Hand-Wing.Index`, Tail.Length, Habitat, Habitat.Density, Migration, Trophic.Level, Trophic.Niche, Min.Latitude, Max.Latitude, Centroid.Latitude, Centroid.Longitude, Range.Size)
 
 Amniote_2015_ALL <- Amniote_2015%>%
@@ -68,6 +70,8 @@ Amniote_2015_ALL <- Amniote_2015%>%
          sex_diff_male_female = male - female,
          SDI = (male-female)/female)%>%
   dplyr::select(taxon, male, female, sex_diff_male_female, SDI)
+
+
 Amniote_2015_ALL$taxon <- reorder(Amniote_2015_ALL$taxon, Amniote_2015_ALL$sex_diff_male_female)
 
 
@@ -91,25 +95,25 @@ Amniote_2015_birds <- Amniote_2015%>%
          male_body_mass_g >= -500,
          female_body_mass_g >= -500)%>%
   na.omit()%>%
-  mutate(male_mass = male_body_mass_g,
-         female_mass = female_body_mass_g,
+  mutate(mass_male = male_body_mass_g,
+         mass_female = female_body_mass_g,
          taxon = factor(paste(genus, species, sep=" ")))%>%
-  dplyr::select(taxon, male_mass, female_mass)
+  dplyr::select(taxon, mass_male, mass_female)
 
 
 animal_traits_birds <- animal_traits%>%
   filter(class=="Aves")%>%
-  dplyr::select(genus, species, sex, body.mass)%>%
+  dplyr::select(genus, species, family, sex, body.mass)%>%
   mutate(body.mass = body.mass *1000, #change from kg to g
          taxon = factor(species))%>%
   filter(!is.na(body.mass) & !is.na(sex) & !sex == "")%>%
-  group_by(taxon, sex)%>%
+  group_by(taxon, family, sex)%>%
   dplyr::summarise(body.mass = mean(body.mass, na.rm = T))%>%
-  pivot_wider(.,id_cols =c(taxon), values_from = body.mass, names_from = sex)%>%
+  pivot_wider(.,id_cols =c(taxon, family), values_from = body.mass, names_from = sex)%>%
   na.omit()%>%
-  mutate(male_mass = male,
-         female_mass = female)%>%
-  dplyr::select(taxon, male_mass, female_mass)
+  mutate(mass_male = male,
+         mass_female = female)%>%
+  dplyr::select(taxon, family, mass_male, mass_female)
 
 Livesand_birds <- avian_Lislevand_2007%>%
   dplyr::select(Species_name, M_mass, F_mass, M_wing, F_wing, M_tarsus, F_tarsus, M_bill, F_bill)%>%
@@ -124,16 +128,25 @@ Livesand_birds <- avian_Lislevand_2007%>%
          F_bill >= -500)%>%
   na.omit()%>%
   group_by(taxon)%>%
-  dplyr::summarise(male_mass = mean(M_mass, na.rm = T),
-            female_mass = mean(F_mass, na.rm = T),
+  dplyr::summarise(mass_male = mean(M_mass, na.rm = T),
+            mass_female = mean(F_mass, na.rm = T),
             male_wing = mean(M_wing, na.rm=T),
             female_wing = mean(F_wing, na.rm=T),
             male_tarsus = mean(M_tarsus, na.rm=T),
             female_tarsus = mean(F_tarsus, na.rm=T),
             male_bill = mean(M_bill, na.rm=T),
             female_bill = mean(F_bill, na.rm=T))%>%
-  dplyr::select(taxon, male_mass, female_mass, male_wing, female_wing, male_tarsus, female_tarsus, male_bill, female_bill)
+  dplyr::select(taxon, mass_male, mass_female, male_wing, female_wing, male_tarsus, female_tarsus, male_bill, female_bill)
 
+
+#Linck dataset to get dimoprhism in blood metrics
+L.elevs<- Linck_et_al_data%>%
+  group_by(species, family)%>%
+  dplyr::summarise(max_sample_elev = max(elevation, na.rm=T),
+                   mean_sample_elev = mean(elevation, na.rm=T),
+                   min_sample_elev = min(elevation, na.rm=T))%>%
+  mutate(taxon=species)
+  
 df.Linck <-Linck_et_al_data%>%
   filter(!is.na(mass),
          sex %in% c("male", "female"))%>%
@@ -143,10 +156,17 @@ df.Linck <-Linck_et_al_data%>%
   )%>%
   group_by(taxon) %>% 
   filter(all(levels(sex) %in% sex))%>%
-  group_by(taxon, sex) %>% 
+  group_by(taxon, sex, family) %>% 
   dplyr::summarise(mean_mass = mean(mass),
+                   mean_hb = mean(hb, na.rm=T),
+                   mean_hct = mean(hct, na.rm=T)
   )%>%
-  pivot_wider(id_cols = c(taxon), names_from = c(sex), values_from = c(mean_mass))
+  pivot_wider(id_cols = c(taxon, family), names_from = c(sex), values_from = c(mean_mass, mean_hb, mean_hct))%>%
+  mutate(
+         SSDI_hct = ((mean_hct_male- mean_hct_female)/mean_hct_female),
+         SSDI_hb = ((mean_hb_male- mean_hb_female)/mean_hb_female),
+         SSDI_mass = ((mean_mass_male - mean_mass_female)/mean_mass_female))%>%
+  left_join(., L.elevs)
 
 Quinter_Jetz_bird_elevs <-Quinter_Jetz_bird_elevs%>% #take min and max of species elev ranges hopefully this is not oversimplification
   group_by(Species)%>%
@@ -156,19 +176,37 @@ Quinter_Jetz_bird_elevs <-Quinter_Jetz_bird_elevs%>% #take min and max of specie
   distinct()%>%
   dplyr::rename(taxon = Species,
                 min_elev = `Minimum elevation`,
-                max_elev = `Maximum elevation`)
+                max_elev = `Maximum elevation`)%>%
+  dplyr::select(taxon, min_elev, max_elev)
+
+
 
 #combine datasets
 all_animals <- rbind(Amniote_2015_ALL, animal_traits_all)
+
 all_birds <- Dunning2%>%
-  bind_rows(.,Amniote_2015_birds, Livesand_birds, animal_traits_birds, df.Linck)%>%
-  left_join(., avonet)%>%
+  dplyr::select(!Species)%>%
+  left_join(., Livesand_birds, by = "taxon")%>%
+  mutate(taxon = as.character(taxon))%>%
+  mutate_all(~ifelse(is.nan(.), NA, .))%>% #convert NAN to NA so we can ge rwo means for certain columns
+  mutate(
+  mean_mass_male = mean(c_across(c(mass_male.x, mass_male.y)), na.rm = TRUE),
+  mean_mass_female = mean(c_across(c(mass_female.x, mass_female.y)), na.rm = TRUE))%>%
+  dplyr::select(taxon, family, mean_mass_male, mean_mass_female, male_wing, female_wing, male_tarsus, female_tarsus, male_bill, female_bill)%>%
+  mutate_all(~ifelse(is.nan(.), NA, .))%>% #convert NAN to NA again because better for analyses
+  full_join(., df.Linck)%>%
+  left_join(., avonet, by="taxon")%>%
   left_join(., Quinter_Jetz_bird_elevs)%>%
   distinct()%>%
-  mutate(SSDI_mass = ((male_mass-female_mass)/female_mass),
-         SSDI_bill = ((male_bill-female_bill)/female_bill),
-         SSDI_wing = ((male_wing-female_wing)/female_wing),
-         SSDI_tarsus = ((male_tarsus-female_tarsus)/female_tarsus))
+  mutate(SSDI_mass = if_else(is.na(mean_mass_male) | is.na(mean_mass_female), NA, ((mean_mass_male-mean_mass_female)/mean_mass_female)),
+         SSDI_bill = if_else(is.na(male_bill) | is.na(female_bill), NA, ((male_bill-female_bill)/female_bill)),
+         SSDI_wing = if_else(is.na(male_wing) | is.na(female_wing), NA, ((male_wing-female_wing)/female_wing)),
+         SSDI_tarsus = if_else(is.na(male_tarsus) | is.na(female_tarsus), NA, ((male_tarsus-female_tarsus)/female_tarsus)),
+         sex_diff_male_female = if_else(is.na(mean_mass_male) | is.na(mean_mass_female), NA, (mean_mass_male-mean_mass_female)),
+         family = family.x)%>%
+  mutate_all(~ifelse(is.nan(.), NA, .))%>%#convert NAN to NA again because better for analyses
+  filter(!is.na(mean_mass_female), !is.na(mean_mass_male))%>%
+  dplyr::select(-family.x, -family.y, -Species, -species)
   
   
 
@@ -188,119 +226,45 @@ all_birds <- Dunning2%>%
 all_animals$taxon <- reorder(all_animals$taxon, all_animals$sex_diff_male_female)
 all_birds$taxon <- reorder(all_birds$taxon, all_birds$sex_diff_male_female)
 
-all_birds <- all_birds|>
-  mutate(species = factor(taxon))|>
-  dplyr::select(species, male, female)
+# all_birds <- all_birds|>
+#   mutate(species = factor(taxon))|>
+#   dplyr::select(species, male, female)
 
 
 
-elevs <- elevs%>%
-  mutate(species = str_replace(species, "_", " "),
-         species = factor(species))|>
-  distinct()
+# elevs <- elevs%>%
+#   mutate(species = str_replace(species, "_", " "),
+#          species = factor(species))|>
+#   distinct()
 
 
-df <- rbind(df, all_birds)
-
-L.elevs<- Linck_et_al_data%>%
-  group_by(species)%>%
-  dplyr::summarise(max_sample_elev = max(elevation, na.rm=T),
-            mean_sample_elev = mean(elevation, na.rm=T),
-            min_sample_elev = min(elevation, na.rm=T))
-
-L.blood<- Linck_et_al_data%>%
-  group_by(species)%>%
-  dplyr::summarise(mean_hct = mean(hct, na.rm=T),
-            sd_hct = sd(hct, na.rm=T),
-            mean_hb = mean(hb, na.rm=T),
-            sd_hb = sd(hb, na.rm=T))
-
-L.blood.sex<- Linck_et_al_data%>%
-  filter(sex %in% c("male", "female"))%>%
-  group_by(species, sex)%>%
-  dplyr::summarise(mean_hct = mean(hct, na.rm=T),
-            sd_hct = sd(hct, na.rm=T),
-            mean_hb = mean(hb, na.rm=T),
-            sd_hb = sd(hb, na.rm=T))%>%
-  pivot_wider(id_cols = c(species), names_from = c(sex), values_from = c(mean_hct, sd_hct, mean_hb, sd_hb))
+#df <- rbind(df, all_birds)
 
 
-df<-df%>%
-  left_join(., L.elevs, by="species")
 
-df<-df%>%
-  left_join(., elevs, by = "species")
-
-df<- df%>%
-  left_join(., avonet, by = "species")%>%
-  mutate(amplitude = max_elev - min_elev)
 
 #generate Lovich's simple SSDI Metric
 
-df <- df%>%
-  mutate(lov.SSDI = if_else(male > female, (male/female), (female/male)),
-         SSDI = (male-female)/female,
-         sex_diff = male-female,
-         mean_mass_mf = (male + female)/2,
-         species = factor(species))
-
-df<-df%>%
-  left_join(., L.blood, by="species")
-
-df<-df%>%
-  left_join(., L.blood.sex, by="species")
-
-# elev.d <- elevs%>%   #find duplicate names
-#   filter(duplicated(species))
-
-df <- df|>
-  filter(duplicated(species) == FALSE)
-
-#elevation range is 5000 m
-
-df.all.birds <- all_birds%>%
-  left_join(., Quinter_Jetz_bird_elevs, by = "species")%>%
-  left_join(., avonet, by = "species")%>%
-  mutate(amplitude = max_elev - min_elev,
-         SSDI = (male-female)/female,
-         mdpt.elev = (max_elev - min_elev)/2)
 
 #get vector of species for tree THIS HAS ALL BEEN DONE ALREADY
 
-df.all.birds2 <-df.all.birds %>% 
-  group_by(family) %>% 
-  filter(n() >= 10)%>%
-  na.omit()
 
 species_in_tree <- tree$tip.label
 
-species <- df.all.birds|>
-  dplyr::select(species)|>
-  mutate(species = as.character(str_replace(species, " ", "_")))%>%
-  filter(species %in% species_in_tree)%>%
+species <- all_birds|>
+  dplyr::select(taxon)|>
+  mutate(species_tree = as.character(str_replace(taxon, " ", "_")))%>%
+  filter(species_tree %in% species_in_tree)%>%
   pull()
 
 
-Livesand_birds <- Livesand_birds%>%
-  mutate(species = as.character(taxon))%>%
-  left_join(., Quinter_Jetz_bird_elevs)
 
-Dunning2 <- Dunning%>%
-  filter(Sex %in% c("M", "F"))%>%
-  group_by(Species)%>%
-  mutate(count = n())%>%
-  pivot_wider(.,id_cols =c(Species, species), values_from = c(Mean, Min, Max, S.D.), names_from = Sex, values_fn = ~mean(.x, na.rm = TRUE))%>%
-  left_join(., Quinter_Jetz_bird_elevs, by="species")%>%
-  left_join(., avonet, by ="species")%>%
-  mutate(SSDI_con = ((Mean_M -Mean_F)/Mean_F),
-         amp= max_elev-min_elev,
-         mdpt = (max_elev + min_elev)/2)
+
 
 # 
 tree <- ape::keep.tip(tree, tip = as.character(species))
-# write.tree(tree, file="data/tree_4398spp.tre")
-# write.tree(tree, file="data/tree_395spp.tre")
-write.csv(df, "data/All_elev_macro_morpho.csv")
-write.csv(Livesand_birds, "data/Livesand_sex_morph_elev.csv")
-write.csv(df.all.birds, "data/All_bird_SSDI_macro_morpho.csv")
-write.csv(Dunning, "data/Dunning_Quintero__avonet_mass_morph_eco_elevs.csv")
+
+#Write out tree and dataframe Tree will need fruther pruning depedning on analyses
+write.tree(tree, file=paste0("data/tree_", length(tree$tip.label), "spp.tre"))
+write.csv(all_birds, "data/All_birds_elev_macro_morpho.csv")
+
