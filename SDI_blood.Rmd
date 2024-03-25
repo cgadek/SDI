@@ -1,0 +1,4719 @@
+---
+title: "Blood Sexual Dimorphims"
+author: "Chauncey Gadek" 
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    toc_depth: 5
+    code_folding: show
+    bibliography: true
+    #df_print: paged
+    #df_print: kable
+    #toc_float: true
+      #collapsed: false
+      #smooth_scroll: TRUE
+    theme: cosmo #spacelab #yeti #united #cosmo
+    highlight: tango
+  pdf_document:
+    df_print: kable
+fontsize: 12pt
+geometry: margin=0.25in
+always_allow_html: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{=html}
+<style>
+/* HTML FORMATTING */
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5 {
+  margin-top: 25px; /* space before each header */
+  font-weight: bold; /* bold headers */
+}
+</style>
+```
+
+```{R, echo=FALSE}
+# I set some GLOBAL R chunk options here.
+#   (to hide this message add "echo=FALSE" to the code chunk options)
+rm(list =ls (all = TRUE)) #This removes objects from global environ
+knitr::opts_chunk$set(echo=F, comment = NA, message = FALSE, warning = FALSE, width = 100)
+knitr::opts_chunk$set(fig.align = "center", fig.height = 4, fig.width = 6)
+
+```
+
+# Load Packages
+
+```{R, echo=F}
+pacman::p_load(
+reshape,
+reshape2,
+
+dplyr,
+tidyr,
+car,
+picante,
+rcompanion,
+GGally,
+Hmisc,
+gridExtra,
+stats,
+gplots,
+ggplot2,
+ggExtra,
+cowplot,
+colorspace,
+stats4, # Forces knitr to work when it's being wonky
+PMCMR, #Allows Kruskal-Wallis post-hocs
+effects,
+gridExtra,
+lattice,
+survival,
+fmsb,
+faraway,
+ape,
+data.table,
+#wBoot,
+ggridges,
+boot,
+faux,
+effsize,
+plotrix,
+colorspace,
+ggpubr,
+patchwork,
+ggdist,
+factoextra,
+
+# Mapping 
+raster,
+sp,
+#rgdal,
+#RStoolbox,
+prettymapr,
+viridis,
+rasterVis,
+
+
+# Modeling packages 
+nlme,
+lme4,
+AICcmodavg,
+MuMIn,
+#glmulti,
+reghelper,
+lsmeans,
+rsq, # get r-squared values from GLM
+r2glmm, # for R^2 values from lmer(, and glmer(,
+multcompView, # related to multiple comparisons?
+jtools, # interaction plots 
+interactions, # interaction plots 
+broom,
+stargazer, # model output tables
+ggeffects, # for estimating model predictions from mixed effects models
+MCMCglmm,
+bayesplot,
+rstan,
+Rcpp, # required for brms
+brms,
+magrittr,
+tidybayes,
+modelr,
+hexbin,
+ggExtra,
+rgl,
+readr,
+tidyverse,
+# Phylo packages 
+phytools,
+ape,
+phylobase,
+phylosignal,
+adephylo,
+phylolm,
+ggtree,
+evobiR,
+ggeffects,
+splines
+)
+
+# To run each time you load rstan
+options(mc.cores = parallel::detectCores()) # for core setup 
+rstan_options(auto_write = TRUE) # auto save  bare version of compiled Stan program to HD
+
+#import extra fonts or else there will be issues with custom theme
+#extrafont::font_import() #must select yes
+#y
+extrafont::loadfonts()
+
+#Load in functions
+source("~/Desktop/R_color_palettes/Gadek_custom_colors.R")
+source("~/Desktop/ggplot_themes/ggplot_themes.R")
+
+#set theme
+theme_set(theme_arial_clean())
+
+#setup folder paths for less coding
+figures <- paste(getwd(), "/figures/", sep="")
+tables <- paste(getwd(), "/Tables/", sep="")
+models <- paste(getwd(), "/models/", sep="")
+results <- paste(getwd(), "/models/results/", sep="")
+```
+
+# Set up come colors to use
+```{r}
+n <- 10
+
+h1 <- hcl.colors(n, palette = "Dynamic")
+h2 <- hcl.colors(n, palette = "Earth")
+h3 <- hcl.colors(n, palette = "Berlin")
+h4 <- hcl.colors(n, palette = "Fall")
+h5 <- hcl.colors(n, palette = "Sunset")
+
+library(unikn)
+seecol(list(h1, h2, h3, h4, h5), 
+       col_brd = "white", lwd_brd = 4, 
+       title = "Example palettes from hcl.colors(n = 10)", 
+       pal_names = c("Dynamic", "Earth", "Berlin", "Fall",  "Sunset"))
+
+contr.col <- c(h2[1], h2[8], h1[3], h4[10])
+
+```
+Blood metrics (e.g. hemoglobin concentrations, Hct) are indicators of organism function with respect to oxygen transport. Reductions or increases in some blood metrics can reveal alternate physiological processes like reproduction or pathologist. Sexual differences in blood metrics seem to fluctuate with life history, among species but generally, when identified, female birds have lower hemoglobin/hct compared to males. This weak pattern has been attributed to the cost of female reprodcution and/or more directly the differential effects of sex hormones stimulate erythrocyte production and oestrogens inhibit it. Additionally hct reductions in females before egg laying has been attributed to increased blood volume coinciding with blood increases in egg yolk precursors. Importantly, many female hematocrits examined did not return to normal levels.
+
+#Read in data
+Data are from Linck et al. 2023 Blood variation paper
+```{r}
+
+df <- read_csv("data/species_means_blood_final.csv")
+
+df.all <- read_csv("data/all_blood_final.csv")
+
+df.within <- read_csv("data/blood_final_within.csv")
+
+df.gonads <- read_csv("data/gonads.csv")
+
+```
+
+
+# What is our sample size?
+This data has been cleaned and supplemneted by BOTW elevation ranges.
+```{r}
+
+#Get sample sizes
+df%>%
+  ungroup()%>%
+  dplyr::summarise(n_hb_females = sum(n_hb_female, na.rm=T),
+                   n_hb_males = sum(n_hb_male, na.rm=T),
+                   total_hb = n_hb_females+n_hb_males,
+                   n_hct_females = sum(n_hct_female, na.rm=T),
+                   n_hct_males = sum(n_hct_male, na.rm=T),
+                   total_hct = n_hct_females+n_hct_males)
+
+```
+
+## Sample size by species
+```{r}
+
+#Get sample sizes
+df%>%
+  group_by(taxon)%>%
+  dplyr::summarise(n_hb_females = sum(n_hb_female, na.rm=T),
+                   n_hb_males = sum(n_hb_male, na.rm=T),
+                   total_hb = n_hb_females+n_hb_males,
+                   n_hct_females = sum(n_hct_female, na.rm=T),
+                   n_hct_males = sum(n_hct_male, na.rm=T),
+                   total_hct = n_hct_females+n_hct_males)
+
+```
+# Gonad size over time
+## testis length
+```{r}
+
+df.gonads%>%
+  filter(family %in% c("Tyrannidae", "Trochilidae", "Furnariidae", "Thraupidae"), sex=="male")%>%
+  ggplot(aes(doy, log10(length), color=family))+
+  #geom_point()+
+   scale_color_manual(values = c(h2[1], h2[3], h2[7], h2[10]))+
+  geom_smooth()+
+  labs(x="Day of year")+
+   ylab(bquote(log[10]*testis~length))+
+  theme(aspect.ratio = 0.5)
+
+```
+
+## ovary length
+```{r}
+
+df.gonads%>%
+  filter(family %in% c("Tyrannidae", "Trochilidae", "Furnariidae", "Thraupidae"), sex=="female")%>%
+  ggplot(aes(doy, log10(length), color=family))+
+  #geom_point()+
+  geom_smooth()+
+  scale_color_manual(values = c(h2[1], h2[3], h2[7], h2[10]))+
+  labs(x="Day of year")+
+   ylab(bquote(log[10]*ovary~length))+
+  theme(aspect.ratio = 0.5)
+
+```
+
+# Species SBDI comparisons
+## Hb
+```{r}
+thresh <-5
+  
+p1<-df%>%
+   mutate(bias.direction = as.factor(if_else(SSDI_hb >0, "male biased", "female biased")),
+          n_sample = n_hb_female + n_hb_male)%>%
+  filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         bias.direction =="male biased")%>%
+  dplyr::select(species, mean_hb_female, mean_hb_male,bias.direction, SSDI_hb, n_sample)%>%
+  pivot_longer(cols = 2:3, names_to = "sex", values_to = "hb")%>%
+    mutate(median=median(SSDI_hb))%>%
+  ggplot(aes(x=sex, y=hb, group = species, fill = sex))+
+  geom_line(aes(color=SSDI_hb),alpha=0.9)+
+   geom_point(aes(size=n_sample),shape=21, color="black", alpha=0.5)+
+  scale_color_gradient2(low="steelblue4",mid ="grey96", high="brown", midpoint = 0)+
+  labs(y="[Hb]", x=NULL)+
+  scale_x_discrete(labels=c("female", "male"))+
+  scale_fill_manual(values=c("grey33", "navajowhite3"))+
+  theme(aspect.ratio = 1,
+        legend.position = "right")
+p1
+
+
+p2<-df%>%
+   mutate(bias.direction = as.factor(if_else(SSDI_hb >0, "male biased", "female biased")),
+          n_sample = n_hb_female + n_hb_male)%>%
+  filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         bias.direction =="female biased")%>%
+  dplyr::select(species, mean_hb_female, mean_hb_male,bias.direction, SSDI_hb, n_sample)%>%
+  pivot_longer(cols = 2:3, names_to = "sex", values_to = "hb")%>%
+    mutate(median=median(SSDI_hb))%>%
+  ggplot(aes(x=sex, y=hb, group = species, fill = sex))+
+  geom_line(aes(color=SSDI_hb),alpha=0.9)+
+   geom_point(aes(size=n_sample),shape=21, color="black", alpha=0.5)+
+  scale_color_gradient2(low="steelblue4",mid ="grey96", high="brown", midpoint = 0)+
+  labs(y="[Hb]", x=NULL)+
+  scale_x_discrete(labels=c("female", "male"))+
+  scale_fill_manual(values=c("grey33", "navajowhite3"))+
+  theme(aspect.ratio = 1,
+        legend.position = "right")
+p2
+
+g <- grid.arrange(p1, p2, nrow=2)
+ggsave(g, file=paste0("figures/2Panel_dotplot_hb_colored_by_SSDI_N_over_", thresh, ".pdf"), width=5, height=7, device=cairo_pdf)
+
+```
+
+## Hct
+```{r}
+thresh <- 5
+p1<-df%>%
+   mutate(bias.direction = as.factor(if_else(SSDI_hct >0, "male biased", "female biased")),
+          n_sample = n_hct_female + n_hct_male)%>%
+  filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         bias.direction =="male biased")%>%
+  dplyr::select(species, mean_hct_female, mean_hct_male,bias.direction, SSDI_hct, n_sample)%>%
+  pivot_longer(cols = 2:3, names_to = "sex", values_to = "hct")%>%
+    mutate(median=median(SSDI_hct))%>%
+  ggplot(aes(x=sex, y=hct, group = species, fill = sex))+
+  geom_line(aes(color=SSDI_hct),alpha=0.9)+
+   geom_point(aes(size=n_sample),shape=21, color="black", alpha=0.5)+
+  scale_color_gradient2(low="steelblue4",mid ="grey96", high="brown", midpoint = 0)+
+  labs(y="Hct", x=NULL)+
+  scale_x_discrete(labels=c("female", "male"))+
+  scale_fill_manual(values=c("grey33", "navajowhite3"))+
+  theme(aspect.ratio = 1,
+        legend.position = "right")
+p1
+
+
+p2<-df%>%
+   mutate(bias.direction = as.factor(if_else(SSDI_hct >0, "male biased", "female biased")),
+          n_sample = n_hct_female + n_hct_male)%>%
+  filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         bias.direction =="female biased")%>%
+  dplyr::select(species, mean_hct_female, mean_hct_male,bias.direction, SSDI_hct, n_sample)%>%
+  pivot_longer(cols = 2:3, names_to = "sex", values_to = "hct")%>%
+    mutate(median=median(SSDI_hct))%>%
+  ggplot(aes(x=sex, y=hct, group = species, fill = sex))+
+  geom_line(aes(color=SSDI_hct),alpha=0.9)+
+   geom_point(aes(size=n_sample),shape=21, color="black", alpha=0.5)+
+  scale_color_gradient2(low="steelblue4",mid ="grey96", high="brown", midpoint = 0)+
+  labs(y="Hct", x=NULL)+
+  scale_x_discrete(labels=c("female", "male"))+
+  scale_fill_manual(values=c("grey33", "navajowhite3"))+
+  theme(aspect.ratio = 1,
+        legend.position = "right")
+p2
+
+g <- grid.arrange(p1, p2, nrow=2)
+ggsave(g, file=paste0("figures/2Panel_dotplot_hct_colored_by_SSDI_N_over_", thresh, ".pdf"), width=5, height=7, device=cairo_pdf)
+
+
+```
+
+# Distribution of Hb and Hct SDI
+## Hb among species
+```{r}
+thresh <-3
+
+p<-df%>%
+  filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh)%>%
+  ggplot(aes(x=SSDI_hb, group = SSDI_hb, fill = ..x..))+
+  geom_histogram()+
+  scale_fill_gradient2(low="steelblue4",mid ="grey86", high="brown", midpoint = 0)+
+  geom_vline(xintercept = 0, linetype="dashed")+
+  labs(y=NULL)+
+  xlab(bquote(SDI[Hb]))+ 
+  theme(aspect.ratio = .5,
+        legend.position = c(0.85,0.75))
+p
+ggsave(p, file=paste0("figures/histogram_elev_SDI_hb_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+
+
+
+## Hct among species
+```{r}
+p<-df%>%
+  filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh)%>%
+  ggplot(aes(x=SSDI_hct, group = SSDI_hct, fill = ..x..))+
+  geom_histogram()+
+  scale_fill_gradient2(low="steelblue4",mid ="grey86", high="brown", midpoint = 0)+
+  geom_vline(xintercept = 0, linetype="dashed")+
+  labs(y=NULL)+
+  xlab(bquote(SDI[Hct]))+ 
+  theme(aspect.ratio = 0.5,
+        legend.position = c(0.85,0.75))
+p
+ggsave(p, file=paste0("figures/histogram_elev_SDI_hct_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+# Contributions to SBDI
+## More data processing
+Keeping this data processing separate, mainly to allow for changing initial sample size.
+```{r}
+
+thresh <- 5
+
+df.contribution <- df %>%
+  filter(n_hb_male >= thresh,
+         n_hb_female >= thresh) %>%
+  mutate(SDBI_hb_z = scale(SSDI_hb),
+         SDBI_hct_z = scale(SSDI_hct),
+         expect_SBDI_hb_z = mean(SDBI_hb_z[which(abs(SDBI_hb_z) <= 0.25)], na.rm = T),# calculate the pooled expectation from the mean of all z scores  within 0.25 sd 
+         expect_SBDI_hct_z = mean(SDBI_hct_z[which(abs(SDBI_hct_z) <= 0.25)], na.rm = T),# calculate the pooled expectation from the mean of all z scores  within 0.25 sd 
+         expect_SBDI_hb_elev_z = mean(mean_sample_elev[which(abs(SDBI_hb_z) <= 0.25)], na.rm = T),
+         expect_SBDI_hct_elev_z = mean(mean_sample_elev[which(abs(SDBI_hct_z) <= 0.25)], na.rm = T),
+         species_0_SDI_hb = species[which.min(abs(SSDI_hb) - abs(expect_SBDI_hb_z))][1],
+         species_0_SDI_hct = species[which.min(abs(SSDI_hct) - abs(expect_SBDI_hct_z))][1],
+    male_0_SDI_hb = mean(mean_hb_male[which.min(abs(SSDI_hb)- abs(expect_SBDI_hb_z))], na.rm = T),
+    #I believe these result in list of values so I will take a mean from these
+    female_0_SDI_hb = mean(mean_hb_female[which.min(abs(SSDI_hb)- abs(expect_SBDI_hb_z))], na.rm =
+                             T),
+     male_0_SDI_hct = mean(mean_hct_male[which.min(abs(SSDI_hct)- abs(expect_SBDI_hct_z))], na.rm = T),
+    #I believe these result in list of values so I will take a mean from these
+    female_0_SDI_hct = mean(mean_hct_female[which.min(abs(SSDI_hct)- abs(expect_SBDI_hct_z))], na.rm =
+                             T),
+    pooled_diff_from_expected_hb_male = mean_hb_male - male_0_SDI_hb, #these are from subtracting all mean hb values from a single species closest to the central SDI from z scores above
+    pooled_diff_from_expected_hb_female = mean_hb_female - female_0_SDI_hb,
+     pooled_diff_from_expected_hct_male = mean_hct_male - male_0_SDI_hct, #these are from subtracting all mean hb values from a single species closest to the central SDI from z scores above
+    pooled_diff_from_expected_hct_female = mean_hct_female - female_0_SDI_hct,
+     pooled_diff_from_expected_elev_hb = mean_sample_elev - expect_SBDI_hb_elev_z,
+     pooled_diff_from_expected_elev_hct = mean_sample_elev - expect_SBDI_hct_elev_z,
+     pooled_diff_from_exp_hb_male_elev_corr = pooled_diff_from_expected_hb_male + (pooled_diff_from_expected_elev_hb * (0.7/
+                                                                          1000)),
+    #need to correct for ~ 1 unit increase in per 1000 m increase in elevation
+    pooled_diff_from_exp_hb_female_elev_corr = pooled_diff_from_expected_hb_female + (pooled_diff_from_expected_elev_hb * (0.7/
+                                                                          1000)),
+    
+    pooled_diff_from_exp_hct_male_elev_corr = pooled_diff_from_expected_hct_male + (pooled_diff_from_expected_elev_hct * (0.02/
+                                                                          1000)),
+    #need to correct for ~ 1 unit increase in per 1000 m increase in elevation
+    pooled_diff_from_exp_hct_female_elev_corr = pooled_diff_from_expected_hct_female + (pooled_diff_from_expected_elev_hct * (0.02/
+                                                                          1000)),
+     pooled_hb_SBD_driver = if_else(
+      abs(pooled_diff_from_exp_hb_male_elev_corr) < abs(pooled_diff_from_exp_hb_female_elev_corr) &
+        pooled_diff_from_exp_hb_female_elev_corr < 0,
+      "female driven reduction",
+      if_else(
+        abs(pooled_diff_from_exp_hb_male_elev_corr) < abs(pooled_diff_from_exp_hb_female_elev_corr) &
+          pooled_diff_from_exp_hb_female_elev_corr > 0,
+        "female driven increase",
+        if_else(
+          abs(pooled_diff_from_exp_hb_male_elev_corr) > abs(pooled_diff_from_exp_hb_female_elev_corr) &
+            pooled_diff_from_exp_hb_male_elev_corr < 0,
+          "male driven reduction",
+          if_else(
+            abs(pooled_diff_from_exp_hb_male_elev_corr) > abs(pooled_diff_from_exp_hb_female_elev_corr) &
+              pooled_diff_from_exp_hb_male_elev_corr > 0,
+            "male driven increase",
+            NA
+          )
+        )
+      )
+    ),
+     pooled_hct_SBD_driver = if_else(
+      abs(pooled_diff_from_exp_hct_male_elev_corr) < abs(pooled_diff_from_exp_hct_female_elev_corr) &
+        pooled_diff_from_exp_hct_female_elev_corr < 0,
+      "female driven reduction",
+      if_else(
+        abs(pooled_diff_from_exp_hct_male_elev_corr) < abs(pooled_diff_from_exp_hct_female_elev_corr) &
+          pooled_diff_from_exp_hct_female_elev_corr > 0,
+        "female driven increase",
+        if_else(
+          abs(pooled_diff_from_exp_hct_male_elev_corr) > abs(pooled_diff_from_exp_hct_female_elev_corr) &
+            pooled_diff_from_exp_hct_male_elev_corr < 0,
+          "male driven reduction",
+          if_else(
+            abs(pooled_diff_from_exp_hct_male_elev_corr) > abs(pooled_diff_from_exp_hct_female_elev_corr) &
+              pooled_diff_from_exp_hct_male_elev_corr > 0,
+            "male driven increase",
+            NA
+          )
+        )
+      )
+    ))%>%
+  group_by(family) %>%
+  mutate(
+    fam_species_0_SDI_hb = species[which.min(abs(SSDI_hb) - abs(expect_SBDI_hb_z))][1],
+    fam_elev_0_SDI_hb = mean_sample_elev[which.min(abs(SSDI_hb) - abs(expect_SBDI_hb_z))][1],
+    fam_male_0_SDI_hb = mean(mean_hb_male[which.min(abs(SSDI_hb)- abs(expect_SBDI_hb_z))], na.rm = T),
+    #I believe these result in list of values so I will take a mean from these
+    fam_female_0_SDI_hb = mean(mean_hb_female[which.min(abs(SSDI_hb)- abs(expect_SBDI_hb_z))], na.rm =
+                             T),
+    fam_diff_from_expected_hb_male = mean_hb_male - fam_male_0_SDI_hb,
+    fam_diff_from_expected_hb_female = mean_hb_female - fam_female_0_SDI_hb,
+   
+    fam_diff_from_expected_elev = mean_sample_elev - fam_elev_0_SDI_hb,
+    fam_diff_from_exp_hb_male_elev_corr = fam_diff_from_expected_hb_male + (fam_diff_from_expected_elev * (0.7/                                                                   1000)),
+    #need to correct for ~ 1 unit increase in per 1000 m increase in elevation
+   fam_diff_from_exp_hb_female_elev_corr = fam_diff_from_expected_hb_female + (fam_diff_from_expected_elev * (0.7/                                                                   1000)),
+    fam_SBD_hb_driver = if_else(
+      abs(fam_diff_from_exp_hb_male_elev_corr) < abs(fam_diff_from_exp_hb_female_elev_corr) &
+        fam_diff_from_exp_hb_female_elev_corr < 0,
+      "female driven reduction",
+      if_else(
+        abs(fam_diff_from_exp_hb_male_elev_corr) < abs(fam_diff_from_exp_hb_female_elev_corr) &
+          fam_diff_from_exp_hb_female_elev_corr > 0,
+        "female driven increase",
+        if_else(
+          abs(fam_diff_from_exp_hb_male_elev_corr) > abs(fam_diff_from_exp_hb_female_elev_corr) &
+            fam_diff_from_exp_hb_male_elev_corr < 0,
+          "male driven reduction",
+          if_else(
+            abs(fam_diff_from_exp_hb_male_elev_corr) > abs(fam_diff_from_exp_hb_female_elev_corr) &
+              fam_diff_from_exp_hb_male_elev_corr > 0,
+            "male driven increase",
+            NA
+          )
+        )
+      )
+    ),
+   fam_species_0_SDI_hct = species[which.min(abs(SSDI_hct) - abs(expect_SBDI_hct_z))][1],
+    fam_elev_0_SDI_hct = mean_sample_elev[which.min(abs(SSDI_hct) - abs(expect_SBDI_hct_z))][1],
+    fam_male_0_SDI_hct = mean(mean_hct_male[which.min(abs(SSDI_hct)- abs(expect_SBDI_hct_z))], na.rm = T),
+    #I believe these result in list of values so I will take a mean from these
+    fam_female_0_SDI_hct = mean(mean_hct_female[which.min(abs(SSDI_hct)- abs(expect_SBDI_hct_z))], na.rm =
+                             T),
+    fam_diff_from_expected_hct_male = mean_hct_male - fam_male_0_SDI_hct,
+    fam_diff_from_expected_hct_female = mean_hct_female - fam_female_0_SDI_hct,
+   
+    fam_diff_from_expected_elev = mean_sample_elev - fam_elev_0_SDI_hct,
+    fam_diff_from_exp_hct_male_elev_corr = fam_diff_from_expected_hct_male + (fam_diff_from_expected_elev * (0.02/                                                                   1000)),
+    #need to correct for ~ 1 unit increase in per 1000 m increase in elevation
+   fam_diff_from_exp_hct_female_elev_corr = fam_diff_from_expected_hct_female + (fam_diff_from_expected_elev * (0.02/                                                                   1000)),
+    fam_SBD_hct_driver = if_else(
+      abs(fam_diff_from_exp_hct_male_elev_corr) < abs(fam_diff_from_exp_hct_female_elev_corr) &
+        fam_diff_from_exp_hct_female_elev_corr < 0,
+      "female driven reduction",
+      if_else(
+        abs(fam_diff_from_exp_hct_male_elev_corr) < abs(fam_diff_from_exp_hct_female_elev_corr) &
+          fam_diff_from_exp_hct_female_elev_corr > 0,
+        "female driven increase",
+        if_else(
+          abs(fam_diff_from_exp_hct_male_elev_corr) > abs(fam_diff_from_exp_hct_female_elev_corr) &
+            fam_diff_from_exp_hct_male_elev_corr < 0,
+          "male driven reduction",
+          if_else(
+            abs(fam_diff_from_exp_hct_male_elev_corr) > abs(fam_diff_from_exp_hct_female_elev_corr) &
+              fam_diff_from_exp_hct_male_elev_corr > 0,
+            "male driven increase",
+            NA
+          )
+        )
+      )
+    ))
+
+
+```
+
+## Summarize contributions
+### Hb (pooled shift)
+```{r}
+
+df.contribution%>%
+  group_by(pooled_hb_SBD_driver)%>%
+  dplyr::summarise(n=n())
+
+```
+
+### Hct (pooled shift)
+```{r}
+df.contribution%>%
+  group_by(pooled_hct_SBD_driver)%>%
+  dplyr::summarise(n=n())
+```
+
+### Hb (Family pooled shift)
+```{r}
+df.contribution%>%
+  group_by(fam_SBD_hb_driver)%>%
+  dplyr::summarise(n=n())
+```
+
+### Hct (Family pooled shift)
+```{r}
+df.contribution%>%
+  group_by(fam_SBD_hct_driver)%>%
+  dplyr::summarise(n=n())
+```
+
+## Plot contributions
+### Hb (pooled shift)
+```{r}
+p<-df.contribution%>%
+   filter(SSDI_hb <=0.5,
+        !is.na(pooled_hb_SBD_driver))%>%
+ggplot(., aes(pooled_diff_from_exp_hb_female_elev_corr, pooled_diff_from_exp_hb_male_elev_corr))+
+  ggdensity::geom_hdr(n=100, probs=c( 0.25, 0.50, 0.75, 0.95))+
+  geom_point(aes(color=pooled_hb_SBD_driver),alpha=0.5)+
+  scale_color_manual(values=c(h2[1], h2[8], h1[3], h4[10]))+
+  geom_abline(intercept = 0)+
+  geom_abline(intercept = 0, slope=-1)+
+  # geom_hline(yintercept = 0, linetype="dashed")+
+  # geom_vline(xintercept = 0, linetype="dashed")+
+  coord_cartesian(xlim=c(-6,6), ylim=c(-6,6))+
+  labs(x= "Female [Hb] shift", y= "Male [Hb] shift")+
+  theme(aspect.ratio = 1)
+  
+p
+
+ggsave(p, file=paste0("figures/Contributions_SDI_hb_pooled_N_over_", thresh, ".pdf"), width=7, height=4, device=cairo_pdf)
+```
+
+### Hb (family pooled shift)
+```{r}
+p<-df.contribution%>%
+   filter(SSDI_hb <=0.5,
+          !is.na(fam_SBD_hb_driver))%>%
+ggplot(., aes(fam_diff_from_exp_hb_female_elev_corr, fam_diff_from_exp_hb_male_elev_corr))+
+  ggdensity::geom_hdr(n=100, probs=c( 0.25, 0.50, 0.75, 0.95))+
+  geom_point(aes(color=fam_SBD_hb_driver),alpha=0.5)+
+  scale_color_manual(values=c(h2[1], h2[8], h1[3], h4[10]))+
+  geom_abline(intercept = 0)+
+  geom_abline(intercept = 0, slope=-1)+
+  # geom_hline(yintercept = 0, linetype="dashed")+
+  # geom_vline(xintercept = 0, linetype="dashed")+
+  labs(x= "Female [Hb] shift", y= "Male [Hb] shift")+
+  #coord_cartesian(xlim=c(-6,6), ylim=c(-6,6))+
+  theme(aspect.ratio = 1)
+  
+p
+
+ggsave(p, file=paste0("figures/Contributions_SDI_hb_family_pooled_N_over_", thresh, ".pdf"), width=7, height=4, device=cairo_pdf)
+```
+
+### Hct (pooled shift)
+```{r}
+p<-df.contribution%>%
+   filter(SSDI_hb <=0.5,
+        !is.na(pooled_hct_SBD_driver))%>%
+ggplot(., aes(pooled_diff_from_exp_hct_female_elev_corr, pooled_diff_from_exp_hct_male_elev_corr))+
+  ggdensity::geom_hdr(n=100, probs=c( 0.25, 0.50, 0.75, 0.95))+
+  geom_point(aes(color=pooled_hct_SBD_driver),alpha=0.5)+
+  scale_color_manual(values=c(h2[1], h2[8], h1[3], h4[10]))+
+  geom_abline(intercept = 0)+
+  geom_abline(intercept = 0, slope=-1)+
+  # geom_hline(yintercept = 0, linetype="dashed")+
+  # geom_vline(xintercept = 0, linetype="dashed")+
+  #coord_cartesian(xlim=c(-6,6), ylim=c(-6,6))+
+  labs(x= "Female Hct shift", y= "Male Hct shift")+
+  theme(aspect.ratio = 1)
+  
+p
+
+ggsave(p, file=paste0("figures/Contributions_SDI_hct_pooled_N_over_", thresh, ".pdf"), width=7, height=4, device=cairo_pdf)
+```
+
+### Hct (Family pooled shift)
+```{r}
+p<-df.contribution%>%
+   filter(SSDI_hb <=0.5,
+          !is.na(fam_SBD_hct_driver))%>%
+ggplot(., aes(fam_diff_from_exp_hct_female_elev_corr, fam_diff_from_exp_hct_male_elev_corr))+
+  ggdensity::geom_hdr(n=100, probs=c( 0.25, 0.50, 0.75, 0.95))+
+  geom_point(aes(color=fam_SBD_hct_driver),alpha=0.5)+
+  scale_color_manual(values=c(h2[1], h2[8], h1[3], h4[10]))+
+  geom_abline(intercept = 0)+
+  geom_abline(intercept = 0, slope=-1)+
+  # geom_hline(yintercept = 0, linetype="dashed")+
+  # geom_vline(xintercept = 0, linetype="dashed")+
+   labs(x= "Female Hct shift", y= "Male Hct shift")+
+  #coord_cartesian(xlim=c(-6,6), ylim=c(-6,6))+
+  theme(aspect.ratio = 1)
+  
+p
+
+ggsave(p, file=paste0("figures/Contributions_SDI_hct_family_pooled_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
+```
+
+# Male and Female Blood x Elevation
+## Hb
+```{r}
+thresh <- 3
+p<-df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh)%>%
+ggplot(., aes(mean_sample_elev, mean_hb_female))+
+  #geom_point(alpha=0.2,  shape=19, color="brown")+
+  geom_smooth(method="lm", color="darkred", linetype="dashed")+
+   # geom_point(data=df%>%
+   # filter(SSDI_hb <=0.8,
+   #       n_male >= 5,
+   #       n_female >= 5), aes(mean_sample_elev, mean_hb_male), alpha=0.2,  shape=19, color="steelblue")+
+  geom_smooth(data=df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= 1,
+         n_hb_female >= 1), aes(mean_sample_elev, mean_hb_male), method="loess", span=5, color="steelblue4", linetype="dashed")+
+  labs(x= "Mean sample elevation (m)", y = "[Hb]")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_elev_hb_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+
+## Hct
+```{r}
+thresh <-5
+p<-df%>%
+   filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh)%>%
+ggplot(., aes(mean_sample_elev, mean_hct_female))+
+  # geom_point(alpha=0.2,  shape=19, color="brown")+
+  geom_smooth(method="lm", color="darkred", linetype="dashed")+
+   # geom_point(data=df%>%
+   # filter(SSDI_hb <=0.8,
+   #       n_male >= 5,
+   #       n_female >= 5), aes(mean_sample_elev, mean_hct_male), alpha=0.2,  shape=19, color="steelblue")+
+  geom_smooth(data=df%>%
+   filter(SSDI_hb <=0.8,
+         n_hct_male >= 5,
+         n_hct_female >= 5), aes(mean_sample_elev, mean_hct_male), method="lm", color="steelblue4", linetype="dashed")+
+  labs(x= "Mean sample elevation (m)", y = "Hct")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_elev_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+# Reproductive Output
+## Gonads Hb 
+### female
+This is from the dataset of Linck et al. with individuals measures.
+```{r}
+
+p<-df.gonads%>%
+   filter(sex == "female",
+          length <=20,
+          width <=10,
+          hb >=10)%>% #remove a few clear outliers
+ggplot(., aes(length, hb))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Ovary length (mm)", y = "[Hb]")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_ovary_length_hb.pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### male
+```{r}
+
+p<-df.gonads%>%
+   filter(sex == "male",
+          length <=20,
+          width <=10,
+          hb >=10)%>% #remove a few clear outliers
+ggplot(., aes(length, hb))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Testis length (mm)", y = "[Hb]")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_testis_length_hb.pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+## Gonads & body size Hb
+### female
+```{r}
+
+p<-df.gonads%>%
+   filter(sex == "female",
+          length <=20,
+          width <=10,
+          hb >=10)%>% #remove a few clear outliers
+ggplot(., aes(resids.gonad.length, hb))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Residuals ovary length (mm) ~ body mass (g)", y = "[Hb]")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_ovary_length_hb.pdf"), width=6, height=4, device=cairo_pdf)
+```
+### male
+```{r}
+
+p<-df.gonads%>%
+   filter(sex == "male",
+          length <=20,
+          width <=10,
+          hb >=10)%>% #remove a few clear outliers
+ggplot(., aes(resids.gonad.length, hb))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Residuals testis length (mm) ~ mass (g)", y = "[Hb]")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_testis_length_hb.pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+## Gonads Hct
+
+### female
+This is from the dataset of Linck et al. with individuals measures.
+```{r}
+
+p<-df.gonads%>%
+   filter(sex == "female",
+          length <=20,
+          width <=10,
+          hb >=10)%>% #remove a few clear outliers
+ggplot(., aes(length, hct))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Ovary length (mm)", y = "Hct")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_ovary_length_hct.pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### male
+```{r}
+
+p<-df.gonads%>%
+   filter(sex == "male",
+          length <=20,
+          width <=10,
+          hb >=10)%>% #remove a few clear outliers
+ggplot(., aes(length, hct))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Testis length (mm)", y = "Hct")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_testis_length_hct.pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+## Gonads & body size Hct
+### female
+```{r}
+
+p<-df.gonads%>%
+   filter(sex == "female",
+          length <=20,
+          width <=10,
+          hct <=0.8)%>% #remove a few clear outliers
+ggplot(., aes(resids.gonad.length, hct))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Residuals ovary length (mm) ~ body mass (g)", y = "Hct")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_ovary_length_hct.pdf"), width=6, height=4, device=cairo_pdf)
+```
+### male
+```{r}
+
+p<-df.gonads%>%
+   filter(sex == "male",
+          length <=20,
+          width <=10,
+          hct <=0.8)%>% #remove a few clear outliers
+ggplot(., aes(resids.gonad.length, hct))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Residuals testis length (mm) ~ mass (g)", y = "Hct")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_testis_length_hct.pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+## Clutch size
+### Hb
+```{r}
+
+
+
+p<-df.contribution%>%
+   filter(pooled_hb_SBD_driver == "female driven reduction")%>%
+ggplot(., aes(spec_gen_clutch_size, pooled_diff_from_exp_hb_female_elev_corr))+ #NOTE all instances of "spec_gen... are variables created with combined species means for egg traits when availiable or genera means if not
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Mean clutch size", y = "Mean female [Hb]")+
+  #coord_cartesian(xlim = c(0.5, 5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_clutch_female_hb_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### Hct
+```{r}
+
+p<-df%>%
+   filter(
+         n_hct_female >= 5)%>%
+ggplot(., aes(spec_gen_clutch_size, mean_hct_female))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Clutch size", y = "Mean female Hct")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_clutch_female_hct_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hb
+```{r}
+thresh <- 5
+p<-df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh)%>%
+ggplot(., aes(spec_gen_clutch_size, SSDI_hb))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black", size=0.75)+
+  labs(x= "Clutch size")+
+  ylab(bquote(SDI[Hb]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_clutch_SBDI_hb_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hct
+```{r}
+thresh <-5
+p<-df%>%
+   filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh)%>%
+ggplot(., aes(spec_gen_clutch_size, SSDI_hct))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Clutch size")+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_clutch_size_SBDI_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+## Egg mass 
+### Hb Residuals (Female driven reduction)
+
+```{r}
+#doing this at head of each resdidual plot... for now
+p<-df.contribution%>%
+  group_by(fam_SBD_hb_driver)%>%
+  mutate(log10_fem_mass = log10(mean_mass_female),
+         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_repro_mass = log10(spec_gen_clutch_size * spec_gen_egg_mass),
+         log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
+         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
+          log10_repro_mass = if_else(is.na(log10_repro_mass) | log10_repro_mass=="-Inf",NA, log10_repro_mass),
+         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)),
+         resids.repro.mass = resid(lm(log10_repro_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_repro_mass, log10_fem_mass), na.action = na.exclude)))%>%
+ggplot(., aes(resids.repro.mass, SSDI_hct))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+ 
+  labs(x= "Residuals (egg mass (g) x clutch size) \n ~ body size (g)")+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype = "dashed")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_female_driven reduction_hb_N_over_", thresh,".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+```{r}
+#doing this at head of each resdidual plot... for now
+p<-df.contribution%>%
+  group_by(fam_SBD_hb_driver)%>%
+  mutate(log10_fem_mass = log10(mean_mass_female),
+         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
+         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
+         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
+   filter(fam_SBD_hb_driver %in% c("female driven reduction", "female driven increase"))%>%
+ggplot(., aes(resids.egg.mass, fam_diff_from_exp_hb_female_elev_corr))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+ 
+  labs(x= "Residuals egg mass (g) ~ body size (g)",y= "Female driven reduction in [Hb]")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_female_driven reduction_hb_N_over_", thresh,".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### Hb Residuals (Male driven increase)
+```{r}
+
+#doing this at head of each resdidual plot... for now
+p<-df.contribution%>%
+  group_by(fam_SBD_hb_driver)%>%
+  mutate(log10_fem_mass = log10(mean_mass_female),
+         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
+         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
+         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
+   filter(fam_SBD_hb_driver == "male driven increase")%>%
+ggplot(., aes(resids.egg.mass, fam_diff_from_exp_hb_male_elev_corr))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+ 
+  labs(x= "Residuals egg mass (g) ~ body size (g)",y= "Male driven increase in [Hb]")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_male_driven increase_hb_N_over_", thresh,".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### Hct Residuals (Female driven reduction)
+```{r}
+
+p<-df.contribution%>%
+  group_by(fam_SBD_hb_driver)%>%
+  mutate(log10_fem_mass = log10(mean_mass_female),
+         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
+         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
+         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
+   filter(fam_SBD_hct_driver == "female driven reduction")%>%
+ggplot(., aes(resids.egg.mass, fam_diff_from_exp_hct_female_elev_corr))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+ 
+  labs(x= "Residuals egg mass (g) ~ body size (g)",y= "Female driven reduction in Hct")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_female_driven reduction_hct_N_over_", thresh,".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### Hct Residuals (Male driven increase)
+```{r}
+
+p<-df.contribution%>%
+  group_by(fam_SBD_hb_driver)%>%
+  mutate(log10_fem_mass = log10(mean_mass_female),
+         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
+         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
+         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
+   filter(fam_SBD_hct_driver == "male driven increase")%>%
+ggplot(., aes(resids.egg.mass, fam_diff_from_exp_hct_male_elev_corr))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+ 
+  labs(x= "Residuals egg mass (g) ~ body size (g)",y= "Male driven increase in Hct")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_male_driven increase_hct_N_over_", thresh,".pdf"), width=6, height=4, device=cairo_pdf)
+```
+### Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         !is.na(taxon))%>%
+ggplot(., aes(spec_gen_egg_mass, mean_hct_female))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x="Egg mass (g)",y= "Mean female Hct")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_female_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hb 
+```{r}
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         !is.na(taxon))%>%
+ggplot(., aes(spec_gen_egg_mass, SSDI_hb))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Egg mass (g)")+
+  ylab(bquote(SDI[Hb]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_SDBI_hb_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hct <=0.7,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         !is.na(taxon))%>%
+ggplot(., aes(log10(spec_gen_egg_mass), SSDI_hct))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Egg mass (g)")+
+  xlab(bquote(log[10]~Egg~mass~(g)))+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_SDBI_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+
+### SBDI Hb (seperate male-female_biased lm)
+```{r}
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         !is.na(taxon))%>%
+  mutate(sex.bias = if_else(SSDI_hb >0, "male biased", "female biased"))%>%
+ggplot(., aes(log10(spec_gen_egg_mass), SSDI_hb, color=sex.bias, fill=sex.bias))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", size=0.75)+
+  labs(x= "Egg mass (g)")+
+  ylab(bquote(SDI[Hb]))+
+  scale_color_manual(values=c("grey55", "gold3"))+
+  scale_fill_manual(values=c("grey65", "gold"))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_SDBI_hb_by_sex_sep_lm_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hct (sperate male-female_biased lm)
+```{r}
+thresh <- 5
+
+p<-df%>%
+   filter(
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         !is.na(taxon))%>%
+  mutate(sex.bias = if_else(SSDI_hct >0, "male biased", "female biased"))%>%
+ggplot(., aes(log10(spec_gen_egg_mass), SSDI_hct, color=sex.bias, fill=sex.bias))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", size=0.75)+
+  labs(x= "Egg mass (g)")+
+  ylab(bquote(SDI[Hct]))+
+  scale_color_manual(values=c("grey55", "gold3"))+
+  scale_fill_manual(values=c("grey65", "gold"))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_SDBI_hct_by_sex_sep_lm_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+
+## Egg mass (residuals of egg mass and body mass)
+### Hb
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         !is.na(taxon))%>%
+  dplyr::select(taxon, mean_mass_female, spec_gen_egg_mass, mean_hb_female)%>%
+  na.omit()%>%
+     rownames_to_column('row') %>% 
+    mutate(resid = residuals(lm(log10(mean_mass_female) ~ log10(spec_gen_egg_mass))))%>%
+ggplot(., aes(resid, mean_hb_female))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+ 
+  labs(x= "Residuals (egg mass ~ body mass)",y= "Mean female [Hb]")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_resid_female_hb_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+### Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         !is.na(taxon))%>%
+  dplyr::select(taxon, mean_mass_female, spec_gen_egg_mass, mean_hct_female)%>%
+  na.omit()%>%
+     rownames_to_column('row') %>% 
+    mutate(resid = residuals(lm(log10(mean_mass_female) ~ log10(spec_gen_egg_mass))))%>%
+ggplot(., aes(resid, mean_hct_female))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x="Residuals (egg mass ~ body mass)",y= "Mean female Hct")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_resdi_female_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hb 
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         !is.na(taxon))%>%
+  dplyr::select(taxon, mean_mass_female, spec_gen_egg_mass, SSDI_hb)%>%
+  na.omit()%>%
+     rownames_to_column('row') %>% 
+    mutate(resid = residuals(lm(log10(mean_mass_female) ~ log10(spec_gen_egg_mass))))%>%
+ggplot(., aes(resid, SSDI_hb))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Resdiduals (egg mass ~ female body mass)")+
+  ylab(bquote(SDI[Hb]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_resid_SDBI_hb_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+### SBDI Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         !is.na(taxon))%>%
+  dplyr::select(taxon, mean_mass_female, spec_gen_egg_mass, SSDI_hct)%>%
+  na.omit()%>%
+     rownames_to_column('row') %>% 
+    mutate(resid = residuals(lm(log10(mean_mass_female) ~ log10(spec_gen_egg_mass))))%>%
+ggplot(., aes(resid, SSDI_hct))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Residuals (egg mass ~ body mass)")+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_resid_SDBI_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+### SBDI Hb (separate male-female lm)
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         !is.na(taxon))%>%
+   mutate(sex.bias = if_else(SSDI_hb >0, "male biased", "female biased"))%>%
+  dplyr::select(taxon, mean_mass_female, spec_gen_egg_mass, SSDI_hb, sex.bias)%>%
+  na.omit()%>%
+     rownames_to_column('row') %>% 
+    mutate(resid = residuals(lm(log10(mean_mass_female) ~ log10(spec_gen_egg_mass))))%>%
+ggplot(., aes(resid, SSDI_hb, color= sex.bias, fill=sex.bias))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", size=0.75)+
+  scale_color_manual(values=c("grey55", "gold3"))+
+  scale_fill_manual(values=c("grey65", "gold"))+
+  labs(x= "Residuals (egg mass ~ female body mass)")+
+  ylab(bquote(SDI[Hb]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_resid_SDBI_hb_by_sex_sep_lm_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+### SBDI Hct (separate male-female lm)
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         !is.na(taxon))%>%
+   mutate(sex.bias = if_else(SSDI_hct >0, "male biased", "female biased"))%>%
+  dplyr::select(taxon, mean_mass_female, spec_gen_egg_mass, SSDI_hct, sex.bias)%>%
+  na.omit()%>%
+     rownames_to_column('row') %>% 
+    mutate(resid = residuals(lm(log10(mean_mass_female) ~ log10(spec_gen_egg_mass))))%>%
+ggplot(., aes(resid, SSDI_hct, color= sex.bias, fill=sex.bias))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", size=0.75)+
+  scale_color_manual(values=c("grey55", "gold3"))+
+  scale_fill_manual(values=c("grey65", "gold"))+
+  labs(x= "Resdiduals (egg mass ~ female body mass)")+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_mass_resid_SDBI_hct_by_sex_sep_lm_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+## Egg length
+### Hb
+```{r}
+
+thresh <- 3
+
+p<-df%>%
+   filter(
+         n_hb_female >= thresh)%>%
+ggplot(., aes(log10(spec_gen_egg_length), mean_hb_female))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Egg length (mm)",y= "Mean female [Hb]")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_length_female_hb_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### Hct
+```{r}
+
+thresh <- 3
+
+p<-df%>%
+   filter(
+         n_hct_female >= thresh)%>%
+ggplot(., aes(log10(spec_gen_egg_length), mean_hct_female))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Egg length (mm)",y= "Mean female Hct")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_length_female_hct_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+### SBDI Hb
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh)%>%
+ggplot(., aes(log10(spec_gen_egg_length), SSDI_hb))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Egg length (mm)")+
+  ylab(bquote(SDI[Hb]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_length_SBDI_hb_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+
+```
+
+## SBDI Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh)%>%
+ggplot(., aes(log10(spec_gen_egg_length), SSDI_hct))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Egg length (mm)")+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  coord_cartesian(ylim=c(-0.2, 0.25))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_egg_length_SBDI_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+# Morphology
+## Mass
+### Hb
+```{r}
+
+p<-df%>%
+   filter()%>%
+  mutate(mass= (mean_mass_female + mean_mass_male)/2)%>%
+ggplot(., aes(log10(mass), log10(mean_hb_female)))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Mass",y= "Mean female [Hb]")+
+  coord_cartesian(xlim = c(0,3))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file="figures/trend-lm_mass_female_hb.pdf", width=6, height=4, device=cairo_pdf)
+```
+
+### Hct
+```{r}
+
+p<-df%>%
+   filter()%>%
+  mutate(mass= (mean_mass_female + mean_mass_male)/2)%>%
+ggplot(., aes(log10(mass), log10(mean_hct_female)))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Mass",y= "Mean female Hct")+
+  coord_cartesian(xlim = c(0,4))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file="figures/trend-lm_mass_female_hct_by_sex_N_over_1.pdf", width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hb
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(n_hb_male >= thresh,
+         n_hb_female >= thresh)%>%
+  mutate(mass= (mean_mass_female + mean_mass_male)/2)%>%
+ggplot(., aes(log10(mass), SSDI_hb))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Mass (g)")+
+  ylab(bquote(SDI[Hb]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  coord_cartesian(xlim=c(0,3))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_mass_SBDI_hb_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(n_hct_male >= thresh,
+         n_hct_female >= thresh)%>%
+  mutate(mass= (mean_mass_female + mean_mass_male)/2)%>%
+ggplot(., aes(log10(mass), SSDI_hct))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Mass (g)")+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  coord_cartesian(xlim=c(0,3))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_mass_SBDI_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+## SSDI (body mass)
+### SBDI Hb
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(n_hb_male >= thresh,
+         n_hb_female >= thresh)%>%
+ggplot(., aes(SSDI_mass, SSDI_hb))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  xlab(bquote(SDI[mass]))+
+  ylab(bquote(SDI[Hb]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  geom_vline(xintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  #coord_cartesian(xlim=c(-0.2, 0.27))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-SSDI_mass_SBDI_hb_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(n_hct_male >= thresh,
+         n_hct_female >= thresh)%>%
+ggplot(., aes(SSDI_mass, SSDI_hct))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  xlab(bquote(SDI[mass]))+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  geom_vline(xintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  #coord_cartesian(xlim=c(0))+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-SSDI_mass_SBDI_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+## Hand Wing Index
+### Hb
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(
+         n_hb_female >= thresh)%>%
+ggplot(., aes(`Hand-Wing.Index`, mean_hb_female))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Hand-wing index",y= "Mean female [Hb]")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_HWI_female_hb_N_over_",thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### Hct
+```{r}
+
+thresh <-5
+
+p<-df%>%
+   filter(
+         n_hct_female >= thresh)%>%
+ggplot(., aes(`Hand-Wing.Index`, mean_hct_female))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x="Hand-wing index",y= "Mean female Hct")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_HWI_female_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+### SBDI Hb
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh)%>%
+ggplot(., aes(`Hand-Wing.Index`, SSDI_hb))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Hand-wing index")+
+  ylab(bquote(SDI[Hb]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_HWI_hb_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### SBDI Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+   filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh)%>%
+ggplot(., aes(`Hand-Wing.Index`, SSDI_hct))+
+  geom_point(alpha=0.6,  shape=19, color="grey")+
+  geom_smooth(method="lm", color="black")+
+  labs(x= "Hand-wing index")+
+  ylab(bquote(SDI[Hct]))+
+  geom_hline(yintercept = 0, linetype="dashed", linewidth=0.75, alpha=0.7)+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+p
+
+ggsave(p, file=paste0("figures/trend-lm_HWI_hct_by_sex_N_over_", thresh, ".pdf"), width=6, height=4, device=cairo_pdf)
+```
+
+### Hb within species
+```{r}
+
+p<-df.within%>%
+  filter(SSDI_hb <=0.8,
+         n_male >= 5,
+         n_female >= 5,
+         elev_bin %in% c("low", "high"))%>%
+  ggplot(aes(x=factor(elev_bin, levels=c("low", "high")),y=SSDI_hb,  fill = factor(elev_bin, levels=c("low", "high"))))+
+   geom_boxplot(outlier.size = 0, alpha=0.5)+
+  geom_jitter(shape=21, width=0.1)+
+  scale_fill_manual(values=c("steelblue4", "goldenrod3"))+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  labs(y=NULL)+
+  xlab(bquote(SDI[Hb]))+ 
+  theme(aspect.ratio = 1,
+        legend.position = "none")
+p
+ggsave(p, file="figures/boxplot_binned_elev_SDI_hb_N_over_5.pdf", width=4, height=4, device=cairo_pdf)
+
+```
+
+# Plumage dimorphism
+### SBDI Hb
+````{r}
+
+thresh <- 5
+
+p<-df.contribution%>%
+  filter(SSDI_hb <=0.8,
+         n_hb_male >= thresh,
+         n_hb_female >= thresh,
+         dimorphic_01 %in% c(1,0),
+         !is.na(fam_SBD_hb_driver))%>%
+  ggplot(aes(x=factor(as.factor(fam_SBD_hb_driver)), y=SSDI_hct,  fill = factor(dimorphic_01)))+
+   geom_boxplot(outlier.size = 0, alpha=0.5)+
+  # geom_jitter(shape=21, position = position_jitterdodge(jitter.width = 0.25))+
+    geom_dotplot(binaxis = "y", stackdir = "center", binwidth = 0.01,
+               position=position_dodge(0.8), dotsize=0.8, alpha=1)+
+  scale_fill_manual(values=c("steelblue4", "goldenrod3"))+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  labs(x=NULL)+
+  ylab(bquote(SDI[Hb]))+ 
+  theme(aspect.ratio = 0.5,
+        legend.position = "none",
+        axis.text.x = element_text(size=10, angle = -45, vjust = 0.5, hjust=-0.02))
+p
+
+ggsave(p, file=paste0("figures/boxplot_dimorphism_SDI_hb_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
+
+t.test(df.contribution%>%filter(n_hb_male >= thresh,
+         n_hb_female >= thresh, dimorphic_01 == 0, fam_SBD_hb_driver == "male driven reduction")%>% pull(SSDI_hb), df.contribution%>%filter(dimorphic_01 == 1, fam_SBD_hb_driver == "male driven reduction",n_hb_male >= thresh,
+         n_hb_female >= thresh)%>% pull(SSDI_hb))
+
+# p<-df%>%
+#   filter(SSDI_hb <=0.8,
+#          n_male >= 5,
+#          n_female >= 5)%>%
+#   ggplot(aes(x=SSDI_hb, fill = factor(dimorphic_01)))+
+#   geom_density(alpha=0.3)+
+#   scale_fill_manual(values=c("steelblue4", "goldenrod3"))+
+#   geom_hline(yintercept = 0, linetype="dashed")+
+#   labs(x="Dimorphic plumage")+
+#   ylab(bquote(SDI[Hb]))+ 
+#   theme(aspect.ratio = 1,
+#         legend.position = "none")
+# p
+```
+
+
+### SBDI Hct
+````{r}
+
+thresh <- 5
+
+
+p<-df.contribution%>%
+  filter(SSDI_hct <=0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         dimorphic_01 %in% c(1,0),
+         !is.na(fam_SBD_hct_driver))%>%
+  ggplot(aes(x=factor(as.factor(fam_SBD_hct_driver)), y=SSDI_hct,  fill = factor(dimorphic_01)))+
+   geom_boxplot(outlier.size = 0, alpha=0.5)+
+  # geom_jitter(shape=21, position = position_jitterdodge(jitter.width = 0.25))+
+    geom_dotplot(binaxis = "y", stackdir = "center", binwidth = 0.01,
+               position=position_dodge(0.8), dotsize=0.8, alpha=1)+
+  scale_fill_manual(values=c("steelblue4", "goldenrod3"))+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  labs(x=NULL)+
+  ylab(bquote(SDI[Hct]))+ 
+  theme(aspect.ratio = 0.5,
+        legend.position = "none",
+        axis.text.x = element_text(size=10, angle = -45, vjust = 0.5, hjust=-0.02))
+p
+
+ggsave(p, file=paste0("figures/boxplot_dimorphism_SDI_hct_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
+
+
+# p<-df%>%
+#   filter(SSDI_hct >=0,
+#          n_male >= 5,
+#          n_female >= 5)%>%
+#   ggplot(aes(x=SSDI_hct, fill = factor(dimorphic_01)))+
+#   geom_density(alpha=0.3)+
+#   scale_fill_manual(values=c("steelblue4", "goldenrod3"))+
+#   geom_hline(yintercept = 0, linetype="dashed")+
+#   labs(x="Dimorphic plumage")+
+#   ylab(bquote(SDI[Hct]))+ 
+#   theme(aspect.ratio = 1,
+#         legend.position = "none")
+# p
+
+t.test(df.contribution%>%filter(dimorphic_01 == 0, SSDI_hct >=0, fam_SBD_hct_driver == "male driven increase")%>% pull(SSDI_hct), df.contribution%>%filter(dimorphic_01 == 1, SSDI_hct >=0, fam_SBD_hct_driver == "male driven increase")%>% pull(SSDI_hct))
+
+```
+
+## SBDI Hb x SDBI Hct 
+````{r}
+
+thresh <- 5
+
+p<-df%>%
+  filter(SSDI_hct <0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         dimorphic_01 %in% c(0))%>%
+  ggplot(aes(x=SSDI_hb, y=SSDI_hct,  fill = factor(dimorphic_01)))+
+  ggdensity::geom_hdr()+
+  #geom_point(alpha=0.4)+
+  #scale_fill_manual(values=c("steelblue4", "goldenrod3"))+
+  scale_fill_manual(values=h2[c(2, 10)])+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  geom_vline(xintercept = 0, linetype="dashed")+
+  xlab(bquote(SDI[Hb]))+ 
+  ylab(bquote(SDI[Hct]))+ 
+  coord_cartesian(ylim=c(-0.1, 0.2), xlim=c(-0.08, 0.15))+
+  theme(aspect.ratio = 1)
+p
+
+p1<-df%>%
+  filter(SSDI_hct <0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         dimorphic_01 %in% c(1))%>%
+  ggplot(aes(x=SSDI_hb, y=SSDI_hct,  fill = factor(dimorphic_01)))+
+  ggdensity::geom_hdr(n=100)+
+  #geom_point(alpha=0.4)+
+  #scale_fill_manual(values=c( "goldenrod3"))+
+  scale_fill_manual(values=h2[c( 10)])+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  geom_vline(xintercept = 0, linetype="dashed")+
+  xlab(bquote(SDI[Hb]))+ 
+  ylab(bquote(SDI[Hct]))+ 
+   coord_cartesian(ylim=c(-0.1, 0.2), xlim=c(-0.08, 0.15))+
+  theme(aspect.ratio = 1)
+p1
+
+g <- grid.arrange(p, p1, nrow=2)
+ggsave(g, file=paste0("figures/2Panel_density_SBDI_hb_hct_dimorphism_N_over_", thresh, ".pdf"), width=5, height=8, device=cairo_pdf)
+
+
+# p<-df%>%
+#   filter(SSDI_hct >=0,
+#          n_male >= 5,
+#          n_female >= 5)%>%
+#   ggplot(aes(x=SSDI_hct, fill = factor(dimorphic_01)))+
+#   geom_density(alpha=0.3)+
+#   scale_fill_manual(values=c("steelblue4", "goldenrod3"))+
+#   geom_hline(yintercept = 0, linetype="dashed")+
+#   labs(x="Dimorphic plumage")+
+#   ylab(bquote(SDI[Hct]))+ 
+#   theme(aspect.ratio = 1,
+#         legend.position = "none")
+# p
+
+t.test(df%>%filter(dimorphic_01 == 0, SSDI_hct >=0)%>% pull(SSDI_hct), df%>%filter(dimorphic_01 == 1, SSDI_hct >=0)%>% pull(SSDI_hct))
+
+```
+
+## Distribution of SBDI colored by dimorphic
+### Hb
+```{r}
+
+df.contribution%>%
+  filter(SSDI_hct <0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         dimorphic_01 %in% c(0,1),
+         fam_SBD_hct_driver == "male driven increase")%>%
+  group_by(dimorphic_01)%>%
+  summarise(Q1 =quantile(SSDI_hb, 0.25, na.rm=T),
+            Q2 =quantile(SSDI_hb, 0.50, na.rm=T),
+            Q3 =quantile(SSDI_hb, 0.75, na.rm=T))
+
+p1<-df.contribution%>%
+  filter(SSDI_hct <0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         dimorphic_01 %in% c(0,1),
+         fam_SBD_hct_driver == "female driven reduction")%>%
+  ggplot(aes(x=SSDI_hb,  fill = factor(dimorphic_01)))+
+  geom_density(alpha=0.5)+
+  
+  geom_rug(aes(color=factor(dimorphic_01)))+
+  scale_fill_manual(values=h2[c(2, 10)])+
+  scale_color_manual(values=h2[c(2, 10)])+
+  geom_vline(xintercept = -0.0156, linetype="dashed", color=h4[c(5)])+
+  geom_vline(xintercept = 0.0269, linetype="solid")+
+  geom_vline(xintercept = 0.0553, linetype="dashed", color=h4[c(5)])+
+  geom_vline(xintercept = -0.00521, linetype="dashed", color=h3[c(9)])+
+  geom_vline(xintercept = 0.0194, linetype="solid")+
+  geom_vline(xintercept = 0.0575, linetype="dashed", color=h3[c(9)])+
+  xlab(bquote(SDI[Hb]))+ 
+   #coord_cartesian(ylim=c(-0.1, 0.2), xlim=c(-0.08, 0.15))+
+  theme(aspect.ratio = 1)
+p1
+
+g <- grid.arrange(p, p1, nrow=2)
+ggsave(g, file=paste0("figures/2Panel_duecedensity_SBDI_hb_hct_dimorphism_N_over_", thresh, ".pdf"), width=5, height=8, device=cairo_pdf)
+
+
+
+```
+
+
+### Hct
+```{r}
+
+df.contribution%>%
+  filter(SSDI_hct <0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         dimorphic_01 %in% c(0,1),
+         fam_SBD_hct_driver == "female driven reduction")%>%
+  group_by(dimorphic_01)%>%
+  summarise(Q1 =quantile(SSDI_hct, 0.25, na.rm=T),
+            Q2 =quantile(SSDI_hct, 0.50, na.rm=T),
+            Q3 =quantile(SSDI_hct, 0.75, na.rm=T))
+
+p1<-df.contribution%>%
+  filter(SSDI_hct <0.8,
+         n_hct_male >= thresh,
+         n_hct_female >= thresh,
+         dimorphic_01 %in% c(0,1),
+         fam_SBD_hct_driver == "female driven reduction")%>%
+  ggplot(aes(x=SSDI_hct,  fill = factor(dimorphic_01)))+
+  geom_density(alpha=0.5)+
+  geom_rug(aes(color=factor(dimorphic_01)))+
+  scale_fill_manual(values=h2[c(2, 10)])+
+  scale_color_manual(values=h2[c(2, 10)])+
+  geom_vline(xintercept = -0.00933, linetype="dashed", color=h4[c(5)])+
+  geom_vline(xintercept = 0.0263, linetype="solid")+
+  geom_vline(xintercept = 0.0627, linetype="dashed", color=h4[c(5)])+
+  geom_vline(xintercept = -0.0154, linetype="dashed", color=h3[c(9)])+
+  geom_vline(xintercept = 0.0142, linetype="solid")+
+  geom_vline(xintercept = 0.0501, linetype="dashed", color=h3[c(9)])+
+  xlab(bquote(SDI[Hb]))+ 
+   #coord_cartesian(ylim=c(-0.1, 0.2), xlim=c(-0.08, 0.15))+
+  theme(aspect.ratio = 1)
+p1
+
+g <- grid.arrange(p, p1, nrow=2)
+ggsave(g, file=paste0("figures/2Panel_duecedensity_SBDI_hct_dimorphism_N_over_", thresh, ".pdf"), width=5, height=8, device=cairo_pdf)
+
+
+
+```
+
+### Hct
+```{r}
+df.all%>%
+  filter(SSDI_hb <0.8,
+         dimorphic_01 %in% c(0,1))%>%
+  group_by(dimorphic_01)%>%
+  summarise(Q1 =quantile(hb, 0.25, na.rm=T),
+            Q2 =quantile(hb, 0.50, na.rm=T),
+            Q3 =quantile(hb, 0.75, na.rm=T))
+
+p<-df.all%>%
+  filter(
+         dimorphic_01 %in% c(0,1),
+         SSDI_hb <0.01)%>%
+  ggplot(aes(x=hb,  fill = factor(dimorphic_01)))+
+  geom_density(alpha=0.5)+
+  geom_rug(aes(color=factor(dimorphic_01)))+
+  scale_fill_manual(values=h2[c(2, 10)])+
+  scale_color_manual(values=h2[c(2, 10)])+
+  labs(y="Density", x = "[Hb]")+
+   #coord_cartesian(ylim=c(-0.1, 0.2), xlim=c(-0.08, 0.15))+
+  theme(aspect.ratio = 1,
+        legend.position = "none")
+p
+
+df.all%>%
+  filter(SSDI_hct <0.8,
+         dimorphic_01 %in% c(0,1))%>%
+  group_by(dimorphic_01)%>%
+  summarise(Q1 =quantile(hct, 0.25, na.rm=T),
+            Q2 =quantile(hct, 0.50, na.rm=T),
+            Q3 =quantile(hct, 0.75, na.rm=T))
+
+p1<-df.all%>%
+  filter(
+         dimorphic_01 %in% c(0,1))%>%
+  ggplot(aes(x=hct,  fill = factor(dimorphic_01)))+
+  geom_density(alpha=0.5)+
+  geom_rug(aes(color=factor(dimorphic_01)))+
+  scale_fill_manual(values=h2[c(2, 10)])+
+  scale_color_manual(values=h2[c(2, 10)])+
+  xlab(bquote(SDI[Hb]))+ 
+   #coord_cartesian(ylim=c(-0.1, 0.2), xlim=c(-0.08, 0.15))+
+  theme(aspect.ratio = 1,
+        legend.position = "none")
+p1
+
+
+ggsave(g, file=paste0("figures/Density__hct_dimorphism_.pdf"), width=4, height=4, device=cairo_pdf)
+
+
+
+```
+
+# Elevation
+
+### Hb witin species
+```{r}
+
+thresh <- 1
+
+p<-df.all%>%
+  ggplot(aes(elevation,y=hb, color=sex, fill = sex))+
+  #geom_point(shape=21)+
+  geom_smooth(method="lm")+
+  scale_fill_manual(values=c("steelblue", "goldenrod1"))+
+  scale_color_manual(values=c("steelblue4", "goldenrod3"))+
+  labs(x=NULL, y="[Hb]")+
+  theme(aspect.ratio = 1,
+        legend.position = c(0.83,0.2))
+p
+ggsave(p, file=paste0("figures/trend_hb_elev_sex.pdf"), width=4, height=4, device=cairo_pdf)
+
+```
+
+
+
+### Hct witin species
+```{r}
+
+
+thresh <- 1
+
+p<-df.all%>%
+  ggplot(aes(elevation,y=hct, color=sex, fill = sex))+
+  #geom_point(shape=21, alpha=0.3)+
+  geom_smooth(method="lm", size=0.75)+
+  scale_fill_manual(values=c("steelblue", "goldenrod1"))+
+  scale_color_manual(values=c("steelblue4", "goldenrod3"))+
+  labs(x=NULL, y="Hct")+
+  theme(aspect.ratio = 1,
+        legend.position = c(0.83,0.2))
+p
+ggsave(p, file=paste0("figures/trend_hct_elev_sex.pdf"), width=4, height=4, device=cairo_pdf)
+
+```
+
+# SBDI ~ elevation colored by plumage
+### Hb
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+  filter(SSDI_hb <=0.8,
+         n_male >= thresh,
+         n_female >= thresh,
+         dimorphic_01 %in%c(0,1))%>%
+  ggplot(aes(x=max_sample_elev,y=SSDI_hb, color= factor(dimorphic_01)))+
+ geom_point(alpha=0.3)+
+  geom_smooth(method="lm")+
+  scale_color_manual(values=c("steelblue4", "goldenrod3"))+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  labs(x="Elevation (m)")+
+  ylab(bquote(SDI[Hb]))+ 
+  theme(aspect.ratio = 1)
+p
+ggsave(p, file=paste0("figures/trend_elev_SDI_hb_colored_by_dimorphism_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
+
+
+```
+
+### Hct
+```{r}
+
+thresh <- 5
+
+p<-df%>%
+  filter(SSDI_hct <0.8,
+         n_male >= thresh,
+         n_female >= thresh,
+         dimorphic_01 %in%c(0,1))%>%
+  ggplot(aes(x=max_sample_elev,y=SSDI_hct, color= factor(dimorphic_01)))+
+ geom_point(alpha=0.3)+
+  geom_smooth(method="lm")+
+  scale_color_manual(values=c("steelblue4", "goldenrod3"))+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  labs(x="Elevation (m)")+
+  ylab(bquote(SDI[Hct]))+ 
+  theme(aspect.ratio = 1,
+        legend.position = "none")
+p
+
+ggsave(p, file=paste0("figures/trend_elev_SDI_hct_colored_by_dimoprhism_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
+
+
+```
+
+
+# SDI Blood
+## Hemoglobin
+```{r}
+thresh <- 0
+p<-df%>%
+   filter(SSDI_hb <=0.5,
+         n_male >= thresh,
+         n_female >= thresh)%>%
+ggplot(., aes(mean_sample_elev, SSDI_hb, size=n_male))+
+  geom_point(alpha=0.2,  shape=19, color="brown")+
+  geom_hline(yintercept = 0, linetype="dashed", alpha=0.5)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  theme(legend.title = element_blank(),
+        legend.position = "none", 
+        aspect.ratio = 1)
+
+p1<-df%>%
+   filter(SSDI_hb <=0.5,
+         n_male >= thresh,
+         n_female >= thresh)%>%
+ggplot(., aes(min_sample_elev, SSDI_hb, size=n_male))+
+  geom_point(alpha=0.2,  shape=19, color="brown")+
+  geom_hline(yintercept = 0, linetype="dashed", alpha=0.5)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  theme(legend.title = element_blank(),
+        legend.position = "none",
+        aspect.ratio = 1)
+
+p2<-df%>%
+   filter(SSDI_hb <=0.5,
+         n_male >= thresh,
+         n_female >= thresh)%>%
+ggplot(., aes(max_sample_elev, SSDI_hb, size=n_male))+
+  geom_point(alpha=0.2,  shape=19, color="brown")+
+  geom_hline(yintercept = 0, linetype="dashed", alpha=0.5)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  theme(legend.title = element_blank(),
+        legend.position = "none",
+        aspect.ratio = 1)
+
+p3<-df%>%
+   filter(SSDI_hb <=0.5,
+         n_male >= thresh,
+         n_female >= thresh)%>%
+  mutate(amplitude = max_sample_elev- min_sample_elev)%>%
+  filter(!is.na(SSDI_hb))%>%
+ggplot(., aes(amplitude, SSDI_hb, size=n_male))+
+  geom_point(alpha=0.2,  shape=19, color="brown")+
+  geom_hline(yintercept = 0, linetype="dashed", alpha=0.5)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  #coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none",
+        aspect.ratio = 1)
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+
+
+
+```
+All elevation ranges decreasing trends in hemoglobin SDI except amplitude.
+
+## Hct
+```{r}
+p<-df%>%
+  filter()%>%
+ggplot(., aes(max_sample_elev, SSDI_hct))+
+  #geom_point(alpha=0.6,  shape=21, color="grey")+
+   geom_hline(yintercept = 0, linetype="dashed", alpha=0.5)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  #coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p1<-df%>%
+  filter()%>%
+ggplot(., aes(min_sample_elev, SSDI_hct))+
+  #geom_point(alpha=0.6,  shape=21, color="grey")+
+   geom_hline(yintercept = 0, linetype="dashed", alpha=0.5)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  #coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p2<-df%>%
+  filter()%>%
+ggplot(., aes(mean_sample_elev, SSDI_hct))+
+#geom_point(alpha=0.6,  shape=21, color="grey")+
+   geom_hline(yintercept = 0, linetype="dashed", alpha=0.5)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+ # coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p3<-df%>%
+  filter()%>%
+  mutate(amplitude = max_sample_elev - min_sample_elev)%>%
+ggplot(., aes(amplitude, SSDI_hct))+
+   geom_hline(yintercept = 0, linetype="dashed", alpha=0.5)+
+  #geom_point(alpha=0.6,  shape=21, color="grey")+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  #coord_cartesian(xlim=c(0,5000), ylim=c(-0.4, 0.5))+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+
+```
+
+
+
+## Hb variability sd
+```{r}
+p<-df%>%
+  filter()%>%
+  mutate(max_elev = ntile(max_sample_elev, 8))%>%
+  group_by(max_elev, family)%>%
+  dplyr::summarize(Hb_sd = sd(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(max_elev, Hb_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p1<-df%>%
+  filter()%>%
+  mutate(min_elev = ntile(min_elev, 8))%>%
+  group_by(min_elev)%>%
+  dplyr::summarize(Hb_sd = sd(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(min_elev, Hb_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p2<-df%>%
+  filter()%>%
+  mutate(mean_sample_elev = ntile(mean_sample_elev, 8))%>%
+  group_by(mean_sample_elev)%>%
+  dplyr::summarize(Hb_sd = sd(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(mean_sample_elev, Hb_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p3<-df%>%
+  mutate(amplitude = max_elev - min_elev,
+        amplitude = ntile(amplitude, 8))%>%
+  group_by(amplitude)%>%
+  dplyr::summarize(Hb_sd = sd(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(amplitude, Hb_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+
+```
+
+## Hct variability
+```{r}
+p<-df%>%
+  filter()%>%
+  mutate(max_elev = ntile(max_elev, 8))%>%
+  group_by(max_elev)%>%
+  dplyr::summarize(Hct_sd = sd(SSDI_hct, na.rm=T))%>%
+ggplot(., aes(max_elev, Hct_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p1<-df%>%
+  filter()%>%
+  mutate(min_elev = ntile(min_elev, 8))%>%
+  group_by(min_elev)%>%
+  dplyr::summarize(Hct_sd = sd(SSDI_hct, na.rm=T))%>%
+ggplot(., aes(min_elev, Hct_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p2<-df%>%
+  filter()%>%
+  mutate(mdpt.elev = ntile(mean_sample_elev, 8))%>%
+  group_by(mdpt.elev)%>%
+  dplyr::summarize(Hct_sd = sd(SSDI_hct, na.rm=T))%>%
+ggplot(., aes(mdpt.elev, Hct_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p3<-df%>%
+  filter()%>%
+  mutate(amplitude = max_elev- min_elev,
+         amplitude = ntile(amplitude, 8))%>%
+  group_by(amplitude)%>%
+  dplyr::summarize(Hct_sd = sd(SSDI_hct, na.rm=T))%>%
+ggplot(., aes(amplitude, Hct_sd))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+
+```
+
+# Hemoglobin variablility CV
+```{r}
+
+p<-df%>%
+  filter()%>%
+  mutate(max_elev = ntile(max_elev, 10))%>%
+  group_by(max_elev)%>%
+  dplyr::summarize(Hb_cv = cv(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(max_elev, Hb_cv))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p1<-df%>%
+  filter()%>%
+  mutate(min_elev = ntile(min_elev, 8))%>%
+  group_by(min_elev)%>%
+  dplyr::summarize(Hb_cv = cv(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(min_elev, Hb_cv))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p2<-df%>%
+  filter()%>%
+  mutate(mean_sample_elev = ntile(mean_sample_elev, 8))%>%
+  group_by(mean_sample_elev)%>%
+  dplyr::summarize(Hb_cv = cv(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(mean_sample_elev, Hb_cv))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+p3<-df%>%
+  mutate(amplitude = max_elev - min_elev,
+        amplitude = ntile(amplitude, 8))%>%
+  group_by(amplitude)%>%
+  mutate(n = n())%>%
+  dplyr::summarize(Hb_cv = cv(SSDI_hb, na.rm=T))%>%
+ggplot(., aes(amplitude, Hb_cv))+
+  geom_point(alpha=0.6,  shape=21)+
+  geom_smooth(method="lm", color="black", linetype="dashed")+
+  # scale_colour_gradient2(
+  #   low = "#d1492d",
+  #   mid = "#FFE6BE",
+  #   high = "#00798c",
+  #   midpoint = 0,
+  #   breaks = c(-0.2, 0, 0.2)
+  # ) +
+  theme_cowplot()+
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+grid.arrange(p, p1, p2, p3, ncol=2, nrow=2)
+
+summarise(cv= cv(precip))
+
+
+```
+
+# Phylogenetic signal
+## Hb
+### Untrimmed Trees
+The untrimmed tree includes all samples for which we can calculate Hb SDI in dataset, meaning lots of SDI calculated form one individual from each sex.
+```{r}
+
+tree <- read.tree("data/birds_mcc.tre")
+
+trees <- read.nexus("data/birdtree_samples_blood.nex")
+
+physig <- data.frame(Cmean=double(),
+                     I = double(),
+                     K = double(),
+                     Kstar = double(),
+                     Lambda = double(),
+                     CmeanP=double(),
+                     IP = double(),
+                     KP = double(),
+                     KstarP = double(),
+                     LambdaP = double())
+
+for(i in 1:length(trees)){
+df.hb <- df%>%
+  dplyr::select(birdtree, SSDI_hb)%>%
+  filter(!birdtree %in% c('Anairetes_parulus', 'Elaenia_albiceps', 'Sephanoides_sephaniodes', 'Tachuris_rubrigastra', 'Troglodytes_aedon', 'Zonotrichia_capensis'))%>%
+  na.omit()
+
+#add P chaski
+#get P. gigas tip number
+pgtn <-which(trees[[i]]$tip.label=="Patagona_gigas")
+
+#bind to tree wherever gigas is
+tree<-bind.tip(trees[[i]], "Patagona_chaski", edge.length=NULL, where=pgtn, position=2)
+
+tree <- keep.tip(tree, df.hb$birdtree)
+
+# First, you need one file that combines both the phylogenetic and trait data
+phylotraits <- phylo4d(tree, df.hb%>%column_to_rownames(var="birdtree"))
+
+#all metrics of phylogenetic signal
+t<-phyloSignal(p4d = phylotraits, method = "all")
+
+physig[i, "Cmean"] <- t$stat$Cmean
+physig[i, "I"] <- t$stat$I
+physig[i, "K"] <- t$stat$K
+physig[i, "Kstar"] <- t$stat$K.star
+physig[i, "Lambda"] <- t$stat$Lambda
+
+physig[i, "CmeanP"] <- t$pvalue$Cmean
+physig[i, "IP"] <- t$pvalue$I
+physig[i, "KP"] <- t$pvalue$K
+physig[i, "KstarP"] <- t$pvalue$K.star
+physig[i, "LambdaP"] <- t$pvalue$Lambda
+
+}
+
+
+
+physig%>%
+  #dplyr::select(-c(Lambda, LambdaP))%>%
+  #summarise(across( where(is.numeric), ~ quantile(., c(0.05,  0.95, na.rm=T))))%>%
+  #write.csv("tables/phylosignal_untrimmed_100_trees.csv")
+  ggplot(aes(CmeanP))+
+  geom_histogram(bins=30, color="black", fill="grey", alpha=0.5)+
+  # geom_histogram(aes(x=KP), bins=30, color="black", fill="navajowhite3", alpha=0.5)+
+  geom_histogram(aes(x=IP), bins=30, color="black", fill="steelblue3", alpha=0.5)+
+  geom_histogram(aes(x=LambdaP), bins=30, color="black", fill="steelblue3", alpha=0.5)
+
+```
+
+### Trimmed Trees
+Hb SDI calculated from only species where we have more than 5 for each sex.
+```{r}
+
+trees <- read.nexus("data/birdtree_samples_blood.nex")
+
+physig <- data.frame(Cmean=double(),
+                     I = double(),
+                     K = double(),
+                     Kstar = double(),
+                     Lambda = double(),
+                     CmeanP=double(),
+                     IP = double(),
+                     KP = double(),
+                     KstarP = double(),
+                     LambdaP = double())
+
+for(i in 1:length(trees)){
+
+df.hb <- df%>%
+  filter(SSDI_hb <=0.8,
+         n_male >= 5,
+         n_female >= 5)%>%
+  dplyr::select(birdtree, SSDI_hb)%>%
+  unique()%>%
+  na.omit()
+
+#add P chaski
+#get P. gigas tip number
+pgtn <-which(trees[[i]]$tip.label=="Patagona_gigas")
+
+#bind to tree wherever gigas is
+tree<-bind.tip(trees[[i]], "Patagona_chaski", edge.length=NULL, where=pgtn, position=2)
+
+tree <- keep.tip(tree, df.hb$birdtree%>%na.omit())
+
+# First, you need one file that combines both the phylogenetic and trait data
+phylotraits <- phylo4d(tree, df.hb%>%column_to_rownames(var="birdtree"))
+
+#all metrics of phylogenetic signal
+t<-phyloSignal(p4d = phylotraits, method = "all")
+
+physig[i, "Cmean"] <- t$stat$Cmean
+physig[i, "I"] <- t$stat$I
+physig[i, "K"] <- t$stat$K
+physig[i, "Kstar"] <- t$stat$K.star
+physig[i, "Lambda"] <- t$stat$Lambda
+
+physig[i, "CmeanP"] <- t$pvalue$Cmean
+physig[i, "IP"] <- t$pvalue$I
+physig[i, "KP"] <- t$pvalue$K
+physig[i, "KstarP"] <- t$pvalue$K.star
+physig[i, "LambdaP"] <- t$pvalue$Lambda
+
+}
+
+physig%>%
+  dplyr::select(-c(Lambda, LambdaP))%>%
+  summarise(across( where(is.numeric), ~ quantile(., c(0.05,  0.95, na.rm=T))))%>%write.csv("tables/phylosignal_SBDI_hb_trimmed_n_min_5_100_trees.csv")
+
+```
+
+### Locate phylogenetic signal
+```{r}
+bsdi.lipa <- lipaMoran(phylotraits)
+bdsi.lipa.p4d <- lipaMoran(phylotraits, as.p4d = TRUE)
+
+barplot.phylo4d(phylotraits, bar.col=(bsdi.lipa$p.value < 0.05) + 1,tree.ladderize = T, center = FALSE , scale = FALSE, bar.lwd=2, tip.cex=0.2)
+
+barplot.phylo4d(bdsi.lipa.p4d, bar.col = (bsdi.lipa$p.value < 0.05) + 1, center = FALSE, scale = FALSE, bar.lwd=2, tree.ladderize = T, tip.cex=0.2)
+
+```
+
+
+## Hct
+### Untrimmed Trees
+The untrimmed trees includes all samples for which we can calculate Hct SDI in dataset, meaning lots of SDI calculated form one individual from each sex.
+```{r}
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+
+trees <- read.nexus("data/birdtree_samples_blood.nex")
+
+physig2 <- data.frame(Cmean=double(),
+                     I = double(),
+                     K = double(),
+                     Kstar = double(),
+                     Lambda = double(),
+                     CmeanP=double(),
+                     IP = double(),
+                     KP = double(),
+                     KstarP = double(),
+                     LambdaP = double())
+
+for(i in 1:length(trees)){
+df.hct <- df%>%
+  dplyr::select(birdtree, SSDI_hct)%>%
+  na.omit()
+
+#add P chaski
+#get P. gigas tip number
+pgtn <-which(trees[[i]]$tip.label=="Patagona_gigas")
+
+#bind to tree wherever gigas is
+tree<-bind.tip(trees[[i]], "Patagona_chaski", edge.length=NULL, where=pgtn, position=2)
+
+tree <- keep.tip(tree, df.hct$birdtree%>%na.omit())
+# First, you need one file that combines both the phylogenetic and trait data
+phylotraits <- phylo4d(tree, df.hct%>%column_to_rownames(var="birdtree"))
+
+#all metrics of phylogenetic signal
+t<-phyloSignal(p4d = phylotraits, method = "all")
+
+physig2[i, "Cmean"] <- t$stat$Cmean
+physig2[i, "I"] <- t$stat$I
+physig2[i, "K"] <- t$stat$K
+physig2[i, "Kstar"] <- t$stat$K.star
+physig2[i, "Lambda"] <- t$stat$Lambda
+
+physig2[i, "CmeanP"] <- t$pvalue$Cmean
+physig2[i, "IP"] <- t$pvalue$I
+physig2[i, "KP"] <- t$pvalue$K
+physig2[i, "KstarP"] <- t$pvalue$K.star
+physig2[i, "LambdaP"] <- t$pvalue$Lambda
+
+}
+
+physig2%>%
+  dplyr::select(-c(Lambda, LambdaP))%>%
+  summarise(across( where(is.numeric), ~ quantile(., c(0.05,  0.95, na.rm=T))))%>%write.csv("tables/phylosignal_SBDI_hct_untrimmed_100_trees.csv")
+```
+
+
+### Trimmed Trees
+Hct SDI calculated from only species where we have more than 5 for each sex.
+```{r}
+
+trees <- read.nexus("data/birdtree_samples_blood.nex")
+
+physig2 <- data.frame(Cmean=double(),
+                     I = double(),
+                     K = double(),
+                     Kstar = double(),
+                     Lambda = double(),
+                     CmeanP=double(),
+                     IP = double(),
+                     KP = double(),
+                     KstarP = double(),
+                     LambdaP = double())
+
+for(i in 1:length(trees)){
+
+df.hct <- df%>%
+  filter(SSDI_hct <=0.8,
+         n_male >= 5,
+         n_female >= 5)%>%
+  dplyr::select(birdtree, SSDI_hct)%>%
+  na.omit()
+
+#add P chaski
+#get P. gigas tip number
+pgtn <-which(trees[[i]]$tip.label=="Patagona_gigas")
+
+#bind to tree wherever gigas is
+tree<-bind.tip(trees[[i]], "Patagona_chaski", edge.length=NULL, where=pgtn, position=2)
+
+tree <- keep.tip(tree, df.hct$birdtree%>%na.omit())
+
+# First, you need one file that combines both the phylogenetic and trait data
+phylotraits <- phylo4d(tree, df.hct%>%column_to_rownames(var="birdtree"))
+
+#all metrics of phylogenetic signal
+t<-phyloSignal(p4d = phylotraits, method = "all")
+
+physig2[i, "Cmean"] <- t$stat$Cmean
+physig2[i, "I"] <- t$stat$I
+physig2[i, "K"] <- t$stat$K
+physig2[i, "Kstar"] <- t$stat$K.star
+physig2[i, "Lambda"] <- t$stat$Lambda
+
+physig2[i, "CmeanP"] <- t$pvalue$Cmean
+physig2[i, "IP"] <- t$pvalue$I
+physig2[i, "KP"] <- t$pvalue$K
+physig2[i, "KstarP"] <- t$pvalue$K.star
+physig2[i, "LambdaP"] <- t$pvalue$Lambda
+
+}
+
+physig2%>%
+  dplyr::select(-c(Lambda, LambdaP))%>%
+  summarise(across( where(is.numeric), ~ quantile(., c(0.05,  0.95, na.rm=T))))%>%write.csv("tables/phylosignal_SBDI_hct_trimmed_min_n_5_100_trees.csv")
+
+```
+
+### Locate signal
+```{r}
+bsdi.lipa <- lipaMoran(phylotraits)
+bdsi.lipa.p4d <- lipaMoran(phylotraits, as.p4d = TRUE)
+
+barplot.phylo4d(phylotraits, bar.col=(bsdi.lipa$p.value < 0.05) + 1,tree.ladderize = T, center = FALSE , scale = FALSE, bar.lwd=2)
+
+barplot.phylo4d(bdsi.lipa.p4d, bar.col = (bsdi.lipa$p.value < 0.05) + 1, center = FALSE, scale = FALSE, bar.lwd=2, tree.ladderize = T, )
+
+
+```
+
+# Map contributions to trees
+```{r}
+
+
+## extract character of interest
+hb.cont <- df.contribution%>%
+  filter(SSDI_hb <=0.8)%>%
+  dplyr::select(fam_SBD_hb_driver, birdtree)%>%
+  na.omit()%>%
+  column_to_rownames(var="birdtree")%>%
+  pull(fam_SBD_hb_driver)%>%
+  as.factor()
+
+hb.cont <- setNames(hb.cont, df.contribution%>%
+  dplyr::select(fam_SBD_hb_driver, birdtree)%>%
+  na.omit()%>%
+  pull(birdtree))
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+t <- keep.tip(tree, names(hb.cont))
+
+
+cols<-setNames(palette(contr.col)[1:length(levels(hb.cont))],
+    levels(hb.cont))
+## then plot it:
+plotTree(t,type = "fan", ftype="i",fsize=0.5,color="darkgrey",
+    offset=4.5)
+tiplabels(pie=to.matrix(hb.cont[t$tip.label],
+    levels(hb.cont)),piecol=cols,cex=0.3)
+legend(x="bottomleft",levels(hb.cont),pch=22,
+    pt.bg=cols,pt.cex=1.5,bty="n",cex=0.9)
+
+map.trees<-make.simmap(t,hb.cont,model="ER",
+    nsim=100)
+
+## next plot an outline tree:
+plotTree(t,type = "fan",ftype="i",fsize=0.5,offset=4.5,
+    lwd=4.2, color="black")
+par(fg="transparent",lend=1)
+plotTree(t,type = "fan",ftype="i",fsize=0.5,offset=4.5,
+    lwd=3,color="white",add=TRUE)
+## now plot our 100 stochastic map trees
+## with 99% transparency
+for(i in 1:length(map.trees)) plot(map.trees[[i]], type = "fan",
+    colors=sapply(cols,make.transparent,alpha=0.01),
+    add=TRUE,lwd=3,ftype="i",fsize=0.5,offset=4.5)
+par(fg="black")
+# nodelabels(pie=summary(map.trees)$ace,piecol=cols,
+#     cex=0.25)
+tiplabels(pie=to.matrix(hb.cont[t$tip.label],
+    levels(hb.cont)),piecol=cols,cex=0.3)
+legend(x="bottomleft",levels(hb.cont),pch=22,
+    pt.bg=cols,pt.cex=1.5,bty="n",cex=0.7)
+
+
+#reorder trait data
+hb.cont<-ReorderData(t, hb.cont, taxa.names="row names")
+
+## create "contMap" object
+hb.contMap<-contMap(t,
+    hb.cont,plot=FALSE,res=200)
+
+## change color scheme
+hb.contMap<-setMap(hb.contMap,
+    c("steelblue4", "steelblue","grey88",
+  "lightpink2",  "indianred", "brown", "darkred"))
+plot(hb.contMap,fsize=c(0.2,0.2),
+    leg.txt="SDI Hb", lwd=1.2, type="fan")
+par(mar=c(5.1,4.1,4.1,2.1)) ## reset margins to default
+
+
+```
+
+# Map continuous character to trees
+## Hb
+```{r}
+
+sample.thresh <- 3
+## extract character of interest
+hb.cont <- df%>%
+  filter(n_female >=sample.thresh,
+         n_male >=sample.thresh)%>%
+  filter(SSDI_hb <=0.8)%>%
+  dplyr::select(SSDI_hb, birdtree)%>%
+  na.omit()%>%
+  column_to_rownames(var="birdtree")%>%
+  pull(SSDI_hb)
+
+hb.cont <- setNames(hb.cont, df%>%
+          filter(n_female >=sample.thresh,
+         n_male >=sample.thresh)%>% 
+  filter(SSDI_hb <=0.8)%>%
+  dplyr::select(SSDI_hb, birdtree)%>%
+  na.omit()%>%
+  pull(birdtree))
+
+
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+t <- keep.tip(tree, df%>% 
+                filter(n_female >=sample.thresh,
+         n_male >=sample.thresh)%>%
+           filter(SSDI_hb <=0.8)%>%
+  dplyr::select(SSDI_hb, birdtree)%>%
+  na.omit()%>%pull(birdtree))
+
+#reorder trait data
+hb.cont<-ReorderData(t, hb.cont, taxa.names="row names")
+
+## create "contMap" object
+hb.contMap<-contMap(t,
+    hb.cont,plot=FALSE,res=200)
+
+## change color scheme
+hb.contMap<-setMap(hb.contMap,
+    c("steelblue4", "steelblue","grey88",
+  "lightpink2",  "indianred", "brown", "darkred"))
+plot(hb.contMap,fsize=c(0.2,0.2),
+    leg.txt="SDI Hb", lwd=1.2, type="fan")
+par(mar=c(5.1,4.1,4.1,2.1)) ## reset margins to default
+
+
+```
+
+### GGtree
+```{r}
+
+thresh <-1
+
+## extract character of interest
+hb.cont <- df%>%
+  filter(n_female >=thresh,
+         n_male >=thresh)%>%
+  filter(SSDI_hb <=0.8)%>%
+  dplyr::select(SSDI_hb, birdtree)%>%
+  na.omit()%>%
+  column_to_rownames(var="birdtree")%>%
+  pull(SSDI_hb)
+
+hb.cont <- setNames(hb.cont, df%>%
+          filter(n_female >=thresh,
+         n_male >=thresh)%>% 
+  filter(SSDI_hb <=0.8)%>%
+  dplyr::select(SSDI_hb, birdtree)%>%
+  na.omit()%>%
+  pull(birdtree))
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+
+t <- keep.tip(tree, df%>% 
+                filter(n_female >=thresh,
+         n_male >=thresh)%>%
+           filter(SSDI_hb <=0.8)%>%
+  dplyr::select(SSDI_hb, birdtree)%>%
+  na.omit()%>%pull(birdtree))
+
+#reorder trait data
+hb.cont<-ReorderData(t, hb.cont, taxa.names="row names")
+
+
+# Fit an ancestral state character reconstruction
+fit <- phytools::fastAnc(t, hb.cont, vars = TRUE, CI = TRUE)
+
+# Make a dataframe with trait values at the tips
+td <- data.frame(
+  node = tidytree::nodeid(t, names(hb.cont)),
+  trait = hb.cont)
+
+# Make a dataframe with estimated trait values at the nodes
+nd <- data.frame(node = names(fit$ace), trait = fit$ace)
+
+# Combine these with the tree data for plotting with ggtree
+d <- rbind(td, nd)
+d$node <- as.numeric(d$node)
+tree <- full_join(t, d, by = 'node')
+
+g<-ggtree(
+  tree, 
+  aes(color = trait), 
+  layout = 'circular', 
+  ladderize = FALSE, continuous = "color", size = 1) +
+  # >>> The important part! <<<
+  # Choose your favorite scale_color_* function here: 
+   scale_color_gradient2(low="navyblue", mid="honeydew2", high="darkred", midpoint = 0)+
+  # scale_colour_gradientn(colours = c("steelblue4","steelblue","lightblue","grey88", "lightpink",),
+  #                        values = c(1.0,0.8,0.6,0.4,0.2,0)) 
+  #scico::scale_color_scico(palette = "bilbao") + 
+  geom_tiplab(hjust = -.1, size = 1, color = "black") + 
+  theme(
+    legend.position = c(0, .82),
+    legend.text = element_text(size = 8),
+    legend.title = element_blank()
+  ) 
+
+g
+ggsave(g, file=paste0("figures/GGtree_hb_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
+
+```
+
+
+## Hct
+```{r}
+
+## extract character of interest
+hct.cont <- hct.cont <- df%>%
+  filter(SSDI_hct <=0.8)%>%
+  dplyr::select(SSDI_hct, birdtree)%>%
+  na.omit()%>%
+  column_to_rownames(var="birdtree")%>%
+  pull(SSDI_hct)
+
+#create named vector for phytools
+hct.cont <- setNames(hct.cont, df%>% 
+  filter(SSDI_hct <=0.8)%>%
+  dplyr::select(SSDI_hct, birdtree)%>%
+  na.omit()%>%
+  pull(birdtree))
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+t <- keep.tip(tree, df%>% filter(SSDI_hct <=0.8)%>%
+  dplyr::select(SSDI_hct, birdtree)%>%
+  na.omit()%>%pull(birdtree))
+
+#reorder trait data
+hct.cont<-ReorderData(t, hct.cont, taxa.names="row names")
+
+
+## create "contMap" object
+hct.contMap<-contMap(t,
+    hct.cont,plot=FALSE,res=200)
+
+## change color scheme
+hct.contMap<-setMap(hct.contMap,
+    c("steelblue4", "steelblue2", "white",
+    "indianred", "brown"))
+plot(hct.contMap,fsize=c(0.2,0.2),
+    leg.txt="SDI Hct", lwd=1, type="fan")
+par(mar=c(5.1,4.1,4.1,2.1)) ## reset margins to default
+
+```
+### GGtree
+```{r}
+
+thresh <- 5
+## extract character of interest
+hct.cont <- df%>%
+  filter(n_female >=thresh,
+         n_male >=thresh)%>%
+  filter(SSDI_hct <=0.8)%>%
+  dplyr::select(SSDI_hct, birdtree)%>%
+  na.omit()%>%
+  column_to_rownames(var="birdtree")%>%
+  pull(SSDI_hct)
+
+hct.cont <- setNames(hct.cont, df%>%
+          filter(n_female >=thresh,
+         n_male >=thresh)%>% 
+  filter(SSDI_hct <=0.8)%>%
+  dplyr::select(SSDI_hct, birdtree)%>%
+  na.omit()%>%
+  pull(birdtree))
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+t <- keep.tip(tree, df%>% 
+                filter(n_female >=thresh,
+         n_male >=thresh)%>%
+           filter(SSDI_hct <=0.8)%>%
+  dplyr::select(SSDI_hct, birdtree)%>%
+  na.omit()%>%pull(birdtree))
+
+#reorder trait data
+hct.cont<-ReorderData(t, hct.cont, taxa.names="row names")
+
+
+# Fit an ancestral state character reconstruction
+fit <- phytools::fastAnc(t, hct.cont, vars = TRUE, CI = TRUE)
+
+# Make a dataframe with trait values at the tips
+td <- data.frame(
+  node = tidytree::nodeid(t, names(hb.cont)),
+  trait = hb.cont)
+
+# Make a dataframe with estimated trait values at the nodes
+nd <- data.frame(node = names(fit$ace), trait = fit$ace)
+
+# Combine these with the tree data for plotting with ggtree
+d <- rbind(td, nd)
+d$node <- as.numeric(d$node)
+tree <- full_join(t, d, by = 'node')
+
+g<-ggtree(
+  tree, 
+  aes(color = trait), 
+  layout = 'circular', 
+  ladderize = FALSE, continuous = "color", size = 1) +
+  # >>> The important part! <<<
+  # Choose your favorite scale_color_* function here: 
+   scale_color_gradient2(low="navyblue", mid="honeydew2", high="darkred", midpoint = 0)+
+  #scico::scale_color_scico(palette = "bilbao") + 
+  geom_tiplab(hjust = -.1, size = 1, color = "black") + 
+  theme(
+    legend.position = c(0, .82),
+    legend.text = element_text(size = 8),
+    legend.title = element_blank()
+  ) 
+
+g
+ggsave(g, file=paste0("figures/GGtree_hct_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
+```
+
+# Phylogenetic mixed models
+
+## Hb and Hct with elevation
+## Prepare tree and dataframe
+### Hb
+```{r}
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+df.all.brm <- df.all%>%
+  filter(SSDI_hb <=0.8)%>%
+  dplyr::select(taxon, family, sex, birdtree, hb, elevation, dimorphic_01)%>%
+  mutate(
+         dimorphic_01 =as.factor(dimorphic_01),
+         mean_sample_elev.z = scale(elevation))%>%
+  na.omit()
+
+tips.keep <-df.all.brm%>%dplyr::select(birdtree)%>%na.omit()%>%unique()%>%pull()
+
+tree <- keep.tip(tree, tips.keep)
+
+#unscaled vcv matrix
+#A <- ape::vcv(tree, corr = FALSE)
+
+# we want to use correlation matrix and maybe scale tree branches according to:
+#https://discourse.mc-stan.org/t/covariance-matrix-phylogenetic-models/20477
+
+#  scaled correlation matrix
+scaled_tree <- tree
+scaled_tree$edge.length <- scaled_tree$edge.length / (max(tree$edge.length))
+A <- ape::vcv(scaled_tree, corr = TRUE)
+plot(scaled_tree, cex=0.01)
+
+hist(df.all.brm$hb)
+#try using gamma to model responses
+```
+
+### Student
+#### Null, intercept only
+```{r}
+
+job::job({
+m1 <- brm(
+  formula = bf(hb ~ 1),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m1, file="models/m1_hb_intercept_only.RData") # save model
+})
+
+#load("models/m1_hb_intercept_only.RData") # If loading from pre-saved file and not re-running
+
+
+```
+
+#### Null, phylo grouping only
+```{r}
+job::job({
+m2 <- brm(
+  formula = bf(hb ~ 1 + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m2, file="models/m2_hb_phylo_RF_only.RData") # save model
+})
+
+
+#load("models/m2_hb_phylo_RF_only.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, dimorphism
+```{r}
+job::job({
+m3 <- brm(
+  formula = bf(hb ~ 1 + sex),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m3, file="models/m3_hb_sex.RData") # save model
+})
+
+
+#load("models/m3_hb_sex.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, elev
+```{r}
+job::job({
+m4 <- brm(
+  formula = bf(hb ~ 1 + mean_sample_elev.z),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+      prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m4, file="models/m4_hb_elev.RData") # save model
+})
+
+#load("models/m4_hb_elev.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, elev + phylo grouping
+```{r}
+job::job({
+m5 <- brm(
+  formula = bf(hb ~ 1 + mean_sample_elev.z + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+      prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m5, file="models/m5_hb_elev_phylo_RF.RData") # save model
+})
+
+#load("models/m5_hb_elev_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, sex + phylo grouping
+```{r}
+job::job({
+m6 <- brm(
+  formula = bf(hb ~ 1 + sex + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+      prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m6, file="models/m6_hb_sex_phylo_RF.RData") # save model
+})
+
+#load("models/m6_hb_sex_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, dimorphism + phylo grouping
+```{r}
+job::job({
+m6 <- brm(
+  formula = bf(hb ~ 1 + dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m6, file="models/m6_hb_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m6_hb_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, elev + sex + phylo grouping
+```{r}
+job::job({
+m7 <- brm(
+  formula = bf(hb ~ 1 + mean_sample_elev.z + sex + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m7, file="models/m7_hb_elev_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m7_hb_elev_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Interaction, elev + sex + elev x sex + phylo grouping
+```{r}
+job::job({
+m8.hb <- brm(
+  formula = bf(hb ~ 1 + mean_sample_elev.z + sex + dimorphic_01 + mean_sample_elev.z * sex + mean_sample_elev.z*dimorphic_01 +(1|taxon)),
+  data = df.all.brm,
+  family = skew_normal(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m8.hb, file="models/m8_hb_Int_elev_sex_phylo_RF.RData") # save model
+})
+
+#load("models/m8_hb_Int_elev_sex_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(m8.hb)
+
+mcmc_plot(m8, variable = c("b_mean_sample_elev.z", "b_dimorphic_011", "b_mean_sample_elev.z:dimorphic_011"))
+
+```
+#### Loo
+```{r}
+
+loo(m1, m2, m3, m4, m5, m6, m7, m8)
+
+# Model comparisons:
+#    elpd_diff se_diff
+# m8    0.0       0.0 
+# m5   -1.1       1.8 
+# m7   -1.2       1.6 
+# m6 -165.1      17.7 
+# m2 -165.9      17.7 
+# m4 -764.1      36.4 
+# m3 -946.7      40.2 
+# m1 -971.0      40.4 
+```
+
+
+## Prepare tree and dataframe
+### Hct
+```{r}
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+df.all.brm <- df.all%>%
+  filter(SSDI_hct <=0.8)%>%
+  dplyr::select(taxon, family, sex, birdtree, hct, elevation, dimorphic_01)%>%
+  mutate(
+         dimorphic_01 =as.factor(dimorphic_01),
+         mean_sample_elev.z = scale(elevation))%>%
+  na.omit()
+
+tips.keep <-df.all.brm%>%dplyr::select(birdtree)%>%na.omit()%>%unique()%>%pull()
+
+tree <- keep.tip(tree, tips.keep)
+
+#unscaled vcv matrix
+#A <- ape::vcv(tree, corr = FALSE)
+
+# we want to use correlation matrix and maybe scale tree branches according to:
+#https://discourse.mc-stan.org/t/covariance-matrix-phylogenetic-models/20477
+
+#  scaled correlation matrix
+scaled_tree <- tree
+scaled_tree$edge.length <- scaled_tree$edge.length / (max(tree$edge.length))
+A <- ape::vcv(scaled_tree, corr = TRUE)
+plot(scaled_tree, cex=0.01)
+
+hist(df.all.brm$hct)
+#try using gamma to model responses
+```
+
+### Student
+#### Null, intercept only
+```{r}
+
+job::job({
+m1.hct <- brm(
+  formula = bf(hct ~ 1),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m1.hct, file="models/m1_hct_intercept_only.RData") # save model
+})
+
+#load("models/m1_hct_intercept_only.RData") # If loading from pre-saved file and not re-running
+
+
+```
+
+#### Null, phylo grouping only
+```{r}
+job::job({
+m2.hct <- brm(
+  formula = bf(hct ~ 1 + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m2.hct, file="models/m2_hct_phylo_RF_only.RData") # save model
+})
+
+
+#load("models/m2_hct_phylo_RF_only.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, sex
+```{r}
+job::job({
+m3.hct <- brm(
+  formula = bf(hct ~ 1 + sex),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m3.hct, file="models/m3_hct_sex.RData") # save model
+})
+
+
+#load("models/m3_hct_sex.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, elev
+```{r}
+job::job({
+m4.hct <- brm(
+  formula = bf(hct ~ 1 + mean_sample_elev.z),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+      prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m4.hct, file="models/m4_hct_elev.RData") # save model
+})
+
+#load("models/m4_hct_elev.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, dimorphism
+```{r}
+job::job({
+m5.hct <- brm(
+  formula = bf(hct ~ 1 + dimorphic_01),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+      prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m5.hct, file="models/m5_hct_dimorph.RData") # save model
+})
+
+#load("models/m5_hct_dimorph.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, elev + phylo grouping
+```{r}
+job::job({
+m6.hct <- brm(
+  formula = bf(hct ~ 1 + mean_sample_elev.z + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+      prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m6.hct, file="models/m6_hct_elev_phylo_RF.RData") # save model
+})
+
+#load("models/m6_hct_elev_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, sex + phylo grouping
+```{r}
+job::job({
+m7.hct <- brm(
+  formula = bf(hct ~ 1 + sex + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+      prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m7.hct, file="models/m7_hct_sex_phylo_RF.RData") # save model
+})
+
+#load("models/m7_hct_sex_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, dimorphism + phylo grouping
+```{r}
+job::job({
+m8.hct <- brm(
+  formula = bf(hct ~ 1 + dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m8.hct, file="models/m8_hct_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m8_hct_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, elev + dimorphism + phylo grouping
+```{r}
+job::job({
+m9.hct <- brm(
+  formula = bf(hct ~ 1 + mean_sample_elev.z + dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m9.hct, file="models/m9_hct_elev_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m9_hct_elev_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, elev + sex + phylo grouping
+```{r}
+job::job({
+m10.hct <- brm(
+  formula = bf(hct ~ 1 + mean_sample_elev.z + sex + (1|gr(birdtree, cov = A))),
+  data = df.all.brm,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m10.hct, file="models/m10_hct_elev_sex_phylo_RF.RData") # save model
+})
+
+#load("models/m10_hct_elev_sex_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Interaction, elev + sex + elev x sex + phylo grouping
+```{r}
+job::job({
+m8.hct <- brm(
+  formula = bf(hct ~ 1 + mean_sample_elev.z + sex + mean_sample_elev.z * sex + (1|taxon)),
+  data = df.all.brm,
+  family = skew_normal(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m8.hct, file="models/m8_hct_Int_elev_sex_phylo_RF.RData") # save model
+})
+
+#load("models/m8_hct_Int_elev_sex_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(m8.hct)
+
+mcmc_plot(m8.hct, variable = c("b_mean_sample_elev.z", "b_dimorphic_011", "b_mean_sample_elev.z:dimorphic_011"))
+
+```
+#### Loo
+```{r}
+
+loo(m1, m2, m3, m4, m5, m6, m7, m8)
+
+# Model comparisons:
+#    elpd_diff se_diff
+# m8    0.0       0.0 
+# m5   -1.1       1.8 
+# m7   -1.2       1.6 
+# m6 -165.1      17.7 
+# m2 -165.9      17.7 
+# m4 -764.1      36.4 
+# m3 -946.7      40.2 
+# m1 -971.0      40.4 
+```
+
+
+## SBDI Hb Models
+## Prepare tree and dataframe
+```{r}
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+df.hb <- df%>%
+  filter(SSDI_hb <=0.8,
+         n_male >= 5,
+         n_female >= 5)%>%
+  dplyr::select(taxon, family, birdtree, SSDI_hb, mean_sample_elev, dimorphic_01)%>%
+  mutate(
+         dimorphic_01 =as.factor(dimorphic_01),
+         mean_sample_elev.z = scale(mean_sample_elev))%>%
+  na.omit()
+
+tree <- keep.tip(tree, df.hb$birdtree%>%na.omit())
+
+#unscaled vcv matrix
+#A <- ape::vcv(tree, corr = FALSE)
+
+# we want to use correlation matrix and maybe scale tree branches according to:
+#https://discourse.mc-stan.org/t/covariance-matrix-phylogenetic-models/20477
+
+#  scaled correlation matrix
+scaled_tree <- tree
+scaled_tree$edge.length <- scaled_tree$edge.length / (max(tree$edge.length))
+A <- ape::vcv(scaled_tree, corr = TRUE)
+plot(scaled_tree, cex=0.01)
+```
+### Student
+#### Null, intercept only
+```{r}
+
+job::job({
+m1 <- brm(
+  formula = bf(SSDI_hb ~ 1),
+  data = df.hb,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+})
+save(m1, file="models/m1_SDI_intercept_only.RData") # save model
+#load("models/m1_SDI_intercept_only.RData") # If loading from pre-saved file and not re-running
+
+
+```
+
+#### Null, phylo grouping only
+```{r}
+job::job({
+m2 <- brm(
+  formula = bf(SSDI_hb ~ 1 + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+})
+
+save(m2, file="models/m2_SDI_hb_phylo_RF_only.RData") # save model
+#load("models/m2_SDI_hb_phylo_RF_only.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, dimorphism
+```{r}
+job::job({
+m3 <- brm(
+  formula = bf(SSDI_hb ~ 1 + dimorphic_01),
+  data = df.hb,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m3, file="models/m3_SDI_hb_dimorph.RData") # save model
+})
+
+
+#load("models/m3_SDI_hb_dimorph.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, elev
+```{r}
+job::job({
+m4 <- brm(
+  formula = bf(SSDI_hb ~ 1 + mean_sample_elev.z),
+  data = df.hb,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m4, file="models/m4_SDI_hb_elev.RData") # save model
+})
+
+#load("models/m4_SDI_hb_elev.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, elev + phylo grouping
+```{r}
+job::job({
+m5 <- brm(
+  formula = bf(SSDI_hb ~ 1 + mean_sample_elev.z + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m5, file="models/m5_SDI_hb_elev_phylo_RF.RData") # save model
+})
+
+#load("models/m5_SDI_hb_elev_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, dimorphism + phylo grouping
+```{r}
+job::job({
+m6 <- brm(
+  formula = bf(SSDI_hb ~ 1 + dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m6, file="models/m6_SDI_hb_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m6_SDI_hb_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, elev + dimorphism + phylo grouping
+```{r}
+job::job({
+m7 <- brm(
+  formula = bf(SSDI_hb ~ 1 + mean_sample_elev.z + dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m7, file="models/m7_SDI_hb_elev_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m7_SDI_hb_elev_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Interaction, elev + dimorphism + elev x dimorphism + phylo grouping
+```{r}
+job::job({
+m8 <- brm(
+  formula = bf(SSDI_hb ~ 1 + mean_sample_elev.z + dimorphic_01 + mean_sample_elev.z * dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m8, file="models/m8_SDI_hb_Int_elev_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m8_SDI_hb_Int_elev_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(m8)
+
+mcmc_plot(m8, variable = c("b_mean_sample_elev.z", "b_dimorphic_011", "b_mean_sample_elev.z:dimorphic_011"))
+
+```
+#### Loo
+```{r}
+
+loo(m1, m2, m3, m4, m5, m6, m7, m8)
+
+# Model comparisons:
+#    elpd_diff se_diff
+# m4  0.0       0.0   
+# m1 -0.2       1.5   
+# m5 -0.8       0.5   
+# m3 -1.1       1.7   
+# m2 -1.2       1.6   
+# m8 -1.4       1.8   
+# m7 -1.4       0.9   
+# m6 -2.0       1.8  
+```
+
+## SBDI Hct Models
+## Prepare tree and dataframe
+```{r}
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+df.hct <- df%>%
+  filter(SSDI_hct <=0.8,
+         n_male >= 5,
+         n_female >= 5)%>%
+  dplyr::select(taxon, family, birdtree, SSDI_hct, mean_sample_elev, dimorphic_01)%>%
+  mutate(
+         dimorphic_01 =as.factor(dimorphic_01),
+         mean_sample_elev.z = scale(mean_sample_elev))%>%
+  na.omit()
+
+tree <- keep.tip(tree, df.hct$birdtree%>%na.omit())
+
+#unscaled vcv matrix
+#A <- ape::vcv(tree, corr = FALSE)
+
+# we want to use correlation matrix and maybe scale tree branches according to:
+#https://discourse.mc-stan.org/t/covariance-matrix-phylogenetic-models/20477
+
+#  scaled correlation matrix
+scaled_tree <- tree
+scaled_tree$edge.length <- scaled_tree$edge.length / (max(tree$edge.length))
+A <- ape::vcv(scaled_tree, corr = TRUE)
+plot(scaled_tree, cex=0.01)
+```
+### Student
+#### Null, intercept only
+```{r}
+
+job::job({
+m1hct <- brm(
+  formula = bf(SSDI_hct ~ 1),
+  data = df.hct,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+})
+save(m1hct, file="models/m1hct_SDI_intercept_only.RData") # save model
+#load("models/m1hct_SDI_intercept_only.RData") # If loading from pre-saved file and not re-running
+
+
+```
+
+#### Null, phylo grouping only
+```{r}
+job::job({
+m2hct <- brm(
+  formula = bf(SSDI_hct ~ 1 + (1|gr(birdtree, cov = A))),
+  data = df.hct,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+})
+
+save(m2hct, file="models/m2hct_SDI_hct_phylo_RF_only.RData") # save model
+#load("models/m2hct_SDI_hct_phylo_RF_only.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, dimorphism
+```{r}
+job::job({
+m3hct <- brm(
+  formula = bf(SSDI_hct ~ 1 + dimorphic_01),
+  data = df.hct,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m3hct, file="models/m3hct_SDI_hct_dimorph.RData") # save model
+})
+
+
+#load("models/m3hct_SDI_hct_dimorph.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, elev
+```{r}
+job::job({
+m4hct <- brm(
+  formula = bf(SSDI_hct ~ 1 + mean_sample_elev.z),
+  data = df.hct,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m4hct, file="models/m4hct_SDI_hct_elev.RData") # save model
+})
+
+#load("models/m4hct_SDI_hct_elev.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, elev + phylo grouping
+```{r}
+job::job({
+m5hct <- brm(
+  formula = bf(SSDI_hct ~ 1 + mean_sample_elev.z + (1|gr(birdtree, cov = A))),
+  data = df.hct,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m5hct, file="models/m5hct_SDI_hct_elev_phylo_RF.RData") # save model
+})
+
+#load("models/m5hct_SDI_hct_elev_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+
+#### Additive, dimorphism + phylo grouping
+```{r}
+job::job({
+m6hct <- brm(
+  formula = bf(SSDI_hct ~ 1 + dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.hct,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m6hct, file="models/m6hct_SDI_hct_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m6hct_SDI_hct_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Additive, elev + dimorphism + phylo grouping
+```{r}
+job::job({
+m7hct <- brm(
+  formula = bf(SSDI_hct ~ 1 + mean_sample_elev.z + dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.hct,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m7hct, file="models/m7hct_SDI_hct_elev_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m7hct_SDI_hct_elev_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+```
+
+#### Interaction, elev + dimorphism + elev x dimorphism + phylo grouping
+```{r}
+job::job({
+m8hct <- brm(
+  formula = bf(SSDI_hct ~ 1 + mean_sample_elev.z + dimorphic_01 + mean_sample_elev.z * dimorphic_01 + (1|gr(birdtree, cov = A))),
+  data = df.hct,
+  family = student(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(student_t(3, 0, 20), "sigma"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(m8hct, file="models/m8hct_SDI_hct_Int_elev_dimorph_phylo_RF.RData") # save model
+})
+
+#load("models/m8hct_SDI_hct_Int_elev_dimorph_phylo_RF.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(m8hct)
+
+mcmc_plot(m8hct, variable = c("b_mean_sample_elev.z", "b_dimorphic_011", "b_mean_sample_elev.z:dimorphic_011"))
+
+```
+#### Loo
+```{r}
+
+loo(m1hct, m2hct, m3hct, m4hct, m5hct, m6hct, m7hct, m8hct)
+
+#M8 Interaction model is best but many are equivalent.
+```
+
+
+### Logistic
+```{r}
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+df.hb <- df%>%
+  filter(SSDI_hb <=0.8,
+         n_male >= 5,
+         n_female >= 5,
+         dimorphic_01 %in% c(0,1))%>%
+  dplyr::select(taxon, family, birdtree, SSDI_hb, mean_sample_elev, dimorphic_01)%>%
+  mutate(
+         dimorphic_01 =factor(dimorphic_01),
+         mean_sample_elev.z = scale(mean_sample_elev))%>%
+  na.omit()
+
+tree <- keep.tip(tree, df.hb$birdtree%>%na.omit())
+
+
+#  scaled correlation matrix
+scaled_tree <- tree
+scaled_tree$edge.length <- scaled_tree$edge.length / (max(tree$edge.length))
+A <- ape::vcv(scaled_tree, corr = TRUE)
+plot(scaled_tree, cex=0.01)
+```
+
+#### Null, phylo grouping effect only
+```{r}
+job::job({
+mL1 <- brm(
+  formula = bf(dimorphic_01 ~ 1 + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = bernoulli(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(mL1, file="models/mL1_dimorphism_phylo_ef.RData") # save model
+})
+
+#load("models/mL1_dimorphism_phylo_ef.RData") # If loading from pre-saved file and not re-running
+
+```
+#### Additive, Hb SBDI fixed effect only
+```{r}
+job::job({
+mL2 <- brm(
+  formula = bf(dimorphic_01 ~ 1 + SSDI_hb),
+  data = df.hb,
+  family = bernoulli(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 2.5), class ="b")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(mL2, file="models/mL2_Hb_SDI_dimorphism.RData") # save model
+})
+
+#load("models/mL2_Hb_SDI_dimorphism.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(mL2)
+
+```
+
+#### Additive, elev fixed effect only
+```{r}
+job::job({
+mL3 <- brm(
+  formula = bf(dimorphic_01 ~ 1 + mean_sample_elev.z),
+  data = df.hb,
+  family = bernoulli(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 2.5), class ="b")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(mL3, file="models/mL3_dimorphism_elev.RData") # save model
+})
+
+#load("models/mL3_dimorphism_elev.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(mL3)
+
+
+```
+
+#### Additive, SBDI + phylo grouping 
+```{r}
+job::job({
+mL4 <- brm(
+  formula = bf(dimorphic_01 ~ 1 + SSDI_hb + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = bernoulli(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 2.5), class ="b"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+save(mL4, file="models/mL4_Hb_SDI_dimorphism_phylo_ef.RData") # save model
+})
+
+
+#load("models/mL4_Hb_SDI_dimorphism_phylo_ef.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(mL4)
+
+```
+
+#### Additive, elev + phylo grouping 
+```{r}
+job::job({
+mL5 <- brm(
+  formula = bf(dimorphic_01 ~ 1 + mean_sample_elev.z + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = bernoulli(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 2.5), class ="b"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+})
+
+save(mL5, file="models/mL5_elev_dimorphism_phylo_ef.RData") # save model
+#load("models/mL5_elev_dimorphism_phylo_ef.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(mL5)
+
+```
+#### Additive, SBDI hb + elev + phylo grouping
+```{r}
+job::job({
+mL6 <- brm(
+  formula = bf(dimorphic_01 ~ 1 + mean_sample_elev.z + SSDI_hb + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = bernoulli(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 2.5), class ="b"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+})
+
+save(mL6, file="models/mL6_elev_SBDI_hb_dimorphism_phylo_ef.RData") # save model
+#load("models/mL6_elev_SBDI_hb_dimorphism_phylo_ef.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(mL6)
+
+```
+
+#### Interaction,SBDI hb + elev + phylo grouping
+```{r}
+job::job({
+mL7 <- brm(
+  formula = bf(dimorphic_01 ~ 1 + mean_sample_elev.z + SSDI_hb +  mean_sample_elev.z * SSDI_hb + (1|gr(birdtree, cov = A))),
+  data = df.hb,
+  family = bernoulli(), # estimates of  mean and sd in t dist are robust to outliers relative to normal dist
+  data2 = list(A = A), # Phylogeny
+  cores = 8,
+  chains = 4,
+  backend = "cmdstanr",
+  threads = threading(4),
+  thin = 10,
+  prior = c(
+    prior(student_t(3, 0, 2.5), "Intercept"),
+     prior(student_t(3, 0, 2.5), class ="b"),
+    prior(normal(0,10), class = "sd")),
+  warmup = 5000, # default is iter/2; shouldn't ever be larger than iter
+  iter = 10000,
+  control = list(adapt_delta = 0.98, max_treedepth = 18),
+  sample_prior = TRUE # default priors
+)
+})
+
+save(mL7, file="models/mL7_Int_SBDI_hb_elev_dimorphism_phylo_ef.RData") # save model
+#load("models/mL7_Int_SBDI_hb_elev_dimorphism_phylo_ef.RData") # If loading from pre-saved file and not re-running
+
+conditional_effects(mL7)
+
+
+```
+
+# Phylolm
+```{r}
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+
+
+df.hb <- df%>%
+  filter(SSDI_hb <=0.8,
+         n_male >= 3,
+         n_female >= 3,
+         dimorphic_01 %in% c(0,1))%>%
+  dplyr::select( birdtree, SSDI_hb, mean_sample_elev, min_sample_elev, max_sample_elev, dimorphic_01)%>%
+  mutate(amplitude = max_sample_elev-min_sample_elev,
+         dimorphic_01 =factor(dimorphic_01))%>%
+  na.omit()
+
+
+tree <- keep.tip(tree, df.hb$birdtree%>%na.omit())
+
+df.hb <- column_to_rownames(df.hb, var="birdtree")
+
+df.hb <- ReorderData(tree, df.hb)
+
+
+pm1<-phyloglm(dimorphic_01 ~ SSDI_hb + mean_sample_elev + SSDI_hb * mean_sample_elev, data=df.hb, phy=tree, method ="logistic_MPLE", boot=1000, btol=200)
+
+summary(pm1)
+
+
+ggplot(mydf, aes(x, predicted)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.1)
+
+gg
+
+
+```
+
+```{r}
+
+tree <- read.tree("data/birds_mcc.tre")
+tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+
+
+df.hct <- df%>%
+  filter(SSDI_hct <=0.8,
+         n_male >= 3,
+         n_female >= 3,
+         dimorphic_01 %in% c(0,1))%>%
+  dplyr::select( birdtree, SSDI_hct, mean_sample_elev, min_sample_elev, max_sample_elev, dimorphic_01)%>%
+  mutate(amplitude = max_sample_elev-min_sample_elev,
+         dimorphic_01 =factor(dimorphic_01))%>%
+  na.omit()
+
+
+tree <- keep.tip(tree, df.hct$birdtree%>%na.omit())
+
+df.hct <- column_to_rownames(df.hct, var="birdtree")
+
+df.hct <- ReorderData(tree, df.hct)
+
+
+pm1<-phyloglm(dimorphic_01 ~ SSDI_hct, data=df.hct, phy=tree, method ="logistic_MPLE", boot=1000)
+
+summary(pm1)
+
+
+```
