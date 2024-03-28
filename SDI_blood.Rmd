@@ -598,6 +598,65 @@ df.contribution%>%
 ```
 
 ## Plot contributions
+```{r}
+df.cont%>%
+  filter(hb_cont != "at reference")%>%
+  ggplot(aes(SSDI_hb, diff_from_expected_hb_male_base))+
+  geom_smooth(color="black", method="lm")+
+  geom_point(color=mycolors[1], size=2, alpha=0.5)+
+  geom_hline(yintercept = 0, linetype="dashed")
+  labs(x="[Hb] SDI", y= "Difference from\n expected [Hb]")
+
+df.cont%>%
+  filter(hb_cont != "at reference")%>%
+  ggplot(aes(SSDI_hb, diff_from_expected_hb_male_base, color=dimorphic_01))+
+  geom_smooth(method="lm")+
+  geom_point()
+
+df.cont%>%
+  filter(hb_cont != "at reference")%>%
+  ggplot(aes(SSDI_hb, diff_from_expected_hb_male_base, color=log10(mean_mass_male)))+
+  geom_smooth(method="lm")+
+  geom_point()
+
+ df.cont%>%
+  filter(hct_cont != "at reference")%>%
+  ggplot(aes(SSDI_hct, diff_from_exp_hct_elev_corr_female, color=hct_cont))+
+  geom_smooth(method="lm")+
+  geom_point()
+
+df.cont%>%
+  filter(hct_cont != "at reference")%>%
+  ggplot(aes(SSDI_hct, hct_exp_diff_global_mean, color=SSDI_hb))+
+  geom_smooth()+
+  geom_point()
+
+df.cont%>%
+  filter(hct_cont != "at reference")%>%
+  ggplot(aes(SSDI_hct, hct_exp_diff_base, color=SSDI_hb))+
+  geom_smooth()+
+  geom_point()
+
+df.cont%>%
+  filter(hb_cont != "at reference")%>%
+  ggplot(aes(mean_sample_elev, hb_exp_diff))+
+  geom_smooth(method="lm")+
+  geom_point(aes(color=hb_cont))
+
+df.cont%>%
+  filter(hct_cont != "at reference")%>%
+  ggplot(aes(mean_sample_elev, hct_exp_diff))+
+  geom_smooth(method="lm")+
+  geom_point()
+
+df.blood%>%
+  ggplot(aes(log10(gen_egg_mass), SSDI_hb))+
+  geom_smooth(method="lm")+
+  geom_point()
+
+
+```
+
 ### Hb (pooled shift)
 ```{r}
 p<-df.contribution%>%

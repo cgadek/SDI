@@ -181,6 +181,11 @@ Myhrvold.genus.egg.traits<-Myhrvold%>%
                    gen_clutch_size = median(clutch_size, na.rm=T))
 
 
+#
+
+development<- readxl::read_excel("data/41467_2020_16257_MOESM3_ESM.xlsx", sheet=4)%>%
+  dplyr::rename(taxon =  binomial)
+
 
 #Minias et al. blood data####
 #first elev
@@ -291,6 +296,7 @@ df.blood <- bind_rows(pgcl, santema)%>%
   left_join(., Myhrvold)%>%
   left_join(., minias)%>%
   left_join(., minias.hct)%>%
+  left_join(development)%>%
   mutate(genus = stringr::word(species))%>%
   left_join(Myhrvold.genus.egg.traits)
 
@@ -317,44 +323,162 @@ df.blood%>%
          spec_gen_egg_width = if_else(is.na(egg_width), gen_egg_width, egg_width),
          spec_gen_clutch_size = if_else(is.na(clutch_size), gen_clutch_size, clutch_size))%>%
  write_csv(., "data/species_means_blood_final.csv")
-  
 
-df.cont<-df.blood%>%
-  group_by(family)%>%
-  filter(!is.na(SSDI_hb))%>%
+#get mean hb value across all birds to calibrate
+all.blood%>%
+  ungroup()%>%
+  dplyr::summarise(meanhb = mean(hb, na.rm=T),
+                   meanhct = mean(hct, na.rm=T))
+
+df.blood%>%
+  ungroup()%>%
+  dplyr::summarise(meanhbSDI = mean(SSDI_hb, na.rm=T),
+                   meanhctSDI = mean(SSDI_hct, na.rm=T))
+
+threshold <- 3
+df.cont <- df.blood %>%
+  filter(n_hb_male >= threshold,
+         n_hb_female >= threshold)%>%
+  left_join(dimorph)%>%
+  group_by(family) %>%
+  filter(!is.na(SSDI_hb)) %>%
   mutate(
-    mean_family_elev = mean(mean_sample_elev, na.rm=T),
-    closest_to_0_hb = min(abs(SSDI_hb), na.rm=T),
-         species_0_hb = species[which.min(abs(SSDI_hb))][1],
-         male_0_SDI_hb = mean_hb_male[which.min(abs(SSDI_hb))], 
-         female_0_SDI_hb = mean_hb_female[which.min(abs(SSDI_hb))], 
-         diff_from_expected_hb_male = mean_hb_male-male_0_SDI_hb,
-         diff_from_expected_hb_female = mean_hb_female-female_0_SDI_hb,
-         diff_from_expected_elev = mean_sample_elev-mean_family_elev,
-         diff_from_exp_hb_elev_corr_male = diff_from_expected_hb_male + (diff_from_expected_elev/1000),
-         diff_from_exp_hb_elev_corr_female = diff_from_expected_hb_female + (diff_from_expected_elev/1000),
-    hb_cont = if_else(mean_taxon_hb > closest_to_0_hb & abs(diff_from_exp_hb_elev_corr_female) > abs(diff_from_exp_hb_elev_corr_male), "female driven increase", 
-                      if_else(mean_taxon_hb > closest_to_0_hb & abs(diff_from_exp_hb_elev_corr_male) > abs(diff_from_exp_hb_elev_corr_female), "male driven increase", 
-                              if_else(mean_taxon_hb < closest_to_0_hb & abs(diff_from_exp_hb_elev_corr_female) > abs(diff_from_exp_hb_elev_corr_male), "female driven reduction", 
-                                      if_else(mean_taxon_hb < closest_to_0_hb & abs(diff_from_exp_hb_elev_corr_male) > abs(diff_from_exp_hb_elev_corr_female), "male driven reduction", "at reference")))))%>%
-  full_join(., df.blood%>%
-              group_by(family)%>%
-              filter(!is.na(SSDI_hct))%>%
-              mutate(
-                mean_family_elev = mean(mean_sample_elev, na.rm=T),
-                closest_to_0_hct = min(abs(SSDI_hct), na.rm=T),
-                species_0_hct = species[which.min(abs(SSDI_hct))][1],
-                male_0_SDI_hct = mean_hct_male[which.min(abs(SSDI_hct))],
-                female_0_SDI_hct = mean_hct_female[which.min(abs(SSDI_hct))],
-                diff_from_expected_hct_male = mean_hct_male-male_0_SDI_hct,
-                diff_from_expected_hct_female = mean_hct_female-female_0_SDI_hct,
-                diff_from_expected_elev = mean_sample_elev-mean_family_elev,
-                diff_from_exp_hct_elev_corr_male = diff_from_expected_hct_male + (diff_from_expected_elev/10000),
-                diff_from_exp_hct_elev_corr_female = diff_from_expected_hct_female + (diff_from_expected_elev/10000),
-            hct_cont = if_else(mean_taxon_hct > closest_to_0_hct & abs(diff_from_exp_hct_elev_corr_female) > abs(diff_from_exp_hct_elev_corr_male), "female driven increase", 
-                              if_else(mean_taxon_hct > closest_to_0_hct & abs(diff_from_exp_hct_elev_corr_male) > abs(diff_from_exp_hct_elev_corr_female), "male driven increase", 
-                                      if_else(mean_taxon_hct < closest_to_0_hct & abs(diff_from_exp_hct_elev_corr_female) > abs(diff_from_exp_hct_elev_corr_male), "female driven reduction", 
-                                              if_else(mean_taxon_hct < closest_to_0_hct & abs(diff_from_exp_hct_elev_corr_male) > abs(diff_from_exp_hct_elev_corr_female), "male driven reduction", "at reference"))))))
+    mean_family_elev = mean(mean_sample_elev, na.rm = T),
+    closest_to_0_hb = min(abs(SSDI_hb), na.rm = T),
+    species_0_hb = species[which.min(abs(SSDI_hb))][1],
+    male_0_SDI_hb = mean_hb_male[which.min(abs(SSDI_hb))],
+    female_0_SDI_hb = mean_hb_female[which.min(abs(SSDI_hb))],
+    diff_from_expected_hb_male = mean_hb_male - male_0_SDI_hb,
+    #Now we create contribution based on mean SSDI --assuming that low male bias is the ancestral baseline condition
+    species_base_hb = species[which.min(abs(SSDI_hb - 0.0297))][1],
+    male_base_SDI_hb = mean_hb_male[which.min(abs(SSDI_hb - 0.0297))],
+    female_base_SDI_hb = mean_hb_female[which.min(abs(SSDI_hb - 0.0297))],
+    diff_from_expected_hb_male_base = mean_hb_male - male_base_SDI_hb,
+    diff_from_expected_hb_female_base = mean_hb_female - female_base_SDI_hb,
+    #Now we create contribution based off global mean hb whihc is probably no good
+    diff_from_expected_hb_male_global_mean = mean_hb_male - 18,
+    diff_from_expected_hb_female = mean_hb_female - female_0_SDI_hb,
+    diff_from_expected_hb_female_global_mean = mean_hb_female - 18,
+    diff_from_expected_elev = mean_sample_elev - mean_family_elev,
+    diff_from_exp_hb_elev_corr_male = diff_from_expected_hb_male + (diff_from_expected_elev /
+                                                                      1000),
+    diff_from_exp_hb_elev_corr_female = diff_from_expected_hb_female + (diff_from_expected_elev /
+                                                                          1000),
+    diff_from_exp_hb_elev_corr_male_global_mean = diff_from_expected_hb_male_global_mean  + (diff_from_expected_elev /
+                                                                                               1000),
+    diff_from_exp_hb_elev_corr_female_global_mean  = diff_from_expected_hb_female_global_mean  + (diff_from_expected_elev /
+                                                                                                    1000),
+    diff_from_exp_hb_elev_corr_male_base = diff_from_expected_hb_male_base  + (diff_from_expected_elev /
+                                                                                               1000),
+    diff_from_exp_hb_elev_corr_female_base  = diff_from_expected_hb_female_base  + (diff_from_expected_elev /
+                                                                                                    1000),
+    hb_cont = if_else(
+      diff_from_exp_hb_elev_corr_female > 0 &
+        abs(diff_from_exp_hb_elev_corr_female) > abs(diff_from_exp_hb_elev_corr_male),
+      "female driven increase",
+      if_else(
+        diff_from_exp_hb_elev_corr_male > 0 &
+          abs(diff_from_exp_hb_elev_corr_male) > abs(diff_from_exp_hb_elev_corr_female),
+        "male driven increase",
+        if_else(
+          diff_from_exp_hb_elev_corr_female < 0 &
+            abs(diff_from_exp_hb_elev_corr_female) > abs(diff_from_exp_hb_elev_corr_male),
+          "female driven reduction",
+          if_else(
+            diff_from_exp_hb_elev_corr_male < 0 &
+              abs(diff_from_exp_hb_elev_corr_male) > abs(diff_from_exp_hb_elev_corr_female),
+            "male driven reduction",
+            "at reference"
+          )
+        )
+      )
+    ),
+    hb_exp_diff = diff_from_exp_hb_elev_corr_male - diff_from_exp_hb_elev_corr_female,
+    hb_exp_diff_global_mean = diff_from_exp_hb_elev_corr_male_global_mean - diff_from_exp_hb_elev_corr_female_global_mean,
+    hb_exp_diff_base = diff_from_exp_hb_elev_corr_male_base - diff_from_exp_hb_elev_corr_female_base
+  ) %>%
+  full_join(
+    .,
+    df.blood %>%
+      group_by(family) %>%
+      filter(!is.na(SSDI_hct)) %>%
+      mutate(
+        mean_family_elev = mean(mean_sample_elev, na.rm = T),
+        closest_to_0_hct = min(abs(SSDI_hct), na.rm = T),
+        species_0_hct = species[which.min(abs(SSDI_hct))][1],
+        male_0_SDI_hct = mean_hct_male[which.min(abs(SSDI_hct))],
+        female_0_SDI_hct = mean_hct_female[which.min(abs(SSDI_hct))],
+        diff_from_expected_hct_male = mean_hct_male - male_0_SDI_hct,
+        diff_from_expected_hct_female = mean_hct_female - female_0_SDI_hct,
+        #Now we create contribution based on mean SSDI --assuming that low male bias is the ancestral baseline condition
+        species_base_hct = species[which.min(abs(SSDI_hct - 0.028))][1],
+        male_base_SDI_hct = mean_hct_male[which.min(abs(SSDI_hct - 0.028))],
+        female_base_SDI_hct = mean_hct_female[which.min(abs(SSDI_hct - 0.028))],
+        diff_from_expected_hct_male_base = mean_hct_male - male_base_SDI_hct,
+        diff_from_expected_hct_female_base = mean_hct_female - female_base_SDI_hct,
+        #Now create contribution based on global mean Hb this is probably not very useful
+        diff_from_expected_hct_female_global_mean = mean_hct_female -
+          0.525,
+        diff_from_expected_hct_male_global_mean = mean_hct_male -
+          0.525,
+        diff_from_expected_elev = mean_sample_elev - mean_family_elev,
+        diff_from_exp_hct_elev_corr_male = diff_from_expected_hct_male + (diff_from_expected_elev /
+                                                                            10000),
+        diff_from_exp_hct_elev_corr_female = diff_from_expected_hct_female + (diff_from_expected_elev /
+                                                                                10000),
+        diff_from_exp_hct_elev_corr_male_global_mean = diff_from_expected_hct_male_global_mean  + (diff_from_expected_elev /
+                                                                                                     10000),
+        diff_from_exp_hct_elev_corr_female_global_mean  = diff_from_expected_hct_female_global_mean  + (diff_from_expected_elev /
+                                                                                                          10000),
+        diff_from_exp_hct_elev_corr_male_base = diff_from_expected_hct_male_base  + (diff_from_expected_elev /
+                                                                                                     10000),
+        diff_from_exp_hct_elev_corr_female_base  = diff_from_expected_hct_female_base  + (diff_from_expected_elev /
+                                                                                                          10000),
+        hct_cont = if_else(
+          diff_from_exp_hct_elev_corr_female > 0 &
+            abs(diff_from_exp_hct_elev_corr_female) > abs(diff_from_exp_hct_elev_corr_male),
+          "female driven increase",
+          if_else(
+            diff_from_exp_hct_elev_corr_male > 0 &
+              abs(diff_from_exp_hct_elev_corr_male) > abs(diff_from_exp_hct_elev_corr_female),
+            "male driven increase",
+            if_else(
+              diff_from_exp_hct_elev_corr_female < 0 &
+                abs(diff_from_exp_hct_elev_corr_female) > abs(diff_from_exp_hct_elev_corr_male),
+              "female driven reduction",
+              if_else(
+                diff_from_exp_hct_elev_corr_male < 0 &
+                  abs(diff_from_exp_hct_elev_corr_male) > abs(diff_from_exp_hct_elev_corr_female),
+                "male driven reduction",
+                "at reference"
+              )
+            )
+          )
+        ),
+        hct_exp_diff = diff_from_exp_hct_elev_corr_male - diff_from_exp_hct_elev_corr_female,
+        hct_exp_diff_global_mean = diff_from_exp_hct_elev_corr_male_global_mean - diff_from_exp_hct_elev_corr_female_global_mean,
+        hct_exp_diff_base = diff_from_exp_hct_elev_corr_male_base - diff_from_exp_hct_elev_corr_female_base
+      ) %>%
+      dplyr::select(
+        taxon,
+        closest_to_0_hct,
+        species_0_hct,
+        male_0_SDI_hct,
+        female_0_SDI_hct,
+        diff_from_expected_hct_male,
+        diff_from_expected_hct_female,
+        diff_from_exp_hct_elev_corr_male,
+        diff_from_exp_hct_elev_corr_female,
+        species_base_hct,
+        hct_cont,
+        hct_exp_diff,
+        hct_exp_diff_global_mean,
+        hct_exp_diff_base
+      )
+  )
+
+
+
 
 #Next big task is getting some sort of species expected value for Hb and Hct (mean?) then asking if individual points adjusted for elevation fall to above or below value by sex
 all.blood <- read_csv("data/PatagonaData_JLW_HbAndHct_ForBloodSexNElev_2023-12-17.csv")%>%
