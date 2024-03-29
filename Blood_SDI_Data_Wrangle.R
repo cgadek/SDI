@@ -181,10 +181,15 @@ Myhrvold.genus.egg.traits<-Myhrvold%>%
                    gen_clutch_size = median(clutch_size, na.rm=T))
 
 
-#
+#development dataset
 
 development<- readxl::read_excel("data/41467_2020_16257_MOESM3_ESM.xlsx", sheet=4)%>%
   dplyr::rename(taxon =  binomial)
+
+
+#read in generation time/demgrpahic dataset from Bird et al. 2020
+
+demo <-readxl::read_excel("data/Bird_et_al_2020.xlsx", sheet=1)
 
 
 #Minias et al. blood data####
@@ -286,6 +291,8 @@ santema <- readxl::read_excel("data/data_comp.xlsx")%>%
                    SSDI_hct = (mean_hct_male-mean_hct_female)/mean_hct_female,
                    SSDI_mass = (mean_mass_male-mean_mass_female)/mean_mass_female)
 
+
+
 #combine all datastes
 df.blood <- bind_rows(pgcl, santema)%>%
   left_join(., 
@@ -297,8 +304,88 @@ df.blood <- bind_rows(pgcl, santema)%>%
   left_join(., minias)%>%
   left_join(., minias.hct)%>%
   left_join(development)%>%
+  left_join(demo)%>%
   mutate(genus = stringr::word(species))%>%
   left_join(Myhrvold.genus.egg.traits)
+
+
+#test for normality between blood parameters and SDIs before we can use residuals
+# hb.f.mod <- lm(SSDI_hb ~ mean_hb_female, data = df.blood)
+# 
+# shapiro.test(rstandard(hb.f.mod)) #Not normal
+# 
+# 
+# hb.m.mod <- lm(SSDI_hb ~ mean_hb_male, data = df.blood)
+# 
+# shapiro.test(rstandard(hb.m.mod)) #Not normal
+# 
+# 
+# ggplot() +
+#   geom_qq(aes(sample = rstandard(hb.f.mod))) +
+#   geom_abline(color = "red") +
+#   coord_fixed()
+# 
+# ggplot() +
+#   geom_qq(aes(sample = rstandard(hb.m.mod))) +
+#   geom_abline(color = "red") +
+#   coord_fixed()
+
+#both have fat tails....
+
+#Use student t in brms
+# hb.f.mod <- brm(
+#   formula = SSDI_hb ~ mean_hb_female,
+#   data = df.blood,
+#   family = student(),
+#   cores = 8,
+#   chains = 4,
+#   thin = 10,
+#   warmup = 5000,
+#   # default is iter/2; shouldn't ever be larger than iter
+#   iter = 10000,
+#   control = list(adapt_delta = 0.98, max_treedepth = 18),
+#   sample_prior = TRUE # default priors
+# )
+# 
+# summary(hb.f.mod)
+# 
+# hb.f.mod.res <- residuals(hb.f.mod)
+
+df.blood <- df.blood %>%
+  dplyr::select(species, SSDI_hb, mean_hb_female) %>%
+  na.omit() %>%
+  bind_cols(., hb.f.mod.res[, 1]) %>%
+  dplyr::rename(female_SDI_hb_residuals = `...7`) %>%
+  ungroup() %>%
+  dplyr::select(species, female_SDI_hb_residuals) %>%
+  right_join(df.blood)
+
+
+# hb.m.mod <- brm(
+#   formula = SSDI_hb ~ mean_hb_male,
+#   data = df.blood,
+#   family = student(),
+#   cores = 8,
+#   chains = 4,
+#   thin = 10,
+#   warmup = 5000,
+#   # default is iter/2; shouldn't ever be larger than iter
+#   iter = 10000,
+#   control = list(adapt_delta = 0.98, max_treedepth = 18),
+#   sample_prior = TRUE # default priors
+# )
+# 
+# summary(hb.m.mod)
+# hb.m.mod.res <- residuals(hb.m.mod)
+
+df.blood <- df.blood %>%
+  dplyr::select(species, SSDI_hb, mean_hb_female) %>%
+  na.omit() %>%
+  bind_cols(., hb.m.mod.res[, 1]) %>%
+  dplyr::rename(male_SDI_hb_residuals = `...4`) %>%
+  ungroup() %>%
+  dplyr::select(species, male_SDI_hb_residuals) %>%
+  right_join(df.blood)
 
 # match up tree labels
 tree <- read.tree("data/birds_mcc.tre")
@@ -370,8 +457,8 @@ df.cont <- df.blood %>%
                                                                                                     1000),
     diff_from_exp_hb_elev_corr_male_base = diff_from_expected_hb_male_base  + (diff_from_expected_elev /
                                                                                                1000),
-    diff_from_exp_hb_elev_corr_female_base  = diff_from_expected_hb_female_base  + (diff_from_expected_elev /
-                                                                                                    1000),
+    diff_from_exp_hb_elev_corr_female_base  = diff_from_expected_hb_female_base  + (diff_from_expected_elev /1000),
+     # this hb_cont is generated from the species in each group closest to zero SDI                                                                                               1000),
     hb_cont = if_else(
       diff_from_exp_hb_elev_corr_female > 0 &
         abs(diff_from_exp_hb_elev_corr_female) > abs(diff_from_exp_hb_elev_corr_male),
@@ -387,6 +474,48 @@ df.cont <- df.blood %>%
           if_else(
             diff_from_exp_hb_elev_corr_male < 0 &
               abs(diff_from_exp_hb_elev_corr_male) > abs(diff_from_exp_hb_elev_corr_female),
+            "male driven reduction",
+            "at reference"
+          )
+        )
+      )
+    ),
+    hb_cont_global = if_else(
+      diff_from_exp_hb_elev_corr_female_global_mean > 0 &
+        abs(diff_from_exp_hb_elev_corr_female_global_mean) > abs(diff_from_exp_hb_elev_corr_male_global_mean),
+      "female driven increase",
+      if_else(
+        diff_from_exp_hb_elev_corr_male_global_mean > 0 &
+          abs(diff_from_exp_hb_elev_corr_male_global_mean) > abs(diff_from_exp_hb_elev_corr_female_global_mean),
+        "male driven increase",
+        if_else(
+          diff_from_exp_hb_elev_corr_female_global_mean < 0 &
+            abs(diff_from_exp_hb_elev_corr_female_global_mean) > abs(diff_from_exp_hb_elev_corr_male_global_mean),
+          "female driven reduction",
+          if_else(
+            diff_from_exp_hb_elev_corr_male_global_mean < 0 &
+              abs(diff_from_exp_hb_elev_corr_male_global_mean) > abs(diff_from_exp_hb_elev_corr_female_global_mean),
+            "male driven reduction",
+            "at reference"
+          )
+        )
+      )
+    ),
+    hb_cont_base = if_else(
+      diff_from_exp_hb_elev_corr_female_base > 0 &
+        abs(diff_from_exp_hb_elev_corr_female_base) > abs(diff_from_exp_hb_elev_corr_female_base),
+      "female driven increase",
+      if_else(
+        diff_from_exp_hb_elev_corr_male_base > 0 &
+          abs(diff_from_exp_hb_elev_corr_male_base) > abs(diff_from_exp_hb_elev_corr_female_base),
+        "male driven increase",
+        if_else(
+          diff_from_exp_hb_elev_corr_female_base < 0 &
+            abs(diff_from_exp_hb_elev_corr_female_base) > abs(diff_from_exp_hb_elev_corr_male_base),
+          "female driven reduction",
+          if_else(
+            diff_from_exp_hb_elev_corr_male_base < 0 &
+              abs(diff_from_exp_hb_elev_corr_male_base) > abs(diff_from_exp_hb_elev_corr_female_base),
             "male driven reduction",
             "at reference"
           )
@@ -631,310 +760,5 @@ gonads <- readxl::read_excel("~/Dropbox/Data_repo/blood-data-for-ethans explorat
   )%>%
   write_csv(., "data/gonads.csv")
 
-# Within species
-# Williamson
-pgcl.elevs <- read_csv("data/PatagonaData_JLW_HbAndHct_ForBloodSexNElev_2023-12-17.csv")%>%
-  dplyr::select(species, sex, elev,mass, hb, hct)%>%
-  mutate(
-    family = "Trochilidae",
-    species=gsub("_", " ", species))%>%
-  filter(
-    sex %in% c("male", "female"))%>%
-  rename(elevation = elev)%>%
-  mutate(elev_bin = if_else(elevation <=1000, "low", if_else(elevation>=3000, "high", "mid")))%>%
-  bind_rows(.,
-            read_csv("data/blood_data_final.csv")%>%
-              dplyr::select(species, family, sex, elevation, hb, hct)%>%
-              filter(
-                sex %in% c("male", "female"))%>%
-              mutate(elev_bin = if_else(elevation <=1000, "low", if_else(elevation>=3000, "high", "mid"))))%>%
-  group_by(species, family, elev_bin)%>%
-  dplyr::summarise(max_sample_elev = max(elevation, na.rm=T),
-                   mean_sample_elev = mean(elevation, na.rm=T),
-                   min_sample_elev = min(elevation, na.rm=T))%>%
-  mutate(taxon=gsub(" ", "_", species))%>%
-  na.omit()
 
-pgcl <- read_csv("data/PatagonaData_JLW_HbAndHct_ForBloodSexNElev_2023-12-17.csv")%>%
-  filter(
-    sex %in% c("male", "female"))%>%
-  mutate(elev_bin = if_else(elev <=1000, "low", if_else(elev>=3000, "high", "mid")),
-         sex = factor(sex),
-         family = "Trochilidae",
-         taxon = species)%>%
-  rename(elevation = elev)%>%
-  group_by(taxon) %>% 
-  filter(all(levels(sex) %in% sex))%>%
-  group_by(taxon, sex, family) %>% 
-  dplyr::select(taxon, species,family, sex, elevation, elev_bin, mass, hb, hct)%>%
-  bind_rows(.,
-            read_csv("data/blood_data_final.csv")%>%
-              filter(
-                sex %in% c("male", "female"))%>%
-              mutate(elev_bin = if_else(elevation <=1000, "low", if_else(elevation>=3000, "high", "mid")),
-                     sex = factor(sex),
-                     taxon = factor(gsub(" ", "_", species))
-              )%>%
-              group_by(taxon) %>% 
-              filter(all(levels(sex) %in% sex)))%>%
-  dplyr::select(taxon, species,family, sex, elevation, elev_bin, mass, hb, hct)%>%
-  group_by(taxon, sex, family, elev_bin) %>% 
-  dplyr::summarise(mean_mass = mean(mass, na.rm=T),
-                   mean_hb = mean(hb, na.rm=T),
-                   mean_hct = mean(hct, na.rm=T),
-                   n=n())%>%
-  pivot_wider(id_cols = c(taxon, family, elev_bin), names_from = c(sex), values_from = c(mean_mass, mean_hb, mean_hct, n))%>%
-  mutate(
-    SSDI_hct = ((mean_hct_male- mean_hct_female)/mean_hct_female),
-    SSDI_hb = ((mean_hb_male- mean_hb_female)/mean_hb_female),
-    SSDI_mass = ((mean_mass_male - mean_mass_female)/mean_mass_female))%>%
-  left_join(., pgcl.elevs%>%dplyr::select(-c(species, family)), by=c("taxon",  "elev_bin"))
-
-
-# #Linck
-# Linck.elevs <-read_csv("data/blood_data_final.csv")%>%
-#   dplyr::select(species, family, sex, elevation, hb, hct)%>%
-#   filter(
-#     sex %in% c("male", "female"))%>%
-#   mutate(elev_bin = if_else(elevation <=1000, "low", if_else(elevation>=3000, "high", "mid")))%>%
-#   group_by(species, family, elev_bin)%>%
-#   dplyr::summarise(max_sample_elev = max(elevation, na.rm=T),
-#                    mean_sample_elev = mean(elevation, na.rm=T),
-#                    min_sample_elev = min(elevation, na.rm=T))%>%
-#   mutate(taxon=gsub(" ", "_", species))%>%
-#   na.omit()
-# 
-# df.Linck <-read_csv("data/blood_data_final.csv")%>%
-#   filter(
-#     sex %in% c("male", "female"))%>%
-#   mutate(elev_bin = if_else(elevation <=1000, "low", if_else(elevation>=3000, "high", "mid")),
-#          sex = factor(sex),
-#          taxon = factor(gsub(" ", "_", species))
-#   )%>%
-#   group_by(taxon) %>% 
-#   filter(all(levels(sex) %in% sex))%>%
-#   group_by(taxon, sex, family, elev_bin) %>% 
-#   dplyr::summarise(mean_mass = mean(mass, na.rm=T),
-#                    mean_hb = mean(hb, na.rm=T),
-#                    mean_hct = mean(hct, na.rm=T),
-#                    n=n())%>%
-#   pivot_wider(id_cols = c(taxon, family, elev_bin), names_from = c(sex), values_from = c(mean_mass, mean_hb, mean_hct, n))%>%
-#   mutate(
-#     SSDI_hct = ((mean_hct_male- mean_hct_female)/mean_hct_female),
-#     SSDI_hb = ((mean_hb_male- mean_hb_female)/mean_hb_female),
-#     SSDI_mass = ((mean_mass_male - mean_mass_female)/mean_mass_female))%>%
-#   left_join(., Linck.elevs%>%dplyr::select(-c(species, family)), by=c("taxon", "elev_bin"))
-
-
-#add marshbirds
-mbb.elevs <- read_csv("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/blood_final_bioclim_12-9-2022.csv")%>%
-  filter(
-    sex %in% c("male", "female"),
-    species %in% c("Tachuris rubrigastra", "Phleocryptes melanops"))%>%
-  dplyr::select(species, family, sex, elev, hb_final, hct_final)%>%
-  filter(
-    sex %in% c("male", "female"))%>%
-  mutate(elev_bin = if_else(elev <=1000, "low", if_else(elev>=3000, "high", "mid")))%>%
-  group_by(species, family, elev_bin)%>%
-  dplyr::summarise(max_sample_elev = max(elev, na.rm=T),
-                   mean_sample_elev = mean(elev, na.rm=T),
-                   min_sample_elev = min(elev, na.rm=T))%>%
-  mutate(taxon=gsub(" ", "_", species))%>%
-  na.omit()
-
-
-mbb <- read_csv("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/blood_final_bioclim_12-9-2022.csv")%>%
-  filter(
-    sex %in% c("male", "female"),
-    species %in% c("Tachuris rubrigastra", "Phleocryptes melanops"))%>%
-  mutate(elev_bin = if_else(elev <=1000, "low", if_else(elev>=3000, "high", "mid")),
-         sex = factor(sex),
-         taxon = factor(gsub(" ", "_", species))
-  )%>%
-  group_by(taxon) %>% 
-  filter(all(levels(sex) %in% sex))%>%
-  group_by(taxon, sex, family, elev_bin) %>% 
-  dplyr::summarise(mean_mass = mean(mass, na.rm=T),
-                   mean_hb = mean(hb_final, na.rm=T),
-                   mean_hct = mean(hct_final, na.rm=T),
-                   n=n())%>%
-  pivot_wider(id_cols = c(taxon, family, elev_bin), names_from = c(sex), values_from = c(mean_mass, mean_hb, mean_hct, n))%>%
-  mutate(
-    SSDI_hct = ((mean_hct_male- mean_hct_female)/mean_hct_female),
-    SSDI_hb = ((mean_hb_male- mean_hb_female)/mean_hb_female),
-    SSDI_mass = ((mean_mass_male - mean_mass_female)/mean_mass_female))%>%
-  left_join(., mbb.elevs%>%dplyr::select(-c(species, family)),  by=c("taxon", "elev_bin"))
-
-df.Linck <- rbind(pgcl, mbb)
-
-# match up tree labels
-tree <- read.tree("data/birds_mcc.tre")
-
-# tip.labs <- as.data.frame(tree$tip.label)
-# 
-# not.in.tree <- df.Linck%>%dplyr::select(taxon)%>%
-#   filter(!taxon %in% tree$tip.label)%>%
-#   write.csv(.,"data/not_in_tree_blood.csv")
-
-#reset_names in df to match tips in tree
-# created crosswalk excel file (load in)
-blood.crosswalk <- read_csv("data/blood_birdtree_crosswalk.csv")
-
-
-
-df.Linck%>%
-  filter(!taxon %in% c("Elaenia_sp.", "Spinus_sp.", "Scytalopus_sp."))%>%
-  left_join(., blood.crosswalk%>%dplyr::select(2:3), by ="taxon")%>%
-  mutate(birdtree = if_else(is.na(birdtree), taxon, birdtree))%>%
-  write_csv(., "data/blood_final_within.csv")
-
-
-
-# # Use `anti_join()` to determine which observations are missing
-# all <- fruits %>% expand(type, size, year)
-# all
-# all %>% dplyr::anti_join(fruits)
-# 
-# # Use with `right_join()` to fill in missing rows (like `complete()`)
-# fruits %>% dplyr::right_join(all)
-# 
-# x = 1:10
-# y = rep(letters[1:5],each=2)
-# z = rep(1:2,length.out =10)
-# df = data.frame(x,y, z)
-# df = rbind(df,c(11,"e",3))
-# df$verif = paste0(df$y,df$z)
-# df$x = as.numeric(df$x)
-# 
-# 
-# 
-# devtools::source_gist("https://gist.github.com/brshallo/f92a5820030e21cfed8f823a6e1d56e1")
-
-# 
-# Linck_data_within <- read_csv("data/blood_data_final.csv") %>%
-#   filter(sex %in% c("male", "female")) %>%
-#   mutate(elev_bin = if_else(
-#     elevation < 500,
-#     "0-500",
-#     if_else(
-#       elevation >= 500 &
-#         elevation < 1000,
-#       "500-1000",
-#       if_else(
-#         elevation >= 1000 &
-#           elevation < 1500,
-#         "1000-1500",
-#         if_else(
-#           elevation >= 1500 &
-#             elevation < 2000,
-#           "1500-2000",
-#           if_else(
-#             elevation >= 2000 &
-#               elevation < 2500,
-#             "2000-2500",
-#             if_else(
-#               elevation >= 2500 &
-#                 elevation < 3000,
-#               "2500-3000",
-#               if_else(
-#                 elevation >= 3000 &
-#                   elevation < 3500,
-#                 "3000-3500",
-#                 if_else(
-#                   elevation >= 3500 &
-#                     elevation < 4000,
-#                   "3500-4000",
-#                   if_else(elevation >= 4000 , "4000+", paste(as.character(elevation)))
-#                 )
-#               )
-#             )
-#           )
-#         )
-#       )
-#     )
-#   ),
-#   elev_bin_coarse = if_else(elevation <= 1500, "low", if_else(elevation >1500 & elevation <=2200, "mid", "high")))%>% 
-#   ungroup()%>%
-#   group_by(species, elev_bin_coarse)%>%
-#   #mutate(mean_elev = mean(elevation, na.rm=T))%>%
-#   ungroup()%>%
-#   group_by(species, sex, elev_bin_coarse) %>%
-#   mutate(n_sp_sex = n())%>%
-#   filter(n_sp_sex >= 3) %>%
-#   dplyr::select(species, family, n_sp_sex, elev_bin_coarse, mass, hb, hct)%>%
-#   ungroup()%>%
-#   group_by(species, family, sex, elev_bin_coarse, n_sp_sex) %>%
-#   dplyr::summarize(mean_hb = mean(hb, na.rm=T),
-#                    mean_hct = mean(hct, na.rm=T),
-#                    mean_mass = mean(mass, na.rm=T))%>%
-#   pivot_wider(
-#     names_from = c("sex"),
-#     values_from = c("n_sp_sex", "mean_hb", "mean_hct", "mean_mass")
-#   )%>% 
-#   ungroup()%>%
-#   group_by(species, elev_bin_coarse)%>%
-#   mutate(mean.SDI.hb = (mean_hb_male - mean_hb_female)/mean_hb_female,
-#          mean.SDI.hct = (mean_hct_male - mean_hct_female)/mean_hct_female,
-#          mean.SDI.mass = (mean_mass_male - mean_mass_female)/mean_mass_female,
-#          elev_bin_coarse = factor(elev_bin_coarse, levels=c("low","mid", "high")))
-# 
-
-#Pairwise differences dataframe test
-df<-structure(list(Levelname = c("B 1", "B 2", "B 3", 
-                             "B 4", "D 1", "D 2", "D 3", "D 4"), y = c(0.679428655093332, 
-                                                                       1.07554328679719, 0.883000346050764, 0.791772867506205, 0.538143790501689, 
-                                                                       0.805122127560562, 0.591353204313314, 0.795225886492002), fill = c("midnightblue", 
-                                                                                                                                          "dodgerblue4", "steelblue3", "lightskyblue", "midnightblue", 
-                                                                                                                                          "dodgerblue4", "steelblue3", "lightskyblue"), species = c("White Grunt", 
-                                                                                                                                                                                                    "White Grunt", "White Grunt", "White Grunt", "White Grunt", "White Grunt", 
-                                                                                                                                                                                                    "White Grunt", "White Grunt")), row.names = c(NA, -8L), class = "data.frame")
-library(tidyverse)
-
-df %>%
-  group_by(grp = str_extract(Levelname, "\\w+"))%>%
-  summarise(pair = combn(Levelname, 2, str_c, collapse = " - "),
-            perc_diff = combn(y, 2, function(x) 200*abs(diff(x))/sum(x)),
-            .groups = 'drop')
-
-t<-read_csv("data/PatagonaData_JLW_HbAndHct_ForBloodSexNElev_2023-12-17.csv")%>%
-  mutate(elev_bin = if_else(elev <=2000, "low", if_else(elev>=2000, "high", "mid")),
-    sexspp = paste0(species, sex, elev_bin))%>%
-  group_by(grp = str_extract(sexspp, ""))%>%
-  summarise(pair = combn(sexspp, 2, str_c, collapse = " - "),
-            perc_diff = combn(hb, 2, function(x) (diff(x))/x[2]),
-            .groups = 'drop')%>%
-  filter(pair %in% c("Patagona_chaskimalehigh - Patagona_chaskifemalehigh", "Patagona_gigasmalehigh - Patagona_gigasfemalehigh",  "Patagona_gigasmalelow - Patagona_gigasfemalelow"),
-         perc_diff <0.2 &perc_diff > -0.2)%>%
-  ggplot(aes(pair, perc_diff))+
-  geom_boxplot()+
-  geom_hline(yintercept = 0, linetype="dashed")+
-  scale_x_discrete(labels=c("P.chaski", "P.gigas (high)", "P.gigas (low)"))
-t
-
-
-p<-read_csv("data/PatagonaData_JLW_HbAndHct_ForBloodSexNElev_2023-12-17.csv")%>%
-  mutate(elev_bin = if_else(elev <=2000, "low", if_else(elev>=2000, "high", "mid")))%>%
-  filter(sex %in% c("male", "female"),
-         species =="Patagona_gigas")%>%
-  ggplot(aes(elev_bin, hb, fill=sex))+
-  geom_boxplot()+
-  geom_point(shape=21, position=position_jitterdodge(dodge.width=0.9))+
-  scale_fill_manual(values=c("navajowhite3", "grey"))+
-  coord_cartesian(ylim=c(10,22))
-
-p1<-read_csv("data/PatagonaData_JLW_HbAndHct_ForBloodSexNElev_2023-12-17.csv")%>%
-  mutate(elev_bin = if_else(elev <=2000, "low", if_else(elev>=2000, "high", "mid")))%>%
-  filter(sex %in% c("male", "female"),
-         species =="Patagona_chaski")%>%
-  ggplot(aes(elev_bin, hb, fill=sex))+
-  geom_boxplot()+
-  geom_point(shape=21, position=position_jitterdodge(dodge.width=0.9))+
-  scale_fill_manual(values=c("navajowhite3", "grey"))+
-  coord_cartesian(ylim=c(10,22))
-p1
-  
-  
-g <- grid.arrange(p, p1, nrow=1)
-
-  
   

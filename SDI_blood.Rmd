@@ -50,7 +50,7 @@ knitr::opts_chunk$set(fig.align = "center", fig.height = 4, fig.width = 6)
 pacman::p_load(
 reshape,
 reshape2,
-
+evorates,
 dplyr,
 tidyr,
 car,
@@ -408,163 +408,7 @@ ggsave(p, file=paste0("figures/histogram_elev_SDI_hct_N_over_", thresh, ".pdf"),
 ```
 
 # Contributions to SBDI
-## More data processing
-Keeping this data processing separate, mainly to allow for changing initial sample size.
-```{r}
-
-thresh <- 5
-
-df.contribution <- df %>%
-  filter(n_hb_male >= thresh,
-         n_hb_female >= thresh) %>%
-  mutate(SDBI_hb_z = scale(SSDI_hb),
-         SDBI_hct_z = scale(SSDI_hct),
-         expect_SBDI_hb_z = mean(SDBI_hb_z[which(abs(SDBI_hb_z) <= 0.25)], na.rm = T),# calculate the pooled expectation from the mean of all z scores  within 0.25 sd 
-         expect_SBDI_hct_z = mean(SDBI_hct_z[which(abs(SDBI_hct_z) <= 0.25)], na.rm = T),# calculate the pooled expectation from the mean of all z scores  within 0.25 sd 
-         expect_SBDI_hb_elev_z = mean(mean_sample_elev[which(abs(SDBI_hb_z) <= 0.25)], na.rm = T),
-         expect_SBDI_hct_elev_z = mean(mean_sample_elev[which(abs(SDBI_hct_z) <= 0.25)], na.rm = T),
-         species_0_SDI_hb = species[which.min(abs(SSDI_hb) - abs(expect_SBDI_hb_z))][1],
-         species_0_SDI_hct = species[which.min(abs(SSDI_hct) - abs(expect_SBDI_hct_z))][1],
-    male_0_SDI_hb = mean(mean_hb_male[which.min(abs(SSDI_hb)- abs(expect_SBDI_hb_z))], na.rm = T),
-    #I believe these result in list of values so I will take a mean from these
-    female_0_SDI_hb = mean(mean_hb_female[which.min(abs(SSDI_hb)- abs(expect_SBDI_hb_z))], na.rm =
-                             T),
-     male_0_SDI_hct = mean(mean_hct_male[which.min(abs(SSDI_hct)- abs(expect_SBDI_hct_z))], na.rm = T),
-    #I believe these result in list of values so I will take a mean from these
-    female_0_SDI_hct = mean(mean_hct_female[which.min(abs(SSDI_hct)- abs(expect_SBDI_hct_z))], na.rm =
-                             T),
-    pooled_diff_from_expected_hb_male = mean_hb_male - male_0_SDI_hb, #these are from subtracting all mean hb values from a single species closest to the central SDI from z scores above
-    pooled_diff_from_expected_hb_female = mean_hb_female - female_0_SDI_hb,
-     pooled_diff_from_expected_hct_male = mean_hct_male - male_0_SDI_hct, #these are from subtracting all mean hb values from a single species closest to the central SDI from z scores above
-    pooled_diff_from_expected_hct_female = mean_hct_female - female_0_SDI_hct,
-     pooled_diff_from_expected_elev_hb = mean_sample_elev - expect_SBDI_hb_elev_z,
-     pooled_diff_from_expected_elev_hct = mean_sample_elev - expect_SBDI_hct_elev_z,
-     pooled_diff_from_exp_hb_male_elev_corr = pooled_diff_from_expected_hb_male + (pooled_diff_from_expected_elev_hb * (0.7/
-                                                                          1000)),
-    #need to correct for ~ 1 unit increase in per 1000 m increase in elevation
-    pooled_diff_from_exp_hb_female_elev_corr = pooled_diff_from_expected_hb_female + (pooled_diff_from_expected_elev_hb * (0.7/
-                                                                          1000)),
-    
-    pooled_diff_from_exp_hct_male_elev_corr = pooled_diff_from_expected_hct_male + (pooled_diff_from_expected_elev_hct * (0.02/
-                                                                          1000)),
-    #need to correct for ~ 1 unit increase in per 1000 m increase in elevation
-    pooled_diff_from_exp_hct_female_elev_corr = pooled_diff_from_expected_hct_female + (pooled_diff_from_expected_elev_hct * (0.02/
-                                                                          1000)),
-     pooled_hb_SBD_driver = if_else(
-      abs(pooled_diff_from_exp_hb_male_elev_corr) < abs(pooled_diff_from_exp_hb_female_elev_corr) &
-        pooled_diff_from_exp_hb_female_elev_corr < 0,
-      "female driven reduction",
-      if_else(
-        abs(pooled_diff_from_exp_hb_male_elev_corr) < abs(pooled_diff_from_exp_hb_female_elev_corr) &
-          pooled_diff_from_exp_hb_female_elev_corr > 0,
-        "female driven increase",
-        if_else(
-          abs(pooled_diff_from_exp_hb_male_elev_corr) > abs(pooled_diff_from_exp_hb_female_elev_corr) &
-            pooled_diff_from_exp_hb_male_elev_corr < 0,
-          "male driven reduction",
-          if_else(
-            abs(pooled_diff_from_exp_hb_male_elev_corr) > abs(pooled_diff_from_exp_hb_female_elev_corr) &
-              pooled_diff_from_exp_hb_male_elev_corr > 0,
-            "male driven increase",
-            NA
-          )
-        )
-      )
-    ),
-     pooled_hct_SBD_driver = if_else(
-      abs(pooled_diff_from_exp_hct_male_elev_corr) < abs(pooled_diff_from_exp_hct_female_elev_corr) &
-        pooled_diff_from_exp_hct_female_elev_corr < 0,
-      "female driven reduction",
-      if_else(
-        abs(pooled_diff_from_exp_hct_male_elev_corr) < abs(pooled_diff_from_exp_hct_female_elev_corr) &
-          pooled_diff_from_exp_hct_female_elev_corr > 0,
-        "female driven increase",
-        if_else(
-          abs(pooled_diff_from_exp_hct_male_elev_corr) > abs(pooled_diff_from_exp_hct_female_elev_corr) &
-            pooled_diff_from_exp_hct_male_elev_corr < 0,
-          "male driven reduction",
-          if_else(
-            abs(pooled_diff_from_exp_hct_male_elev_corr) > abs(pooled_diff_from_exp_hct_female_elev_corr) &
-              pooled_diff_from_exp_hct_male_elev_corr > 0,
-            "male driven increase",
-            NA
-          )
-        )
-      )
-    ))%>%
-  group_by(family) %>%
-  mutate(
-    fam_species_0_SDI_hb = species[which.min(abs(SSDI_hb) - abs(expect_SBDI_hb_z))][1],
-    fam_elev_0_SDI_hb = mean_sample_elev[which.min(abs(SSDI_hb) - abs(expect_SBDI_hb_z))][1],
-    fam_male_0_SDI_hb = mean(mean_hb_male[which.min(abs(SSDI_hb)- abs(expect_SBDI_hb_z))], na.rm = T),
-    #I believe these result in list of values so I will take a mean from these
-    fam_female_0_SDI_hb = mean(mean_hb_female[which.min(abs(SSDI_hb)- abs(expect_SBDI_hb_z))], na.rm =
-                             T),
-    fam_diff_from_expected_hb_male = mean_hb_male - fam_male_0_SDI_hb,
-    fam_diff_from_expected_hb_female = mean_hb_female - fam_female_0_SDI_hb,
-   
-    fam_diff_from_expected_elev = mean_sample_elev - fam_elev_0_SDI_hb,
-    fam_diff_from_exp_hb_male_elev_corr = fam_diff_from_expected_hb_male + (fam_diff_from_expected_elev * (0.7/                                                                   1000)),
-    #need to correct for ~ 1 unit increase in per 1000 m increase in elevation
-   fam_diff_from_exp_hb_female_elev_corr = fam_diff_from_expected_hb_female + (fam_diff_from_expected_elev * (0.7/                                                                   1000)),
-    fam_SBD_hb_driver = if_else(
-      abs(fam_diff_from_exp_hb_male_elev_corr) < abs(fam_diff_from_exp_hb_female_elev_corr) &
-        fam_diff_from_exp_hb_female_elev_corr < 0,
-      "female driven reduction",
-      if_else(
-        abs(fam_diff_from_exp_hb_male_elev_corr) < abs(fam_diff_from_exp_hb_female_elev_corr) &
-          fam_diff_from_exp_hb_female_elev_corr > 0,
-        "female driven increase",
-        if_else(
-          abs(fam_diff_from_exp_hb_male_elev_corr) > abs(fam_diff_from_exp_hb_female_elev_corr) &
-            fam_diff_from_exp_hb_male_elev_corr < 0,
-          "male driven reduction",
-          if_else(
-            abs(fam_diff_from_exp_hb_male_elev_corr) > abs(fam_diff_from_exp_hb_female_elev_corr) &
-              fam_diff_from_exp_hb_male_elev_corr > 0,
-            "male driven increase",
-            NA
-          )
-        )
-      )
-    ),
-   fam_species_0_SDI_hct = species[which.min(abs(SSDI_hct) - abs(expect_SBDI_hct_z))][1],
-    fam_elev_0_SDI_hct = mean_sample_elev[which.min(abs(SSDI_hct) - abs(expect_SBDI_hct_z))][1],
-    fam_male_0_SDI_hct = mean(mean_hct_male[which.min(abs(SSDI_hct)- abs(expect_SBDI_hct_z))], na.rm = T),
-    #I believe these result in list of values so I will take a mean from these
-    fam_female_0_SDI_hct = mean(mean_hct_female[which.min(abs(SSDI_hct)- abs(expect_SBDI_hct_z))], na.rm =
-                             T),
-    fam_diff_from_expected_hct_male = mean_hct_male - fam_male_0_SDI_hct,
-    fam_diff_from_expected_hct_female = mean_hct_female - fam_female_0_SDI_hct,
-   
-    fam_diff_from_expected_elev = mean_sample_elev - fam_elev_0_SDI_hct,
-    fam_diff_from_exp_hct_male_elev_corr = fam_diff_from_expected_hct_male + (fam_diff_from_expected_elev * (0.02/                                                                   1000)),
-    #need to correct for ~ 1 unit increase in per 1000 m increase in elevation
-   fam_diff_from_exp_hct_female_elev_corr = fam_diff_from_expected_hct_female + (fam_diff_from_expected_elev * (0.02/                                                                   1000)),
-    fam_SBD_hct_driver = if_else(
-      abs(fam_diff_from_exp_hct_male_elev_corr) < abs(fam_diff_from_exp_hct_female_elev_corr) &
-        fam_diff_from_exp_hct_female_elev_corr < 0,
-      "female driven reduction",
-      if_else(
-        abs(fam_diff_from_exp_hct_male_elev_corr) < abs(fam_diff_from_exp_hct_female_elev_corr) &
-          fam_diff_from_exp_hct_female_elev_corr > 0,
-        "female driven increase",
-        if_else(
-          abs(fam_diff_from_exp_hct_male_elev_corr) > abs(fam_diff_from_exp_hct_female_elev_corr) &
-            fam_diff_from_exp_hct_male_elev_corr < 0,
-          "male driven reduction",
-          if_else(
-            abs(fam_diff_from_exp_hct_male_elev_corr) > abs(fam_diff_from_exp_hct_female_elev_corr) &
-              fam_diff_from_exp_hct_male_elev_corr > 0,
-            "male driven increase",
-            NA
-          )
-        )
-      )
-    ))
-
-
-```
+Data processing separate. If you want to adjust sample size used to calculate SDIs then need to rerun "Blood_SDI_Data_Wrangle.R
 
 ## Summarize contributions
 ### Hb (pooled shift)
@@ -601,58 +445,62 @@ df.contribution%>%
 ```{r}
 df.cont%>%
   filter(hb_cont != "at reference")%>%
-  ggplot(aes(SSDI_hb, diff_from_expected_hb_male_base))+
+  ggplot(aes(SSDI_hb, mean_hb_male, color=mean_hb_female))+
   geom_smooth(color="black", method="lm")+
-  geom_point(color=mycolors[1], size=2, alpha=0.5)+
-  geom_hline(yintercept = 0, linetype="dashed")
+  geom_point(size=2, alpha=0.5)+
+  #geom_hline(yintercept = 0, linetype="dashed")+
   labs(x="[Hb] SDI", y= "Difference from\n expected [Hb]")
 
 df.cont%>%
   filter(hb_cont != "at reference")%>%
-  ggplot(aes(SSDI_hb, diff_from_expected_hb_male_base, color=dimorphic_01))+
+  ggplot(aes(SSDI_hb, diff_from_exp_hb_elev_corr_female_base))+
+  geom_smooth(color="black", method="lm")+
+  geom_point(color=mycolors[12], size=2, alpha=0.5)+
+  geom_hline(yintercept = 0, linetype="dashed")+
+  labs(x="[Hb] SDI", y= "Difference from\n expected [Hb]")
+
+
+df.cont%>%
+  filter(hct_cont != "at reference")%>%
+  ggplot(aes(SSDI_hct, diff_from_exp_hb_elev_corr_female_base, color=SSDI_hb))+
   geom_smooth(method="lm")+
   geom_point()
+
+df.cont%>%
+  filter(hct_cont != "at reference")%>%
+  ggplot(aes(SSDI_hct, diff_from_exp_hb_elev_corr_male_base, color=SSDI_hb))+
+  geom_smooth(method="lm")+
+  geom_point()
+
 
 df.cont%>%
   filter(hb_cont != "at reference")%>%
-  ggplot(aes(SSDI_hb, diff_from_expected_hb_male_base, color=log10(mean_mass_male)))+
+  ggplot(aes(mean_sample_elev, hb_exp_diff, color=hb_cont))+
   geom_smooth(method="lm")+
-  geom_point()
+  geom_point(aes())
 
- df.cont%>%
+df.cont%>%
   filter(hct_cont != "at reference")%>%
-  ggplot(aes(SSDI_hct, diff_from_exp_hct_elev_corr_female, color=hct_cont))+
+  ggplot(aes(mean_sample_elev, hct_exp_diff, color=hct_cont))+
   geom_smooth(method="lm")+
   geom_point()
 
 df.cont%>%
   filter(hct_cont != "at reference")%>%
-  ggplot(aes(SSDI_hct, hct_exp_diff_global_mean, color=SSDI_hb))+
-  geom_smooth()+
-  geom_point()
+  ggplot(aes(log10(gen_egg_mass), SSDI_hb, color=hct_cont))+
+  geom_point()+
+  geom_smooth(method="lm")
 
-df.cont%>%
-  filter(hct_cont != "at reference")%>%
-  ggplot(aes(SSDI_hct, hct_exp_diff_base, color=SSDI_hb))+
-  geom_smooth()+
-  geom_point()
-
-df.cont%>%
-  filter(hb_cont != "at reference")%>%
-  ggplot(aes(mean_sample_elev, hb_exp_diff))+
-  geom_smooth(method="lm")+
-  geom_point(aes(color=hb_cont))
-
-df.cont%>%
-  filter(hct_cont != "at reference")%>%
-  ggplot(aes(mean_sample_elev, hct_exp_diff))+
-  geom_smooth(method="lm")+
-  geom_point()
 
 df.blood%>%
-  ggplot(aes(log10(gen_egg_mass), SSDI_hb))+
-  geom_smooth(method="lm")+
-  geom_point()
+  ggplot(aes(mod_adult_survival, mean_hct_female, color=log10(mean_mass_female)))+
+  geom_point()+
+  geom_smooth(method="lm")
+
+df.blood%>%
+  ggplot(aes(log10(mean_mass_female), mean_hct_female, color=log10(mean_mass_female)))+
+  geom_point()+
+  geom_smooth(method="lm")
 
 
 ```
@@ -744,6 +592,18 @@ p
 
 ggsave(p, file=paste0("figures/Contributions_SDI_hct_family_pooled_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
 ```
+# Residuals Analysis
+
+```{r}
+
+df.cont%>%
+  ggplot(.,aes(mean_mass_male, SSDI_hb))+
+  geom_point()+
+  geom_smooth(method="lm")
+
+```
+
+
 
 # Male and Female Blood x Elevation
 ## Hb
