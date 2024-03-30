@@ -189,9 +189,7 @@ Data are from Linck et al. 2023 Blood variation paper
 
 df <- read_csv("data/species_means_blood_final.csv")
 
-df.all <- read_csv("data/all_blood_final.csv")
-
-df.within <- read_csv("data/blood_final_within.csv")
+df.cont <- read_csv("data/all_blood_cont.csv")
 
 df.gonads <- read_csv("data/gonads.csv")
 
@@ -201,7 +199,6 @@ df.gonads <- read_csv("data/gonads.csv")
 # What is our sample size?
 This data has been cleaned and supplemneted by BOTW elevation ranges.
 ```{r}
-
 #Get sample sizes
 df%>%
   ungroup()%>%
@@ -228,6 +225,7 @@ df%>%
                    total_hct = n_hct_females+n_hct_males)
 
 ```
+
 # Gonad size over time
 ## testis length
 ```{r}
@@ -411,34 +409,40 @@ ggsave(p, file=paste0("figures/histogram_elev_SDI_hct_N_over_", thresh, ".pdf"),
 Data processing separate. If you want to adjust sample size used to calculate SDIs then need to rerun "Blood_SDI_Data_Wrangle.R
 
 ## Summarize contributions
-### Hb (pooled shift)
+### Hb (zero-based family shift)
 ```{r}
 
-df.contribution%>%
-  group_by(pooled_hb_SBD_driver)%>%
+df.cont%>%
+  group_by(hb_cont)%>%
   dplyr::summarise(n=n())
 
 ```
 
-### Hct (pooled shift)
+### Hct (zero based family shift)
 ```{r}
-df.contribution%>%
-  group_by(pooled_hct_SBD_driver)%>%
+
+df.cont%>%
+  group_by(hct_cont)%>%
   dplyr::summarise(n=n())
+
 ```
 
-### Hb (Family pooled shift)
+### Hb (global mean based shift)
 ```{r}
-df.contribution%>%
-  group_by(fam_SBD_hb_driver)%>%
+
+df.cont%>%
+  group_by(hb_cont_global)%>%
   dplyr::summarise(n=n())
+
 ```
 
 ### Hct (Family pooled shift)
 ```{r}
+
 df.contribution%>%
   group_by(fam_SBD_hct_driver)%>%
   dplyr::summarise(n=n())
+
 ```
 
 ## Plot contributions
@@ -472,7 +476,6 @@ df.cont%>%
   geom_smooth(method="lm")+
   geom_point()
 
-
 df.cont%>%
   filter(hb_cont != "at reference")%>%
   ggplot(aes(mean_sample_elev, hb_exp_diff, color=hb_cont))+
@@ -487,15 +490,16 @@ df.cont%>%
 
 df.cont%>%
   filter(hct_cont != "at reference")%>%
-  ggplot(aes(log10(gen_egg_mass), SSDI_hb, color=hct_cont))+
+  ggplot(aes(log10(mod_age_at_first_reproduction), female_mass_residuals))+
   geom_point()+
   geom_smooth(method="lm")
 
-
-df.blood%>%
-  ggplot(aes(mod_adult_survival, mean_hct_female, color=log10(mean_mass_female)))+
+df.cont%>%
+  filter(hct_cont != "at reference")%>%
+  ggplot(aes(log10(gen_egg_mass), SSDI_hb, color=hb_cont))+
   geom_point()+
   geom_smooth(method="lm")
+
 
 df.blood%>%
   ggplot(aes(log10(mean_mass_female), mean_hct_female, color=log10(mean_mass_female)))+
@@ -591,16 +595,6 @@ ggplot(., aes(fam_diff_from_exp_hct_female_elev_corr, fam_diff_from_exp_hct_male
 p
 
 ggsave(p, file=paste0("figures/Contributions_SDI_hct_family_pooled_N_over_", thresh, ".pdf"), width=4, height=4, device=cairo_pdf)
-```
-# Residuals Analysis
-
-```{r}
-
-df.cont%>%
-  ggplot(.,aes(mean_mass_male, SSDI_hb))+
-  geom_point()+
-  geom_smooth(method="lm")
-
 ```
 
 
@@ -923,22 +917,23 @@ ggsave(p, file=paste0("figures/trend-lm_clutch_size_SBDI_hct_by_sex_N_over_", th
 ### Hb Residuals (Female driven reduction)
 
 ```{r}
-#doing this at head of each resdidual plot... for now
-p<-df.contribution%>%
-  group_by(fam_SBD_hb_driver)%>%
+#doing this at head of each residual plot... for now
+p<-df.cont%>%
+  filter(!is.na(species))%>%
+  #group_by(hb_cont)%>%
   mutate(log10_fem_mass = log10(mean_mass_female),
-         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
-         log10_repro_mass = log10(spec_gen_clutch_size * spec_gen_egg_mass),
+         log10_extrap_egg_mass = log10(egg_mass_extrap),
+         log10_repro_mass = log10(spec_gen_clutch_size * egg_mass_extrap),
          log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
-         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
+         log10_extrap_egg_mass = if_else(is.na(log10_extrap_egg_mass) | log10_extrap_egg_mass=="-Inf",NA, log10_extrap_egg_mass),
           log10_repro_mass = if_else(is.na(log10_repro_mass) | log10_repro_mass=="-Inf",NA, log10_repro_mass),
-         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)),
+         resids.egg.mass = resid(lm(log10_extrap_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_extrap_egg_mass, log10_fem_mass), na.action = na.exclude)),
          resids.repro.mass = resid(lm(log10_repro_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_repro_mass, log10_fem_mass), na.action = na.exclude)))%>%
-ggplot(., aes(resids.repro.mass, SSDI_hct))+
+ggplot(., aes(SSDI_hb, resids.repro.mass))+
   geom_point(alpha=0.6,  shape=19, color="grey")+
   geom_smooth(method="lm", color="black")+ 
-  labs(x= "Residuals (egg mass (g) x clutch size) \n ~ body size (g)")+
-  ylab(bquote(SDI[Hct]))+
+  labs(y= "Residuals (egg mass (g) x clutch size) \n ~ body size (g)")+
+  xlab(bquote(SDI[Hb]))+
   geom_hline(yintercept = 0, linetype = "dashed")+
   theme(legend.title = element_blank(),
         legend.position = "none", 
@@ -950,15 +945,15 @@ ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_female_driven reduction_
 
 ```{r}
 #doing this at head of each resdidual plot... for now
-p<-df.contribution%>%
-  group_by(fam_SBD_hb_driver)%>%
+p<-df.cont%>%
+  filter(!is.na(species))%>%
   mutate(log10_fem_mass = log10(mean_mass_female),
-         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_extrap_egg_mass = log10(egg_mass_extrap),
          log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
-         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
-         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
-   filter(fam_SBD_hb_driver %in% c("female driven reduction", "female driven increase"))%>%
-ggplot(., aes(resids.egg.mass, fam_diff_from_exp_hb_female_elev_corr))+
+         log10_extrap_egg_mass = if_else(is.na(log10_extrap_egg_mass) | log10_extrap_egg_mass=="-Inf",NA, log10_extrap_egg_mass),
+         resids.egg.mass = resid(lm(log10_extrap_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_extrap_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
+   filter(hb_cont %in% c("female driven reduction"))%>%
+ggplot(., aes(resids.egg.mass, SSDI_hb))+
   geom_point(alpha=0.6,  shape=19, color="grey")+
   geom_smooth(method="lm", color="black")+ 
   labs(x= "Residuals egg mass (g) ~ body size (g)",y= "Female driven reduction in [Hb]")+
@@ -974,15 +969,15 @@ ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_female_driven reduction_
 ```{r}
 
 #doing this at head of each resdidual plot... for now
-p<-df.contribution%>%
-  group_by(fam_SBD_hb_driver)%>%
+p<-df.cont%>%
+  filter(!is.na(species))%>%
   mutate(log10_fem_mass = log10(mean_mass_female),
-         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_extrap_egg_mass = log10(egg_mass_extrap),
          log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
-         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
-         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
-   filter(fam_SBD_hb_driver == "male driven increase")%>%
-ggplot(., aes(resids.egg.mass, fam_diff_from_exp_hb_male_elev_corr))+
+         log10_extrap_egg_mass = if_else(is.na(log10_extrap_egg_mass) | log10_extrap_egg_mass=="-Inf",NA, log10_extrap_egg_mass),
+         resids.egg.mass = resid(lm(log10_extrap_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_extrap_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
+   filter(hb_cont == "male driven increase")%>%
+ggplot(., aes(resids.egg.mass, SSDI_hb))+
   geom_point(alpha=0.6,  shape=19, color="grey")+
   geom_smooth(method="lm", color="black")+ 
   labs(x= "Residuals egg mass (g) ~ body size (g)",y= "Male driven increase in [Hb]")+
@@ -997,15 +992,15 @@ ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_male_driven increase_hb_
 ### Hct Residuals (Female driven reduction)
 ```{r}
 
-p<-df.contribution%>%
-  group_by(fam_SBD_hb_driver)%>%
+p<-df.cont%>%
+  filter(!is.na(species))%>%
   mutate(log10_fem_mass = log10(mean_mass_female),
-         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_extrap_egg_mass = log10(egg_mass_extrap),
          log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
-         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
-         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
-   filter(fam_SBD_hct_driver == "female driven reduction")%>%
-ggplot(., aes(resids.egg.mass, fam_diff_from_exp_hct_female_elev_corr))+
+         log10_extrap_egg_mass = if_else(is.na(log10_extrap_egg_mass) | log10_extrap_egg_mass=="-Inf",NA, log10_extrap_egg_mass),
+         resids.egg.mass = resid(lm(log10_extrap_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_extrap_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
+   filter(hb_cont == "female driven reduction")%>%
+ggplot(., aes(resids.egg.mass, SSDI_hct))+
   geom_point(alpha=0.6,  shape=19, color="grey")+
   geom_smooth(method="lm", color="black")+ 
   labs(x= "Residuals egg mass (g) ~ body size (g)",y= "Female driven reduction in Hct")+
@@ -1020,15 +1015,15 @@ ggsave(p, file=paste0("figures/trend-lm_resids_egg_mass_female_driven reduction_
 ### Hct Residuals (Male driven increase)
 ```{r}
 
-p<-df.contribution%>%
-  group_by(fam_SBD_hb_driver)%>%
+p<-df.cont%>%
+  filter(!is.na(species))%>%
   mutate(log10_fem_mass = log10(mean_mass_female),
-         log10_spec_gen_egg_mass = log10(spec_gen_egg_mass),
+         log10_extrap_egg_mass = log10(egg_mass_extrap),
          log10_fem_mass = if_else(is.na(log10_fem_mass) | log10_fem_mass=="-Inf",NA, log10_fem_mass),
-         log10_spec_gen_egg_mass = if_else(is.na(log10_spec_gen_egg_mass) | log10_spec_gen_egg_mass=="-Inf",NA, log10_spec_gen_egg_mass),
-         resids.egg.mass = resid(lm(log10_spec_gen_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_spec_gen_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
-   filter(fam_SBD_hct_driver == "male driven increase")%>%
-ggplot(., aes(resids.egg.mass, fam_diff_from_exp_hct_male_elev_corr))+
+         log10_extrap_egg_mass = if_else(is.na(log10_extrap_egg_mass) | log10_extrap_egg_mass=="-Inf",NA, log10_extrap_egg_mass),
+         resids.egg.mass = resid(lm(log10_extrap_egg_mass ~ log10_fem_mass, cur_data() %>% dplyr::select(log10_extrap_egg_mass, log10_fem_mass), na.action = na.exclude)))%>%
+   filter(hct_cont == "male driven increase")%>%
+ggplot(., aes(resids.egg.mass, SSDI_hct))+
   geom_point(alpha=0.6,  shape=19, color="grey")+
   geom_smooth(method="lm", color="black")+ 
   labs(x= "Residuals egg mass (g) ~ body size (g)",y= "Male driven increase in Hct")+

@@ -1,4 +1,4 @@
-### SDI (blood) Data Wrangle###
+# SDI (blood) Data Wrangle####
 
 pacman::p_load(
   tidyverse,
@@ -76,7 +76,7 @@ pgcl.elevs <- read_csv("data/PatagonaData_JLW_HbAndHct_ForBloodSexNElev_2023-12-
               filter(
                 sex %in% c("male", "female"),
                 species %in% c("Tachuris rubrigastra", "Phleocryptes melanops"))%>%
-              dplyr::select(species,family, sex, elevation, hb, hct))%>%
+              dplyr::select(species, family, sex, elevation, hb, hct))%>%
   group_by(species, family)%>% #group by species and sex to get mean, min, and max_sample elevs
   dplyr::summarise(max_sample_elev = max(elevation, na.rm=T),
                    mean_sample_elev = mean(elevation, na.rm=T),
@@ -161,7 +161,7 @@ stoddard <- readxl::read_excel("~/Dropbox/Data_repo/Stoddard_egg_shape/aaj1945_d
   dplyr::rename(egg_length = avg.length)
 
 
-#Get others from Myhrvold et al. 2015
+#Myhrvold et al. 2015####
 Myhrvold<- read_csv("~/Dropbox/Data_repo/Amniote_Database_Aug_2015.csv")%>%
   filter(class =="Aves")%>%
   mutate(species = paste(genus, species))%>%
@@ -180,8 +180,15 @@ Myhrvold.genus.egg.traits<-Myhrvold%>%
                    gen_egg_width =mean(egg_length, na.rm=T),
                    gen_clutch_size = median(clutch_size, na.rm=T))
 
+#John T Rotenberry, Priya Balasubramaniam egg dataset extrapolated####
+#https://academic-oup-com.libproxy.unm.edu/auk/article/137/3/ukaa019/5834541?login=true&token=#supplementary-data
+egg_mass_extrap<- read_excel("data/ukaa019_suppl_supplemental_material_tables_s4-s6.xlsx")%>%
+  dplyr::select(Species, egg_mass_Grams)%>%
+  dplyr::rename(species = Species,
+         egg_mass_extrap = egg_mass_Grams)
 
-#development dataset
+ 
+#Development dataset ####
 
 development<- readxl::read_excel("data/41467_2020_16257_MOESM3_ESM.xlsx", sheet=4)%>%
   dplyr::rename(taxon =  binomial)
@@ -305,6 +312,7 @@ df.blood <- bind_rows(pgcl, santema)%>%
   left_join(., minias.hct)%>%
   left_join(development)%>%
   left_join(demo)%>%
+  left_join(egg_mass_extrap)%>%
   mutate(genus = stringr::word(species))%>%
   left_join(Myhrvold.genus.egg.traits)
 
@@ -319,6 +327,16 @@ df.blood <- bind_rows(pgcl, santema)%>%
 # 
 # shapiro.test(rstandard(hb.m.mod)) #Not normal
 # 
+# 
+# hb.f.mass.mod <- lm(SSDI_hb ~ mean_mass_female, data = df.blood)
+# 
+# shapiro.test(rstandard(hb.f.mass.mod)) #Not normal
+# 
+# 
+# hb.m.mass.mod <- lm(SSDI_hb ~ mean_mass_male, data = df.blood)
+# 
+# shapiro.test(rstandard(hb.m.mass.mod)) #Not normal
+
 # 
 # ggplot() +
 #   geom_qq(aes(sample = rstandard(hb.f.mod))) +
@@ -355,7 +373,7 @@ df.blood <- df.blood %>%
   dplyr::select(species, SSDI_hb, mean_hb_female) %>%
   na.omit() %>%
   bind_cols(., hb.f.mod.res[, 1]) %>%
-  dplyr::rename(female_SDI_hb_residuals = `...7`) %>%
+  dplyr::rename(female_SDI_hb_residuals = length(.)) %>%
   ungroup() %>%
   dplyr::select(species, female_SDI_hb_residuals) %>%
   right_join(df.blood)
@@ -382,9 +400,65 @@ df.blood <- df.blood %>%
   dplyr::select(species, SSDI_hb, mean_hb_female) %>%
   na.omit() %>%
   bind_cols(., hb.m.mod.res[, 1]) %>%
-  dplyr::rename(male_SDI_hb_residuals = `...4`) %>%
+  dplyr::rename(male_SDI_hb_residuals = length(.)) %>%
   ungroup() %>%
   dplyr::select(species, male_SDI_hb_residuals) %>%
+  right_join(df.blood)
+
+#mass ~ Hb
+
+# hb.f.mass.mod <- brm(
+#   formula = mean_hb_female ~ mean_mass_female,
+#   data = df.blood,
+#   family = student(),
+#   cores = 8,
+#   chains = 4,
+#   thin = 10,
+#   warmup = 5000,
+#   # default is iter/2; shouldn't ever be larger than iter
+#   iter = 10000,
+#   control = list(adapt_delta = 0.98, max_treedepth = 18),
+#   sample_prior = TRUE # default priors
+# )
+
+summary(hb.f.mass.mod)
+
+hb.f.mass.mod.res <- residuals(hb.f.mass.mod)
+
+df.blood <- df.blood %>%
+  dplyr::select(species, mean_hb_female, mean_mass_female) %>%
+  na.omit() %>%
+  bind_cols(., hb.f.mass.mod.res[, 1]) %>%
+  dplyr::rename(female_mass_residuals = length(.)) %>%
+  ungroup() %>%
+  dplyr::select(species, female_mass_residuals) %>%
+  right_join(df.blood)
+
+
+# hb.m.mass.mod <- brm(
+#   formula = mean_hb_male ~ mean_mass_male,
+#   data = df.blood,
+#   family = student(),
+#   cores = 8,
+#   chains = 4,
+#   thin = 10,
+#   warmup = 5000,
+#   # default is iter/2; shouldn't ever be larger than iter
+#   iter = 10000,
+#   control = list(adapt_delta = 0.98, max_treedepth = 18),
+#   sample_prior = TRUE # default priors
+# )
+
+summary(hb.m.mass.mod)
+hb.m.mass.mod.res <- residuals(hb.m.mass.mod)
+
+df.blood <- df.blood %>%
+  dplyr::select(species, mean_hb_male, mean_mass_male) %>%
+  na.omit() %>%
+  bind_cols(., hb.m.mass.mod.res[, 1]) %>%
+  dplyr::rename(male_mass_residuals = length(.)) %>%
+  ungroup() %>%
+  dplyr::select(species, male_mass_residuals) %>%
   right_join(df.blood)
 
 # match up tree labels
@@ -398,7 +472,7 @@ dimorph<- readxl::read_excel("data/Taxon_names_for_Jessie_WithFamily_DimorphismD
   dplyr::rename(taxon= taxon...1)%>%
   dplyr::select(taxon, family, dimorphic_01)
 
-df.blood%>%
+df.blood<-df.blood%>%
   filter(!taxon %in% c("Elaenia_sp.", "Spinus_sp.", "Scytalopus_sp."))%>%
   left_join(., blood.crosswalk%>%dplyr::select(2:3), by ="taxon")%>%
   left_join(dimorph)%>%
@@ -604,132 +678,8 @@ df.cont <- df.blood %>%
         hct_exp_diff_global_mean,
         hct_exp_diff_base
       )
-  )
+  )%>% write_csv("data/all_blood_cont.csv")
 
-
-
-
-#Next big task is getting some sort of species expected value for Hb and Hct (mean?) then asking if individual points adjusted for elevation fall to above or below value by sex
-all.blood <- read_csv("data/PatagonaData_JLW_HbAndHct_ForBloodSexNElev_2023-12-17.csv")%>%
-  filter(
-    sex %in% c("male", "female"))%>%
-  mutate(
-    sex = factor(sex),
-    family = "Trochilidae",
-    taxon = species)%>%
-  group_by(taxon) %>% 
-  filter(all(levels(sex) %in% sex))%>%
-  dplyr::rename(elevation = elev)%>%
-  dplyr::select(taxon, species,family, sex, elevation, mass, hb, hct)%>%
-  bind_rows(.,
-            read_csv("data/blood_data_final.csv")%>%
-              dplyr::select(nk, species,family, sex, elevation, mass, hb, hct)%>%
-              filter(
-                !nk %in% pgc.nk,
-                sex %in% c("male", "female"),
-                !species %in% c("Accipiter striatus", "Falco sparverius", "Passer domesticus"))%>%
-              mutate(
-                sex = factor(sex),
-                taxon = factor(gsub(" ", "_", species)))%>%
-              dplyr::select(taxon, species, family, sex, elevation,  mass, hb, hct))%>%
-  bind_rows(., read_csv("data/ChileBloodCatalog_NoPatagona_Wrangled_ForChauncey_2023-12-23.csv")%>%
-              dplyr::select(nk,species,family, sex, elev,mass, hb, hct, pull_too_young)%>%
-              dplyr::rename(elevation = elev)%>%
-              filter(pull_too_young==1,
-                     !nk %in% pgc.nk,
-                     sex %in% c("male", "female"))%>%
-              mutate(taxon=factor(gsub(" ", "_", species)))%>%
-              dplyr::select(taxon, species, family, sex, elevation,  mass, hb, hct))%>%
-  bind_rows(., read_csv("~/Dropbox/Research/Marsh Birds/Marsh_birds/data/blood_final_bioclim_12-9-2022.csv")%>%
-              dplyr::select(species, family, sex, elev, mass, hb_final, hct_final)%>%
-              dplyr::rename(hb = hb_final,
-                     hct = hct_final,
-                     elevation = elev)%>%
-              filter(
-                sex %in% c("male", "female"),
-                species %in% c("Tachuris rubrigastra", "Phleocryptes melanops"))%>%
-              mutate(
-                sex = factor(sex),
-                taxon = factor(gsub(" ", "_", species))
-              )%>%
-              group_by(taxon) %>% 
-              filter(all(levels(sex) %in% sex))%>%
-              dplyr::select(taxon, species, family, sex, elevation,  mass, hb, hct))%>%
-  bind_rows(., readxl::read_excel("data/Minias_RAW_DATA.xlsx")%>%
-              filter(Captivity==0,
-                     Sex%in% c("M", "F"))%>%
-              mutate(Sex= if_else(Sex =="M", "male", if_else(Sex == "F", "female", NA)))%>%
-              dplyr::select(`Scientific name`, Family, `Haemoglobin concentration (g/l)`, Sex, `Elevation (m a.s.l.)`, `Clutch size`)%>%
-              dplyr::rename(species = `Scientific name`,
-                     hb = `Haemoglobin concentration (g/l)`,
-                     elevation = `Elevation (m a.s.l.)`,
-                     sex=Sex,
-                     family=Family)%>%
-              mutate(
-                sex = factor(sex),
-                taxon = factor(gsub(" ", "_", species)),
-                hb= hb/10)%>%
-              dplyr::select(taxon, species, family, sex, elevation, hb))%>%
-                  bind_rows(., readxl::read_excel("data/Minias_RAW_DATA.xlsx", sheet=2)%>%
-                              filter(Captivity==0,
-                                     Sex%in% c("M", "F"))%>%
-                              mutate(Sex= if_else(Sex =="M", "male", if_else(Sex == "F", "female", NA)))%>%
-                              dplyr::select(`Scientific name`, Family, `Haematocrit (%)`, Sex, `Elevation (m a.s.l.)`, `Clutch size`)%>%
-                              dplyr::rename(species = `Scientific name`,
-                                     hct = `Haematocrit (%)`,
-                                     elevation = `Elevation (m a.s.l.)`,
-                                     sex=Sex,
-                                     family=Family)%>%
-                              mutate(
-                                sex = factor(sex),
-                                taxon = factor(gsub(" ", "_", species)),
-                                hct = hct/100)%>%
-                              dplyr::select(taxon, species, family, sex, elevation,  hct))%>%
-  bind_rows(.,readxl::read_excel("data/data_comp.xlsx")%>%
-              dplyr::select(scinam, family, hema_m, hema_f)%>%
-              ungroup()%>%
-              group_by(scinam)%>%
-              mutate(SSDI_hct = (hema_m -hema_f)/hema_f)%>%
-              ungroup()%>%
-              pivot_longer(cols =c(3:4), names_to = "sex", values_to = "hct")%>%
-              mutate(sex =  firstup(gsub("hema_", '', sex)),
-                    hct = hct/100,
-                    species = sub("(.)", "\\U\\1", scinam, perl=TRUE),
-                    taxon = gsub(" ", "_", species),
-            sex= if_else(sex =="M", "male", if_else(sex == "F", "female", NA)))%>%
-              dplyr::select(taxon , species, sex, hct))%>%
-  mutate(genus = str_split(species, fixed("_"))[[1]][1])%>%
-  left_join(., df.blood%>%
-              dplyr::select(taxon,  mean_hb_male, mean_hb_female, mean_hct_male, mean_hct_female, SSDI_hct, SSDI_hb))%>%
-  left_join(., blood.crosswalk%>%dplyr::select(2:3), by ="taxon")%>%
-  mutate(birdtree = if_else(is.na(birdtree), taxon, birdtree))%>%
-  ungroup()%>%
-  group_by(genus)%>%
-  mutate(mean_genus_hb = mean(hb, na.rm=T),
-         mean_genus_hct = mean(hct, na.rm =T),
-         mean_genus_elev = mean(elevation, na.rm=T))%>%
-  ungroup()%>%
-  group_by(family)%>%
-  mutate(closest_to_0_hb = min(abs(SSDI_hb), na.rm=T),
-         species_0_hb = species[which.min(abs(SSDI_hb))][1],
-         male_0_SDI_hb = mean(mean_hb_male[which.min(abs(SSDI_hb))], na.rm=T),
-         female_0_SDI_hb = mean(mean_hb_female[which.min(abs(SSDI_hb))], na.rm=T),
-         closest_to_0_hct = min(abs(SSDI_hct), na.rm=T),
-         species_0_hct = species[which.min(abs(SSDI_hct))][1],
-         diff_from_expected_hb_male = mean_hb_male-male_0_SDI_hb,
-         diff_from_expected_hb_female = mean_hb_female-female_0_SDI_hb,
-         diff_from_expected_hct = hct-closest_to_0_hct,
-         diff_from_expected_elev = elevation-mean_genus_elev,
-         diff_from_exp_hb_elev_corr_male = diff_from_expected_hb_male + (diff_from_expected_elev/1000),
-         diff_from_exp_hb_elev_corr_female = diff_from_expected_hb_female + (diff_from_expected_elev/1000))%>%#need to correct for ~ 1 unit increase in per 1000 m increase in elevation
-  left_join(dimorph)%>%
-  write_csv(., "data/all_blood_final.csv")
-
-
-ggplot(all.blood, aes(diff_from_expected_hb_male))+
-  geom_density()+
-  geom_density(data=all.blood, aes(diff_from_expected_hb_female))
-  
 
 # Gonads####
 
