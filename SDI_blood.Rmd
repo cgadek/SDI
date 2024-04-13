@@ -262,7 +262,7 @@ df.gonads%>%
 # Species SBDI comparisons
 ## Hb
 ```{r}
-thresh <-5
+thresh <-3
   
 p1<-df%>%
    mutate(bias.direction = as.factor(if_else(SSDI_hb >0, "male biased", "female biased")),
@@ -513,13 +513,13 @@ df.blood%>%
 
 ### Hb (pooled shift)
 ```{r}
-p<-df.contribution%>%
-   filter(SSDI_hb <=0.5,
-        !is.na(pooled_hb_SBD_driver))%>%
-ggplot(., aes(pooled_diff_from_exp_hb_female_elev_corr, pooled_diff_from_exp_hb_male_elev_corr))+
+p<-df.cont%>%
+   filter(hb_cont != "at reference",
+        !is.na(hb_cont))%>%
+ggplot(., aes(diff_from_exp_hb_elev_corr_female, diff_from_exp_hb_elev_corr_male))+
   ggdensity::geom_hdr(n=100, probs=c( 0.25, 0.50, 0.75, 0.95))+
-  geom_point(aes(color=pooled_hb_SBD_driver),alpha=0.5)+
-  scale_color_manual(values=c(h2[1], h2[8], h1[3], h4[10]))+
+  geom_point(aes(color=hb_cont),alpha=0.5)+
+  scale_color_manual(values=cols)+
   geom_abline(intercept = 0)+
   geom_abline(intercept = 0, slope=-1)+
   # geom_hline(yintercept = 0, linetype="dashed")+
