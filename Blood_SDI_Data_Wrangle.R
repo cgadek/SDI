@@ -194,7 +194,7 @@ development<- readxl::read_excel("data/41467_2020_16257_MOESM3_ESM.xlsx", sheet=
   dplyr::rename(taxon =  binomial)
 
 
-#read in generation time/demgrpahic dataset from Bird et al. 2020
+#read in generation time/demogrpahic dataset from Bird et al. 2020
 
 demo <-readxl::read_excel("data/Bird_et_al_2020.xlsx", sheet=1)
 
@@ -309,12 +309,13 @@ df.blood <- bind_rows(pgcl, santema)%>%
   left_join(., stoddard)%>%
   left_join(., Myhrvold)%>%
   left_join(., minias)%>%
-  left_join(., minias.hct)%>%
   left_join(development)%>%
   left_join(demo)%>%
   left_join(egg_mass_extrap)%>%
   mutate(genus = stringr::word(species))%>%
-  left_join(Myhrvold.genus.egg.traits)
+  left_join(Myhrvold.genus.egg.traits)%>%
+  filter(!is.na(taxon),
+         !grepl('_sp', taxon)) #get rid of unidentified taxa
 
 
 #test for normality between blood parameters and SDIs before we can use residuals
@@ -394,16 +395,17 @@ df.blood <- df.blood %>%
 # )
 # 
 # summary(hb.m.mod)
+# 
 # hb.m.mod.res <- residuals(hb.m.mod)
 
-df.blood <- df.blood %>%
-  dplyr::select(species, SSDI_hb, mean_hb_female) %>%
-  na.omit() %>%
-  bind_cols(., hb.m.mod.res[, 1]) %>%
-  dplyr::rename(male_SDI_hb_residuals = length(.)) %>%
-  ungroup() %>%
-  dplyr::select(species, male_SDI_hb_residuals) %>%
-  right_join(df.blood)
+# df.blood <- df.blood %>%
+#   dplyr::select(species, SSDI_hb, mean_hb_female) %>%
+#   na.omit() %>%
+#   bind_cols(., hb.m.mod.res[, 1]) %>%
+#   dplyr::rename(male_SDI_hb_residuals = length(.)) %>%
+#   ungroup() %>%
+#   dplyr::select(species, male_SDI_hb_residuals) %>%
+#   right_join(df.blood)
 
 #mass ~ Hb
 
@@ -420,10 +422,10 @@ df.blood <- df.blood %>%
 #   control = list(adapt_delta = 0.98, max_treedepth = 18),
 #   sample_prior = TRUE # default priors
 # )
-
-summary(hb.f.mass.mod)
-
-hb.f.mass.mod.res <- residuals(hb.f.mass.mod)
+# 
+# summary(hb.f.mass.mod)
+# 
+# hb.f.mass.mod.res <- residuals(hb.f.mass.mod)
 
 df.blood <- df.blood %>%
   dplyr::select(species, mean_hb_female, mean_mass_female) %>%
@@ -448,9 +450,10 @@ df.blood <- df.blood %>%
 #   control = list(adapt_delta = 0.98, max_treedepth = 18),
 #   sample_prior = TRUE # default priors
 # )
-
-summary(hb.m.mass.mod)
-hb.m.mass.mod.res <- residuals(hb.m.mass.mod)
+# 
+# summary(hb.m.mass.mod)
+# 
+# hb.m.mass.mod.res <- residuals(hb.m.mass.mod)
 
 df.blood <- df.blood %>%
   dplyr::select(species, mean_hb_male, mean_mass_male) %>%
@@ -473,7 +476,6 @@ dimorph<- readxl::read_excel("data/Taxon_names_for_Jessie_WithFamily_DimorphismD
   dplyr::select(taxon, family, dimorphic_01)
 
 df.blood<-df.blood%>%
-  filter(!taxon %in% c("Elaenia_sp.", "Spinus_sp.", "Scytalopus_sp."))%>%
   left_join(., blood.crosswalk%>%dplyr::select(2:3), by ="taxon")%>%
   left_join(dimorph)%>%
   left_join(read_excel("data/Brown_Witt_Wright_2012.xls")%>% # add in and left join the Brown Witt, Wright et al data
@@ -483,6 +485,7 @@ df.blood<-df.blood%>%
          spec_gen_egg_length = if_else(is.na(egg_length), gen_egg_length, egg_length),
          spec_gen_egg_width = if_else(is.na(egg_width), gen_egg_width, egg_width),
          spec_gen_clutch_size = if_else(is.na(clutch_size), gen_clutch_size, clutch_size))%>%
+  left_join(read_csv("data/Cont_re_cat.csv"))%>%#add revised contribution reference clades
  write_csv(., "data/species_means_blood_final.csv")
 
 #get mean hb value across all birds to calibrate
@@ -501,7 +504,7 @@ df.cont <- df.blood %>%
   filter(n_hb_male >= threshold,
          n_hb_female >= threshold)%>%
   left_join(dimorph)%>%
-  group_by(family) %>%
+  group_by(clade_for_cont_ref) %>%
   filter(!is.na(SSDI_hb)) %>%
   mutate(
     mean_family_elev = mean(mean_sample_elev, na.rm = T),
@@ -511,12 +514,12 @@ df.cont <- df.blood %>%
     female_0_SDI_hb = mean_hb_female[which.min(abs(SSDI_hb))],
     diff_from_expected_hb_male = mean_hb_male - male_0_SDI_hb,
     #Now we create contribution based on mean SSDI --assuming that low male bias is the ancestral baseline condition
-    species_base_hb = species[which.min(abs(SSDI_hb - 0.0297))][1],
-    male_base_SDI_hb = mean_hb_male[which.min(abs(SSDI_hb - 0.0297))],
-    female_base_SDI_hb = mean_hb_female[which.min(abs(SSDI_hb - 0.0297))],
+    species_base_hb = species[which.min(abs(SSDI_hb - 0.0307))][1],
+    male_base_SDI_hb = mean_hb_male[which.min(abs(SSDI_hb - 0.0307))],
+    female_base_SDI_hb = mean_hb_female[which.min(abs(SSDI_hb - 0.0307))],
     diff_from_expected_hb_male_base = mean_hb_male - male_base_SDI_hb,
     diff_from_expected_hb_female_base = mean_hb_female - female_base_SDI_hb,
-    #Now we create contribution based off global mean hb whihc is probably no good
+    #Now we create contribution based off global mean hb which is probably no good
     diff_from_expected_hb_male_global_mean = mean_hb_male - 18,
     diff_from_expected_hb_female = mean_hb_female - female_0_SDI_hb,
     diff_from_expected_hb_female_global_mean = mean_hb_female - 18,

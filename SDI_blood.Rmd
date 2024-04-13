@@ -151,6 +151,7 @@ extrafont::loadfonts()
 #Load in functions
 source("~/Desktop/R_color_palettes/Gadek_custom_colors.R")
 source("~/Desktop/ggplot_themes/ggplot_themes.R")
+devtools::source_url("https://raw.github.com/tonybreyal/Blog-Reference-Functions/master/R/bingSearchXScraper/bingSearchXScraper.R")
 
 #set theme
 theme_set(theme_arial_clean())
@@ -178,7 +179,8 @@ seecol(list(h1, h2, h3, h4, h5),
        title = "Example palettes from hcl.colors(n = 10)", 
        pal_names = c("Dynamic", "Earth", "Berlin", "Fall",  "Sunset"))
 
-contr.col <- c(h2[1], h2[8], h1[3], h4[10])
+contr.col <- c(h2[6], h2[2], h1[3], h4[10], h2[9])
+
 
 ```
 Blood metrics (e.g. hemoglobin concentrations, Hct) are indicators of organism function with respect to oxygen transport. Reductions or increases in some blood metrics can reveal alternate physiological processes like reproduction or pathologist. Sexual differences in blood metrics seem to fluctuate with life history, among species but generally, when identified, female birds have lower hemoglobin/hct compared to males. This weak pattern has been attributed to the cost of female reprodcution and/or more directly the differential effects of sex hormones stimulate erythrocyte production and oestrogens inhibit it. Additionally hct reductions in females before egg laying has been attributed to increased blood volume coinciding with blood increases in egg yolk precursors. Importantly, many female hematocrits examined did not return to normal levels.
@@ -409,7 +411,7 @@ ggsave(p, file=paste0("figures/histogram_elev_SDI_hct_N_over_", thresh, ".pdf"),
 Data processing separate. If you want to adjust sample size used to calculate SDIs then need to rerun "Blood_SDI_Data_Wrangle.R
 
 ## Summarize contributions
-### Hb (zero-based family shift)
+### Hb (family compare)
 ```{r}
 
 df.cont%>%
@@ -418,7 +420,7 @@ df.cont%>%
 
 ```
 
-### Hct (zero based family shift)
+### Hct (family compare)
 ```{r}
 
 df.cont%>%
@@ -431,7 +433,7 @@ df.cont%>%
 ```{r}
 
 df.cont%>%
-  group_by(hb_cont_global)%>%
+  group_by(hb_cont_base)%>%
   dplyr::summarise(n=n())
 
 ```
@@ -2740,39 +2742,46 @@ barplot.phylo4d(bdsi.lipa.p4d, bar.col = (bsdi.lipa$p.value < 0.05) + 1, center 
 # Map contributions to trees
 ```{r}
 
-
 ## extract character of interest
-hb.cont <- df.contribution%>%
+hb.cont <- df.cont%>%
   filter(SSDI_hb <=0.8)%>%
-  dplyr::select(fam_SBD_hb_driver, birdtree)%>%
+  dplyr::select(hb_cont, birdtree)%>%
   na.omit()%>%
   column_to_rownames(var="birdtree")%>%
-  pull(fam_SBD_hb_driver)%>%
+  pull(hb_cont)%>%
   as.factor()
 
-hb.cont <- setNames(hb.cont, df.contribution%>%
-  dplyr::select(fam_SBD_hb_driver, birdtree)%>%
+hb.cont <- setNames(hb.cont, df.cont%>%
+  dplyr::select(hb_cont, birdtree)%>%
   na.omit()%>%
   pull(birdtree))
 
 tree <- read.tree("data/birds_mcc.tre")
-tree<-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+pgtn <-which(tree$tip.label=="Patagona_gigas")
 
+#bind to tree wherever gigas is
+tree <-bind.tip(tree, "Patagona_chaski", edge.length=NULL, where=624, position=2)
+
+#trim tree
 t <- keep.tip(tree, names(hb.cont))
 
-
+#set names for colors
 cols<-setNames(palette(contr.col)[1:length(levels(hb.cont))],
     levels(hb.cont))
+
+#reorder trait data
+hb.cont<-ReorderData(t, hb.cont, taxa.names="row names")
+
 ## then plot it:
 plotTree(t,type = "fan", ftype="i",fsize=0.5,color="darkgrey",
     offset=4.5)
 tiplabels(pie=to.matrix(hb.cont[t$tip.label],
-    levels(hb.cont)),piecol=cols,cex=0.3)
+    levels(hb.cont)),piecol=cols,cex=0.18)
 legend(x="bottomleft",levels(hb.cont),pch=22,
     pt.bg=cols,pt.cex=1.5,bty="n",cex=0.9)
 
-map.trees<-make.simmap(t,hb.cont,model="ER",
-    nsim=100)
+map.trees<-make.simmap(t,hb.cont, model="SYM",
+    nsim=10)
 
 ## next plot an outline tree:
 plotTree(t,type = "fan",ftype="i",fsize=0.5,offset=4.5,
@@ -2783,7 +2792,7 @@ plotTree(t,type = "fan",ftype="i",fsize=0.5,offset=4.5,
 ## now plot our 100 stochastic map trees
 ## with 99% transparency
 for(i in 1:length(map.trees)) plot(map.trees[[i]], type = "fan",
-    colors=sapply(cols,make.transparent,alpha=0.01),
+    colors=sapply(cols,make.transparent,alpha=0.1),
     add=TRUE,lwd=3,ftype="i",fsize=0.5,offset=4.5)
 par(fg="black")
 # nodelabels(pie=summary(map.trees)$ace,piecol=cols,
@@ -2794,8 +2803,6 @@ legend(x="bottomleft",levels(hb.cont),pch=22,
     pt.bg=cols,pt.cex=1.5,bty="n",cex=0.7)
 
 
-#reorder trait data
-hb.cont<-ReorderData(t, hb.cont, taxa.names="row names")
 
 ## create "contMap" object
 hb.contMap<-contMap(t,
