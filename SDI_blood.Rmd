@@ -165,6 +165,7 @@ results <- paste(getwd(), "/models/results/", sep="")
 
 # Set up come colors to use
 ```{r}
+
 n <- 10
 
 h1 <- hcl.colors(n, palette = "Dynamic")
@@ -195,6 +196,12 @@ df.cont <- read_csv("data/all_blood_cont.csv")
 
 df.gonads <- read_csv("data/gonads.csv")
 
+
+df.gonads%>%
+  ggplot(., aes(x = MONTH, hb, color=sex))+
+  geom_point()+
+  geom_smooth()
+  
 ```
 
 
@@ -211,6 +218,7 @@ df%>%
                    n_hct_males = sum(n_hct_male, na.rm=T),
                    total_hct = n_hct_females+n_hct_males)
 
+  
 ```
 
 ## Sample size by species
@@ -225,6 +233,8 @@ df%>%
                    n_hct_females = sum(n_hct_female, na.rm=T),
                    n_hct_males = sum(n_hct_male, na.rm=T),
                    total_hct = n_hct_females+n_hct_males)
+
+df
 
 ```
 
