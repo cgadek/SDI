@@ -1,11 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Macro_SSDI
+# SD
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of Macro_SSDI is to …
+This is where I store and develop scripts to evaulate sexual dimorphism in cryptic physiolgical traits like oxygen transport.
 
 ![Amniote SSDI](./figures/All_animals_SDI.png)
